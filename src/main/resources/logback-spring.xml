@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Define where to put logs. Great for local! -->
+    <property name="LOG_DIR" value="./logs" />
+    <property name="LOG_FILE_NAME" value="techgicus-ebiilling" />
+
+    <!-- Appender to write to the CONSOLE (for your IDE) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Appender to write to a FILE -->
+    <appender name="ROLLING-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${LOG_FILE_NAME}.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- Pattern for archived files -->
+            <fileNamePattern>${LOG_DIR}/archived/${LOG_FILE_NAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- COMMENT OUT DELETION: Keep all history locally -->
+            <!-- <maxHistory>7</maxHistory> -->
+            <!-- Roll over at 10MB - still useful to keep files small -->
+            <maxFileSize>10MB</maxFileSize>
+            <!-- COMMENT OUT THE TOTAL SIZE CAP -->
+            <!-- <totalSizeCap>3GB</totalSizeCap> -->
+        </rollingPolicy>
+    </appender>
+
+    <root level="info">
+        <!-- Print to IDE Console -->
+        <appender-ref ref="CONSOLE" />
+        <!-- Save to File -->
+        <appender-ref ref="ROLLING-FILE" />
+    </root>
+
+</configuration>

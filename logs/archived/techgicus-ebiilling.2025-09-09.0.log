@@ -1,0 +1,718 @@
+2025-09-09 11:27:03 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.2.Final
+2025-09-09 11:27:03 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - Starting TechgicusEbillingApplication using Java 24.0.1 with PID 22436 (D:\Techgicus_software\techgicus_ebilling\target\classes started by payal in D:\Techgicus_software\techgicus_ebilling)
+2025-09-09 11:27:03 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - No active profile set, falling back to 1 default profile: "default"
+2025-09-09 11:27:03 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-09-09 11:27:03 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-09-09 11:27:06 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-09 11:27:06 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 118 ms. Found 9 JPA repository interfaces.
+2025-09-09 11:27:07 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8007 (http)
+2025-09-09 11:27:07 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8007"]
+2025-09-09 11:27:07 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-09-09 11:27:07 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-09-09 11:27:07 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-09-09 11:27:07 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 4018 ms
+2025-09-09 11:27:08 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-09-09 11:27:08 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@1d707bc3
+2025-09-09 11:27:08 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-09-09 11:27:08 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-09 11:27:09 [restartedMain] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.8.Final
+2025-09-09 11:27:09 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-09-09 11:27:09 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-09 11:27:09 [restartedMain] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0.42
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-09-09 11:27:11 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-09 11:27:11 [restartedMain] DEBUG org.hibernate.SQL - create table party (party_id bigint not null auto_increment, billing_address varchar(255), created_at datetime(6), email_id varchar(255), gst_type enum ('REGISTED_BUSSINESS_COMPOSITION','REGISTERD_BUSSINESS_REGULAR','UNREGISTER_CONSUMER'), gstin bigint, shiping_address varchar(255), state enum ('ANDHRA_PRADESH','ARUNACHAL_PRADESH','ASSAM','BIHAR','CHHATTISGARH','GOA','GUJARAT','HARYANA','HIMACHAL_PRADESH','JHARKHAND','KARNATAKA','KERALA','MADHYA_PRADESH','MAHARASHTRA','MANIPUR','MEGHALAYA','MIZORAM','NAGALAND','ODISHA','OTHER','PUNJAB','RAJASTHAN','SIKKIM','TAMIL_NADU','TELANGANA','TRIPURA','UTTARAKHAND','UTTAR_PRADESH','WEST_BENGAL'), updated_at datetime(6), company_id bigint, primary key (party_id)) engine=InnoDB
+2025-09-09 11:27:11 [restartedMain] DEBUG org.hibernate.SQL - alter table party add constraint FKj22wrraen16hr0qk8r0d0p9wl foreign key (company_id) references company (company_id)
+2025-09-09 11:27:11 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-09 11:27:12 [restartedMain] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-09 11:27:13 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name daoAuthenticationProvider
+2025-09-09 11:27:13 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-09-09 11:27:14 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-09 11:27:15 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2025-09-09 11:27:15 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8007"]
+2025-09-09 11:27:15 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8007 (http) with context path '/'
+2025-09-09 11:27:15 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - Started TechgicusEbillingApplication in 12.525 seconds (process running for 13.496)
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 11:27:15 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 13:13:41 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=8m31s244ms411µs200ns).
+2025-09-09 14:11:21 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=6m9s131ms171µs300ns).
+2025-09-09 14:46:53 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=35m32s488ms805µs900ns).
+2025-09-09 14:49:37 [http-nio-8007-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-09-09 14:49:37 [http-nio-8007-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-09-09 14:49:37 [http-nio-8007-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 54 ms
+2025-09-09 14:49:37 [http-nio-8007-exec-1] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 14:49:37 [http-nio-8007-exec-2] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 14:49:37 [http-nio-8007-exec-3] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 14:49:37 [http-nio-8007-exec-5] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 14:49:37 [http-nio-8007-exec-4] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 14:49:37 [http-nio-8007-exec-6] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 14:49:38 [http-nio-8007-exec-7] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 14:49:38 [http-nio-8007-exec-8] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 14:49:41 [http-nio-8007-exec-8] INFO  o.s.api.AbstractOpenApiResource - Init duration for springdoc-openapi is: 2358 ms
+2025-09-09 15:01:11 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=11m47s418ms969µs900ns).
+2025-09-09 15:07:07 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-09-09 15:07:08 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-09-09 15:07:08 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-09 15:07:08 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-09-09 15:07:08 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-09-09 15:07:19 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.2.Final
+2025-09-09 15:07:19 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - Starting TechgicusEbillingApplication using Java 24.0.1 with PID 25904 (D:\Techgicus_software\techgicus_ebilling\target\classes started by payal in D:\Techgicus_software\techgicus_ebilling)
+2025-09-09 15:07:19 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - No active profile set, falling back to 1 default profile: "default"
+2025-09-09 15:07:19 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-09-09 15:07:19 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-09-09 15:07:22 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-09 15:07:22 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 124 ms. Found 9 JPA repository interfaces.
+2025-09-09 15:07:23 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8007 (http)
+2025-09-09 15:07:23 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8007"]
+2025-09-09 15:07:23 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-09-09 15:07:23 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-09-09 15:07:23 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-09-09 15:07:23 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3623 ms
+2025-09-09 15:07:23 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-09-09 15:07:24 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2d1dbd00
+2025-09-09 15:07:24 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-09-09 15:07:24 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-09 15:07:24 [restartedMain] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.8.Final
+2025-09-09 15:07:24 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-09-09 15:07:25 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-09 15:07:25 [restartedMain] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0.42
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-09-09 15:07:26 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-09 15:07:27 [restartedMain] DEBUG org.hibernate.SQL - alter table party add column phone_no varchar(255)
+2025-09-09 15:07:27 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-09 15:07:27 [restartedMain] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-09 15:07:29 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name daoAuthenticationProvider
+2025-09-09 15:07:29 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-09-09 15:07:30 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-09 15:07:31 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2025-09-09 15:07:31 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8007"]
+2025-09-09 15:07:31 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8007 (http) with context path '/'
+2025-09-09 15:07:31 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - Started TechgicusEbillingApplication in 12.436 seconds (process running for 13.285)
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:07:31 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:12:50 [http-nio-8007-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-09-09 15:12:50 [http-nio-8007-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-09-09 15:12:50 [http-nio-8007-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 3 ms
+2025-09-09 15:12:51 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:12:51 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:12:51 [http-nio-8007-exec-1] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:12:51 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select us1_0.user_subscription_id,us1_0.created_at,us1_0.duration_at_purchase,us1_0.end_date,us1_0.is_active,us1_0.is_cancelled,us1_0.isexpired,us1_0.name_at_purchase,us1_0.payment_status,us1_0.payment_type,us1_0.price_at_purchase,us1_0.start_date,us1_0.subscription_plan_id,us1_0.updated_at,us1_0.user_id from user_subscriptions us1_0 where us1_0.user_id=? and us1_0.is_active=1
+2025-09-09 15:12:51 [http-nio-8007-exec-1] WARN  o.s.w.s.m.s.DefaultHandlerExceptionResolver - Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Cannot deserialize value of type `java.lang.Long` from String "123er56yh": not a valid `java.lang.Long` value]
+2025-09-09 15:15:05 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-09-09 15:15:05 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-09-09 15:15:06 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-09 15:15:06 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-09-09 15:15:06 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-09-09 15:19:14 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.2.Final
+2025-09-09 15:19:14 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - Starting TechgicusEbillingApplication using Java 24.0.1 with PID 25364 (D:\Techgicus_software\techgicus_ebilling\target\classes started by payal in D:\Techgicus_software\techgicus_ebilling)
+2025-09-09 15:19:14 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - No active profile set, falling back to 1 default profile: "default"
+2025-09-09 15:19:14 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-09-09 15:19:14 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-09-09 15:19:16 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-09 15:19:16 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 134 ms. Found 9 JPA repository interfaces.
+2025-09-09 15:19:18 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8007 (http)
+2025-09-09 15:19:18 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8007"]
+2025-09-09 15:19:18 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-09-09 15:19:18 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-09-09 15:19:18 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-09-09 15:19:18 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3468 ms
+2025-09-09 15:19:18 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-09-09 15:19:19 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@411f6082
+2025-09-09 15:19:19 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-09-09 15:19:19 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-09 15:19:19 [restartedMain] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.8.Final
+2025-09-09 15:19:19 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-09-09 15:19:20 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-09 15:19:20 [restartedMain] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0.42
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-09-09 15:19:21 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-09 15:19:21 [restartedMain] DEBUG org.hibernate.SQL - create table party (party_id bigint not null auto_increment, billing_address varchar(255), created_at datetime(6), email_id varchar(255), gst_type enum ('REGISTED_BUSSINESS_COMPOSITION','REGISTERD_BUSSINESS_REGULAR','UNREGISTER_CONSUMER'), gstin varchar(255), phone_no varchar(255), shiping_address varchar(255), state enum ('ANDHRA_PRADESH','ARUNACHAL_PRADESH','ASSAM','BIHAR','CHHATTISGARH','GOA','GUJARAT','HARYANA','HIMACHAL_PRADESH','JHARKHAND','KARNATAKA','KERALA','MADHYA_PRADESH','MAHARASHTRA','MANIPUR','MEGHALAYA','MIZORAM','NAGALAND','ODISHA','OTHER','PUNJAB','RAJASTHAN','SIKKIM','TAMIL_NADU','TELANGANA','TRIPURA','UTTARAKHAND','UTTAR_PRADESH','WEST_BENGAL'), updated_at datetime(6), company_id bigint, primary key (party_id)) engine=InnoDB
+2025-09-09 15:19:21 [restartedMain] DEBUG org.hibernate.SQL - alter table party add constraint FKj22wrraen16hr0qk8r0d0p9wl foreign key (company_id) references company (company_id)
+2025-09-09 15:19:22 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-09 15:19:22 [restartedMain] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-09 15:19:23 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name daoAuthenticationProvider
+2025-09-09 15:19:23 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-09-09 15:19:24 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-09 15:19:25 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2025-09-09 15:19:25 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8007"]
+2025-09-09 15:19:25 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8007 (http) with context path '/'
+2025-09-09 15:19:25 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - Started TechgicusEbillingApplication in 11.745 seconds (process running for 12.438)
+2025-09-09 15:19:25 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:19:25 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:19:25 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:19:25 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:19:25 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:19:25 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:19:25 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:19:25 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:19:25 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:19:25 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:19:25 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:19:25 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:19:25 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:19:25 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:19:25 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:19:26 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:19:26 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:19:26 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:19:26 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:19:26 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:19:26 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:19:26 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:19:26 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:19:26 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:19:26 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:19:26 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:19:26 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:19:26 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:19:26 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:19:26 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:19:26 [restartedMain] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:19:26 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:19:31 [http-nio-8007-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-09-09 15:19:31 [http-nio-8007-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-09-09 15:19:31 [http-nio-8007-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2025-09-09 15:19:31 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:19:31 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:19:31 [http-nio-8007-exec-1] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:19:31 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select us1_0.user_subscription_id,us1_0.created_at,us1_0.duration_at_purchase,us1_0.end_date,us1_0.is_active,us1_0.is_cancelled,us1_0.isexpired,us1_0.name_at_purchase,us1_0.payment_status,us1_0.payment_type,us1_0.price_at_purchase,us1_0.start_date,us1_0.subscription_plan_id,us1_0.updated_at,us1_0.user_id from user_subscriptions us1_0 where us1_0.user_id=? and us1_0.is_active=1
+2025-09-09 15:19:58 [http-nio-8007-exec-3] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:19:58 [http-nio-8007-exec-3] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:19:58 [http-nio-8007-exec-3] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:20:41 [http-nio-8007-exec-4] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:20:41 [http-nio-8007-exec-4] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:20:41 [http-nio-8007-exec-4] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:20:41 [http-nio-8007-exec-4] DEBUG org.hibernate.SQL - select us1_0.user_subscription_id,us1_0.created_at,us1_0.duration_at_purchase,us1_0.end_date,us1_0.is_active,us1_0.is_cancelled,us1_0.isexpired,us1_0.name_at_purchase,us1_0.payment_status,us1_0.payment_type,us1_0.price_at_purchase,us1_0.start_date,us1_0.subscription_plan_id,us1_0.updated_at,us1_0.user_id from user_subscriptions us1_0 where us1_0.user_id=? and us1_0.is_active=1
+2025-09-09 15:21:08 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-09-09 15:21:08 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-09-09 15:21:08 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-09 15:21:08 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-09-09 15:21:08 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-09-09 15:21:14 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.2.Final
+2025-09-09 15:21:14 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - Starting TechgicusEbillingApplication using Java 24.0.1 with PID 23540 (D:\Techgicus_software\techgicus_ebilling\target\classes started by payal in D:\Techgicus_software\techgicus_ebilling)
+2025-09-09 15:21:14 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - No active profile set, falling back to 1 default profile: "default"
+2025-09-09 15:21:14 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-09-09 15:21:14 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-09-09 15:21:16 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-09 15:21:16 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 133 ms. Found 9 JPA repository interfaces.
+2025-09-09 15:21:17 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8007 (http)
+2025-09-09 15:21:17 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8007"]
+2025-09-09 15:21:17 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-09-09 15:21:17 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-09-09 15:21:17 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-09-09 15:21:17 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2980 ms
+2025-09-09 15:21:17 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-09-09 15:21:18 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@100e4baf
+2025-09-09 15:21:18 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-09-09 15:21:18 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-09 15:21:18 [restartedMain] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.8.Final
+2025-09-09 15:21:18 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-09-09 15:21:18 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-09 15:21:19 [restartedMain] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0.42
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-09-09 15:21:20 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-09 15:21:20 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-09 15:21:20 [restartedMain] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-09 15:21:21 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name daoAuthenticationProvider
+2025-09-09 15:21:21 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-09-09 15:21:22 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-09 15:21:23 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2025-09-09 15:21:23 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8007"]
+2025-09-09 15:21:23 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8007 (http) with context path '/'
+2025-09-09 15:21:23 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - Started TechgicusEbillingApplication in 10.146 seconds (process running for 10.799)
+2025-09-09 15:21:23 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:21:24 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:21:31 [http-nio-8007-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-09-09 15:21:31 [http-nio-8007-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-09-09 15:21:31 [http-nio-8007-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2025-09-09 15:21:31 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:21:31 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:21:31 [http-nio-8007-exec-1] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:21:31 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select us1_0.user_subscription_id,us1_0.created_at,us1_0.duration_at_purchase,us1_0.end_date,us1_0.is_active,us1_0.is_cancelled,us1_0.isexpired,us1_0.name_at_purchase,us1_0.payment_status,us1_0.payment_type,us1_0.price_at_purchase,us1_0.start_date,us1_0.subscription_plan_id,us1_0.updated_at,us1_0.user_id from user_subscriptions us1_0 where us1_0.user_id=? and us1_0.is_active=1
+2025-09-09 15:21:31 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select c1_0.company_id,c1_0.address,c1_0.business_description,c1_0.bussiness_category,c1_0.bussiness_name,c1_0.bussiness_type,c1_0.company_owner_id,co1_0.user_id,co1_0.created_at,co1_0.email,co1_0.password,r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role,co1_0.update_at,co1_0.user_name,c1_0.created_at,c1_0.email_id,c1_0.gstin,c1_0.logo_url,c1_0.phone_no,c1_0.signature_url,c1_0.state,c1_0.update_at from company c1_0 join users co1_0 on co1_0.user_id=c1_0.company_owner_id left join user_roles r1_0 on co1_0.user_id=r1_0.user_id left join roles r1_1 on r1_1.role_id=r1_0.role_id where c1_0.company_id=?
+2025-09-09 15:21:31 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - insert into party (billing_address,company_id,created_at,email_id,gst_type,gstin,phone_no,shiping_address,state,updated_at) values (?,?,?,?,?,?,?,?,?,?)
+2025-09-09 15:22:35 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-09-09 15:22:35 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-09-09 15:22:35 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-09 15:22:35 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-09-09 15:22:35 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-09-09 15:22:41 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.2.Final
+2025-09-09 15:22:41 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - Starting TechgicusEbillingApplication using Java 24.0.1 with PID 13208 (D:\Techgicus_software\techgicus_ebilling\target\classes started by payal in D:\Techgicus_software\techgicus_ebilling)
+2025-09-09 15:22:41 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - No active profile set, falling back to 1 default profile: "default"
+2025-09-09 15:22:42 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-09-09 15:22:42 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-09-09 15:22:43 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-09 15:22:43 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 126 ms. Found 9 JPA repository interfaces.
+2025-09-09 15:22:44 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8007 (http)
+2025-09-09 15:22:44 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8007"]
+2025-09-09 15:22:45 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-09-09 15:22:45 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-09-09 15:22:45 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-09-09 15:22:45 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3103 ms
+2025-09-09 15:22:45 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-09-09 15:22:45 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@411f6082
+2025-09-09 15:22:45 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-09-09 15:22:45 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-09 15:22:46 [restartedMain] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.8.Final
+2025-09-09 15:22:46 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-09-09 15:22:46 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-09 15:22:46 [restartedMain] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0.42
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-09-09 15:22:48 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-09 15:22:48 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-09 15:22:48 [restartedMain] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-09 15:22:49 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name daoAuthenticationProvider
+2025-09-09 15:22:49 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-09-09 15:22:50 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-09 15:22:52 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2025-09-09 15:22:52 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8007"]
+2025-09-09 15:22:52 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8007 (http) with context path '/'
+2025-09-09 15:22:52 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - Started TechgicusEbillingApplication in 11.17 seconds (process running for 11.848)
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:22:52 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:22:59 [http-nio-8007-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-09-09 15:22:59 [http-nio-8007-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-09-09 15:22:59 [http-nio-8007-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2025-09-09 15:22:59 [http-nio-8007-exec-2] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:22:59 [http-nio-8007-exec-2] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:22:59 [http-nio-8007-exec-2] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:22:59 [http-nio-8007-exec-2] DEBUG org.hibernate.SQL - select us1_0.user_subscription_id,us1_0.created_at,us1_0.duration_at_purchase,us1_0.end_date,us1_0.is_active,us1_0.is_cancelled,us1_0.isexpired,us1_0.name_at_purchase,us1_0.payment_status,us1_0.payment_type,us1_0.price_at_purchase,us1_0.start_date,us1_0.subscription_plan_id,us1_0.updated_at,us1_0.user_id from user_subscriptions us1_0 where us1_0.user_id=? and us1_0.is_active=1
+2025-09-09 15:23:00 [http-nio-8007-exec-2] DEBUG org.hibernate.SQL - select c1_0.company_id,c1_0.address,c1_0.business_description,c1_0.bussiness_category,c1_0.bussiness_name,c1_0.bussiness_type,c1_0.company_owner_id,co1_0.user_id,co1_0.created_at,co1_0.email,co1_0.password,r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role,co1_0.update_at,co1_0.user_name,c1_0.created_at,c1_0.email_id,c1_0.gstin,c1_0.logo_url,c1_0.phone_no,c1_0.signature_url,c1_0.state,c1_0.update_at from company c1_0 join users co1_0 on co1_0.user_id=c1_0.company_owner_id left join user_roles r1_0 on co1_0.user_id=r1_0.user_id left join roles r1_1 on r1_1.role_id=r1_0.role_id where c1_0.company_id=?
+2025-09-09 15:23:00 [http-nio-8007-exec-2] DEBUG org.hibernate.SQL - insert into party (billing_address,company_id,created_at,email_id,gst_type,gstin,phone_no,shiping_address,state,updated_at) values (?,?,?,?,?,?,?,?,?,?)
+2025-09-09 15:29:27 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-09-09 15:29:27 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-09-09 15:29:27 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-09 15:29:27 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-09-09 15:29:27 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-09-09 15:29:35 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.2.Final
+2025-09-09 15:29:35 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - Starting TechgicusEbillingApplication using Java 24.0.1 with PID 2280 (D:\Techgicus_software\techgicus_ebilling\target\classes started by payal in D:\Techgicus_software\techgicus_ebilling)
+2025-09-09 15:29:35 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - No active profile set, falling back to 1 default profile: "default"
+2025-09-09 15:29:35 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-09-09 15:29:35 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-09-09 15:29:37 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-09 15:29:37 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 144 ms. Found 9 JPA repository interfaces.
+2025-09-09 15:29:38 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8007 (http)
+2025-09-09 15:29:38 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8007"]
+2025-09-09 15:29:38 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-09-09 15:29:38 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-09-09 15:29:39 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-09-09 15:29:39 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3678 ms
+2025-09-09 15:29:39 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-09-09 15:29:39 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7f653683
+2025-09-09 15:29:39 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-09-09 15:29:39 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-09 15:29:40 [restartedMain] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.8.Final
+2025-09-09 15:29:40 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-09-09 15:29:41 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-09 15:29:41 [restartedMain] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0.42
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-09-09 15:29:44 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-09 15:29:44 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-09 15:29:45 [restartedMain] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-09 15:29:47 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name daoAuthenticationProvider
+2025-09-09 15:29:47 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-09-09 15:29:50 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-09 15:29:52 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2025-09-09 15:29:52 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8007"]
+2025-09-09 15:29:52 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8007 (http) with context path '/'
+2025-09-09 15:29:52 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - Started TechgicusEbillingApplication in 18.109 seconds (process running for 18.913)
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:29:52 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:29:53 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:29:53 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:29:53 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:29:53 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:29:53 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:29:53 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:29:53 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:29:53 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:29:53 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:29:53 [restartedMain] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:29:53 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:30:23 [http-nio-8007-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-09-09 15:30:23 [http-nio-8007-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-09-09 15:30:23 [http-nio-8007-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 3 ms
+2025-09-09 15:30:24 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:30:24 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:30:24 [http-nio-8007-exec-1] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:30:24 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select us1_0.user_subscription_id,us1_0.created_at,us1_0.duration_at_purchase,us1_0.end_date,us1_0.is_active,us1_0.is_cancelled,us1_0.isexpired,us1_0.name_at_purchase,us1_0.payment_status,us1_0.payment_type,us1_0.price_at_purchase,us1_0.start_date,us1_0.subscription_plan_id,us1_0.updated_at,us1_0.user_id from user_subscriptions us1_0 where us1_0.user_id=? and us1_0.is_active=1
+2025-09-09 15:30:24 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select c1_0.company_id,c1_0.address,c1_0.business_description,c1_0.bussiness_category,c1_0.bussiness_name,c1_0.bussiness_type,c1_0.company_owner_id,co1_0.user_id,co1_0.created_at,co1_0.email,co1_0.password,r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role,co1_0.update_at,co1_0.user_name,c1_0.created_at,c1_0.email_id,c1_0.gstin,c1_0.logo_url,c1_0.phone_no,c1_0.signature_url,c1_0.state,c1_0.update_at from company c1_0 join users co1_0 on co1_0.user_id=c1_0.company_owner_id left join user_roles r1_0 on co1_0.user_id=r1_0.user_id left join roles r1_1 on r1_1.role_id=r1_0.role_id where c1_0.company_id=?
+2025-09-09 15:30:24 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - insert into party (billing_address,company_id,created_at,email_id,gst_type,gstin,phone_no,shiping_address,state,updated_at) values (?,?,?,?,?,?,?,?,?,?)
+2025-09-09 15:31:29 [http-nio-8007-exec-5] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:31:29 [http-nio-8007-exec-5] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:31:29 [http-nio-8007-exec-5] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:31:29 [http-nio-8007-exec-5] DEBUG org.hibernate.SQL - select us1_0.user_subscription_id,us1_0.created_at,us1_0.duration_at_purchase,us1_0.end_date,us1_0.is_active,us1_0.is_cancelled,us1_0.isexpired,us1_0.name_at_purchase,us1_0.payment_status,us1_0.payment_type,us1_0.price_at_purchase,us1_0.start_date,us1_0.subscription_plan_id,us1_0.updated_at,us1_0.user_id from user_subscriptions us1_0 where us1_0.user_id=? and us1_0.is_active=1
+2025-09-09 15:31:29 [http-nio-8007-exec-5] DEBUG org.hibernate.SQL - select c1_0.company_id,c1_0.address,c1_0.business_description,c1_0.bussiness_category,c1_0.bussiness_name,c1_0.bussiness_type,c1_0.company_owner_id,co1_0.user_id,co1_0.created_at,co1_0.email,co1_0.password,r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role,co1_0.update_at,co1_0.user_name,c1_0.created_at,c1_0.email_id,c1_0.gstin,c1_0.logo_url,c1_0.phone_no,c1_0.signature_url,c1_0.state,c1_0.update_at from company c1_0 join users co1_0 on co1_0.user_id=c1_0.company_owner_id left join user_roles r1_0 on co1_0.user_id=r1_0.user_id left join roles r1_1 on r1_1.role_id=r1_0.role_id where c1_0.company_id=?
+2025-09-09 15:31:29 [http-nio-8007-exec-5] DEBUG org.hibernate.SQL - select p1_0.party_id,p1_0.billing_address,p1_0.company_id,p1_0.created_at,p1_0.email_id,p1_0.gst_type,p1_0.gstin,p1_0.phone_no,p1_0.shiping_address,p1_0.state,p1_0.updated_at from party p1_0 where p1_0.company_id=?
+2025-09-09 15:43:04 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-09-09 15:43:04 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-09-09 15:43:04 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-09 15:43:04 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-09-09 15:43:04 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-09-09 15:43:14 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.2.Final
+2025-09-09 15:43:14 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - Starting TechgicusEbillingApplication using Java 24.0.1 with PID 5872 (D:\Techgicus_software\techgicus_ebilling\target\classes started by payal in D:\Techgicus_software\techgicus_ebilling)
+2025-09-09 15:43:14 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - No active profile set, falling back to 1 default profile: "default"
+2025-09-09 15:43:14 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-09-09 15:43:14 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-09-09 15:43:17 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-09 15:43:17 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 146 ms. Found 9 JPA repository interfaces.
+2025-09-09 15:43:19 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8007 (http)
+2025-09-09 15:43:19 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8007"]
+2025-09-09 15:43:19 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-09-09 15:43:19 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-09-09 15:43:19 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-09-09 15:43:19 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 4595 ms
+2025-09-09 15:43:19 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-09-09 15:43:20 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@4119ae1f
+2025-09-09 15:43:20 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-09-09 15:43:20 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-09 15:43:21 [restartedMain] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.8.Final
+2025-09-09 15:43:21 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-09-09 15:43:21 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-09 15:43:21 [restartedMain] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0.42
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-09-09 15:43:23 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-09 15:43:23 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-09 15:43:23 [restartedMain] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-09 15:43:24 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name daoAuthenticationProvider
+2025-09-09 15:43:24 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-09-09 15:43:25 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-09 15:43:26 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2025-09-09 15:43:26 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8007"]
+2025-09-09 15:43:26 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8007 (http) with context path '/'
+2025-09-09 15:43:26 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - Started TechgicusEbillingApplication in 14.159 seconds (process running for 15.891)
+2025-09-09 15:43:26 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:43:27 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:43:55 [http-nio-8007-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-09-09 15:43:55 [http-nio-8007-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-09-09 15:43:55 [http-nio-8007-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2025-09-09 15:43:55 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:43:55 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:43:55 [http-nio-8007-exec-1] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:43:55 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select us1_0.user_subscription_id,us1_0.created_at,us1_0.duration_at_purchase,us1_0.end_date,us1_0.is_active,us1_0.is_cancelled,us1_0.isexpired,us1_0.name_at_purchase,us1_0.payment_status,us1_0.payment_type,us1_0.price_at_purchase,us1_0.start_date,us1_0.subscription_plan_id,us1_0.updated_at,us1_0.user_id from user_subscriptions us1_0 where us1_0.user_id=? and us1_0.is_active=1
+2025-09-09 15:43:55 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select p1_0.party_id,p1_0.billing_address,c1_0.company_id,c1_0.address,c1_0.business_description,c1_0.bussiness_category,c1_0.bussiness_name,c1_0.bussiness_type,c1_0.company_owner_id,co1_0.user_id,co1_0.created_at,co1_0.email,co1_0.password,co1_0.update_at,co1_0.user_name,c1_0.created_at,c1_0.email_id,c1_0.gstin,c1_0.logo_url,c1_0.phone_no,c1_0.signature_url,c1_0.state,c1_0.update_at,p1_0.created_at,p1_0.email_id,p1_0.gst_type,p1_0.gstin,p1_0.phone_no,p1_0.shiping_address,p1_0.state,p1_0.updated_at from party p1_0 left join company c1_0 on c1_0.company_id=p1_0.company_id left join users co1_0 on co1_0.user_id=c1_0.company_owner_id where p1_0.party_id=?
+2025-09-09 15:43:55 [http-nio-8007-exec-1] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:44:02 [http-nio-8007-exec-3] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:44:02 [http-nio-8007-exec-3] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:44:02 [http-nio-8007-exec-3] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:44:02 [http-nio-8007-exec-3] DEBUG org.hibernate.SQL - select us1_0.user_subscription_id,us1_0.created_at,us1_0.duration_at_purchase,us1_0.end_date,us1_0.is_active,us1_0.is_cancelled,us1_0.isexpired,us1_0.name_at_purchase,us1_0.payment_status,us1_0.payment_type,us1_0.price_at_purchase,us1_0.start_date,us1_0.subscription_plan_id,us1_0.updated_at,us1_0.user_id from user_subscriptions us1_0 where us1_0.user_id=? and us1_0.is_active=1
+2025-09-09 15:44:02 [http-nio-8007-exec-3] DEBUG org.hibernate.SQL - select p1_0.party_id,p1_0.billing_address,c1_0.company_id,c1_0.address,c1_0.business_description,c1_0.bussiness_category,c1_0.bussiness_name,c1_0.bussiness_type,c1_0.company_owner_id,co1_0.user_id,co1_0.created_at,co1_0.email,co1_0.password,co1_0.update_at,co1_0.user_name,c1_0.created_at,c1_0.email_id,c1_0.gstin,c1_0.logo_url,c1_0.phone_no,c1_0.signature_url,c1_0.state,c1_0.update_at,p1_0.created_at,p1_0.email_id,p1_0.gst_type,p1_0.gstin,p1_0.phone_no,p1_0.shiping_address,p1_0.state,p1_0.updated_at from party p1_0 left join company c1_0 on c1_0.company_id=p1_0.company_id left join users co1_0 on co1_0.user_id=c1_0.company_owner_id where p1_0.party_id=?
+2025-09-09 15:44:02 [http-nio-8007-exec-3] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:46:44 [http-nio-8007-exec-6] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:46:45 [http-nio-8007-exec-6] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:46:45 [http-nio-8007-exec-6] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:46:45 [http-nio-8007-exec-6] DEBUG org.hibernate.SQL - select us1_0.user_subscription_id,us1_0.created_at,us1_0.duration_at_purchase,us1_0.end_date,us1_0.is_active,us1_0.is_cancelled,us1_0.isexpired,us1_0.name_at_purchase,us1_0.payment_status,us1_0.payment_type,us1_0.price_at_purchase,us1_0.start_date,us1_0.subscription_plan_id,us1_0.updated_at,us1_0.user_id from user_subscriptions us1_0 where us1_0.user_id=? and us1_0.is_active=1
+2025-09-09 15:46:45 [http-nio-8007-exec-6] DEBUG org.hibernate.SQL - select p1_0.party_id,p1_0.billing_address,c1_0.company_id,c1_0.address,c1_0.business_description,c1_0.bussiness_category,c1_0.bussiness_name,c1_0.bussiness_type,c1_0.company_owner_id,co1_0.user_id,co1_0.created_at,co1_0.email,co1_0.password,co1_0.update_at,co1_0.user_name,c1_0.created_at,c1_0.email_id,c1_0.gstin,c1_0.logo_url,c1_0.phone_no,c1_0.signature_url,c1_0.state,c1_0.update_at,p1_0.created_at,p1_0.email_id,p1_0.gst_type,p1_0.gstin,p1_0.phone_no,p1_0.shiping_address,p1_0.state,p1_0.updated_at from party p1_0 left join company c1_0 on c1_0.company_id=p1_0.company_id left join users co1_0 on co1_0.user_id=c1_0.company_owner_id where p1_0.party_id=?
+2025-09-09 15:46:45 [http-nio-8007-exec-6] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:46:45 [http-nio-8007-exec-6] DEBUG org.hibernate.SQL - update party set billing_address=?,company_id=?,created_at=?,email_id=?,gst_type=?,gstin=?,phone_no=?,shiping_address=?,state=?,updated_at=? where party_id=?
+2025-09-09 15:47:26 [http-nio-8007-exec-7] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:47:26 [http-nio-8007-exec-7] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:47:26 [http-nio-8007-exec-7] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:47:26 [http-nio-8007-exec-7] DEBUG org.hibernate.SQL - select us1_0.user_subscription_id,us1_0.created_at,us1_0.duration_at_purchase,us1_0.end_date,us1_0.is_active,us1_0.is_cancelled,us1_0.isexpired,us1_0.name_at_purchase,us1_0.payment_status,us1_0.payment_type,us1_0.price_at_purchase,us1_0.start_date,us1_0.subscription_plan_id,us1_0.updated_at,us1_0.user_id from user_subscriptions us1_0 where us1_0.user_id=? and us1_0.is_active=1
+2025-09-09 15:47:26 [http-nio-8007-exec-7] DEBUG org.hibernate.SQL - select p1_0.party_id,p1_0.billing_address,c1_0.company_id,c1_0.address,c1_0.business_description,c1_0.bussiness_category,c1_0.bussiness_name,c1_0.bussiness_type,c1_0.company_owner_id,co1_0.user_id,co1_0.created_at,co1_0.email,co1_0.password,co1_0.update_at,co1_0.user_name,c1_0.created_at,c1_0.email_id,c1_0.gstin,c1_0.logo_url,c1_0.phone_no,c1_0.signature_url,c1_0.state,c1_0.update_at,p1_0.created_at,p1_0.email_id,p1_0.gst_type,p1_0.gstin,p1_0.phone_no,p1_0.shiping_address,p1_0.state,p1_0.updated_at from party p1_0 left join company c1_0 on c1_0.company_id=p1_0.company_id left join users co1_0 on co1_0.user_id=c1_0.company_owner_id where p1_0.party_id=?
+2025-09-09 15:47:26 [http-nio-8007-exec-7] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:47:26 [http-nio-8007-exec-7] DEBUG org.hibernate.SQL - delete from party where party_id=?
+2025-09-09 15:49:32 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-09-09 15:49:32 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-09-09 15:49:32 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-09 15:49:32 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-09-09 15:49:32 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-09-09 15:49:40 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.2.Final
+2025-09-09 15:49:40 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - Starting TechgicusEbillingApplication using Java 24.0.1 with PID 22612 (D:\Techgicus_software\techgicus_ebilling\target\classes started by payal in D:\Techgicus_software\techgicus_ebilling)
+2025-09-09 15:49:40 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - No active profile set, falling back to 1 default profile: "default"
+2025-09-09 15:49:40 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-09-09 15:49:40 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-09-09 15:49:42 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-09 15:49:42 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 128 ms. Found 9 JPA repository interfaces.
+2025-09-09 15:49:44 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8007 (http)
+2025-09-09 15:49:44 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8007"]
+2025-09-09 15:49:44 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-09-09 15:49:44 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.36]
+2025-09-09 15:49:44 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-09-09 15:49:44 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3791 ms
+2025-09-09 15:49:44 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-09-09 15:49:45 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@140e8146
+2025-09-09 15:49:45 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-09-09 15:49:45 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-09 15:49:45 [restartedMain] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.8.Final
+2025-09-09 15:49:45 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-09-09 15:49:46 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-09 15:49:46 [restartedMain] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0.42
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-09-09 15:49:48 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-09 15:49:48 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-09 15:49:48 [restartedMain] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-09 15:49:50 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name daoAuthenticationProvider
+2025-09-09 15:49:50 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-09-09 15:49:52 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-09 15:49:53 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2025-09-09 15:49:53 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8007"]
+2025-09-09 15:49:53 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8007 (http) with context path '/'
+2025-09-09 15:49:53 [restartedMain] INFO  c.e.t.t.TechgicusEbillingApplication - Started TechgicusEbillingApplication in 14.51 seconds (process running for 15.268)
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select f1_0.feature_id,f1_0.code,f1_0.description,f1_0.name,f1_0.premium from features f1_0 where f1_0.code=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select sp1_0.subscription_plan_id,sp1_0.description,sp1_0.duration_days,sp1_0.is_active,sp1_0.name,sp1_0.price from subscription_plans sp1_0 where sp1_0.name=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select pfl1_0.plan_feature_limit_id,pfl1_0.boolean_limit,pfl1_0.feature_id,pfl1_0.limit_type,pfl1_0.plan_id,pfl1_0.usage_limit from plan_feature_limits pfl1_0 where pfl1_0.plan_id=? and pfl1_0.feature_id=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.role_id,r1_0.description,r1_0.role_name,r1_0.is_system_role from roles r1_0 where r1_0.role_name=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select u1_0.user_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.update_at,u1_0.user_name from users u1_0 where u1_0.email=?
+2025-09-09 15:49:54 [restartedMain] DEBUG org.hibernate.SQL - select r1_0.user_id,r1_1.role_id,r1_1.description,r1_1.role_name,r1_1.is_system_role from user_roles r1_0 join roles r1_1 on r1_1.role_id=r1_0.role_id where r1_0.user_id=?
+2025-09-09 15:51:07 [http-nio-8007-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-09-09 15:51:07 [http-nio-8007-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-09-09 15:51:07 [http-nio-8007-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 18 ms
+2025-09-09 15:51:07 [http-nio-8007-exec-1] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:51:07 [http-nio-8007-exec-2] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:51:07 [http-nio-8007-exec-5] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:51:07 [http-nio-8007-exec-6] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:51:07 [http-nio-8007-exec-3] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:51:07 [http-nio-8007-exec-4] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:51:07 [http-nio-8007-exec-10] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:51:07 [http-nio-8007-exec-9] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:51:07 [http-nio-8007-exec-1] INFO  c.e.t.t.filter.SubscriptionFilter - inside the subscription filter
+2025-09-09 15:51:08 [http-nio-8007-exec-1] INFO  o.s.api.AbstractOpenApiResource - Init duration for springdoc-openapi is: 1071 ms
+2025-09-09 16:37:30 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-09-09 16:37:30 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-09-09 16:37:30 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-09 16:37:30 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-09-09 16:37:30 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
