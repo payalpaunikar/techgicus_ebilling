@@ -13,11 +13,13 @@ public class SaleItemRequest {
     private Double pricePerUnit;
     private TaxType pricePerUnitTaxType;
     private TaxRate taxRate;
+    private Double taxAmount;
+    private Double totalAmount;
 
     public SaleItemRequest() {
     }
 
-    public SaleItemRequest(String itemName, String itemHsnCode, String itemDescription, Integer quantity, Unit unit, Double pricePerUnit, TaxType pricePerUnitTaxType, TaxRate taxRate) {
+    public SaleItemRequest(String itemName, String itemHsnCode, String itemDescription, Integer quantity, Unit unit, Double pricePerUnit, TaxType pricePerUnitTaxType, TaxRate taxRate, Double taxAmount, Double totalAmount) {
         this.itemName = itemName;
         this.itemHsnCode = itemHsnCode;
         this.itemDescription = itemDescription;
@@ -26,6 +28,8 @@ public class SaleItemRequest {
         this.pricePerUnit = pricePerUnit;
         this.pricePerUnitTaxType = pricePerUnitTaxType;
         this.taxRate = taxRate;
+        this.taxAmount = taxAmount;
+        this.totalAmount = totalAmount;
     }
 
     public String getItemName() {
@@ -90,5 +94,21 @@ public class SaleItemRequest {
 
     public void setTaxRate(TaxRate taxRate) {
         this.taxRate = taxRate;
+    }
+
+    public Double getTaxAmount() {
+        return taxAmount;
+    }
+
+    public void setTaxAmount(Double taxAmount) {
+        this.taxAmount = taxAmount;
+    }
+
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
     }
 }

@@ -34,6 +34,28 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND,exception.getMessage());
     }
 
+
+    @ExceptionHandler(InvalidPaymentAmountException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidPaymentAmountException(InvalidPaymentAmountException exception){
+        return buildResponse(HttpStatus.BAD_REQUEST,exception.getMessage());
+    }
+
+
+    @ExceptionHandler(QuotationAlreadyClosedException.class)
+    public ResponseEntity<ErrorResponse> handleQuotationAlreadyClosedException(QuotationAlreadyClosedException exception){
+        return buildResponse(HttpStatus.BAD_REQUEST,exception.getMessage());
+    }
+
+    @ExceptionHandler(SaleOrderAlreadyClosedException.class)
+    public ResponseEntity<ErrorResponse> handleSaleOrderAlreadyClosedException(SaleOrderAlreadyClosedException exception){
+        return buildResponse(HttpStatus.BAD_REQUEST,exception.getMessage());
+    }
+
+    @ExceptionHandler(PurchaseOrderAlreadyClosedException.class)
+    public ResponseEntity<ErrorResponse> handlePurchaseOrderAlreadyClosedException(PurchaseOrderAlreadyClosedException exception){
+        return buildResponse(HttpStatus.BAD_REQUEST,exception.getMessage());
+    }
+
     public ResponseEntity<ErrorResponse> buildResponse(HttpStatus httpStatus, String message){
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(LocalDateTime.now());

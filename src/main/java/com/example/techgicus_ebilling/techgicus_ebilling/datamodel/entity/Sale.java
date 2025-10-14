@@ -5,7 +5,12 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.S
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.State;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -20,8 +25,8 @@ public class Sale {
 
     private String invoiceNumber;
 
-    private LocalDateTime invoceDateAndTime;
-    private LocalDateTime dueDateAndTime;
+    private LocalDate invoceDate;
+    private LocalDate dueDate;
 
     @Enumerated(EnumType.STRING)
     private SaleType saleType;
@@ -40,7 +45,7 @@ public class Sale {
 
     private Double deliveryCharges;
 
-    private Double roundOffAmount;
+  //  private Double roundOffAmount;
 
     private Double totalAmount;
 
@@ -52,19 +57,34 @@ public class Sale {
 
     private Boolean isOverdue;
 
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
+
+    @ManyToOne
+    @JoinColumn(name = "party_id")
+    private Party party;
+
+    @OneToMany(mappedBy = "sale",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<SaleItem> saleItem = new ArrayList<>();
+
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SalePayment> salePayments = new ArrayList<>();
+
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public Sale() {
     }
 
-    public Sale(Long saleId, String billingAddress, String shippingAddress, String invoiceNumber, LocalDateTime invoceDateAndTime, LocalDateTime dueDateAndTime, SaleType saleType, State stateOfSupply, PaymentType paymentType, String paymentDescription, Double totalAmountWithoutTax, Double totalTaxAmount, Double deliveryCharges, Double roundOffAmount, Double totalAmount, Double receivedAmount, Double balance, Boolean isPaid, Boolean isOverdue, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Sale(Long saleId, String billingAddress, String shippingAddress, String invoiceNumber, LocalDate invoceDate, LocalDate dueDate, SaleType saleType, State stateOfSupply, PaymentType paymentType, String paymentDescription, Double totalAmountWithoutTax, Double totalTaxAmount, Double deliveryCharges, Double totalAmount, Double receivedAmount, Double balance, Boolean isPaid, Boolean isOverdue, Company company, Party party, List<SaleItem> saleItem, List<SalePayment> salePayments, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.saleId = saleId;
         this.billingAddress = billingAddress;
         this.shippingAddress = shippingAddress;
         this.invoiceNumber = invoiceNumber;
-        this.invoceDateAndTime = invoceDateAndTime;
-        this.dueDateAndTime = dueDateAndTime;
+        this.invoceDate = invoceDate;
+        this.dueDate = dueDate;
         this.saleType = saleType;
         this.stateOfSupply = stateOfSupply;
         this.paymentType = paymentType;
@@ -72,12 +92,15 @@ public class Sale {
         this.totalAmountWithoutTax = totalAmountWithoutTax;
         this.totalTaxAmount = totalTaxAmount;
         this.deliveryCharges = deliveryCharges;
-        this.roundOffAmount = roundOffAmount;
         this.totalAmount = totalAmount;
         this.receivedAmount = receivedAmount;
         this.balance = balance;
         this.isPaid = isPaid;
         this.isOverdue = isOverdue;
+        this.company = company;
+        this.party = party;
+        this.saleItem = saleItem;
+        this.salePayments = salePayments;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -114,20 +137,20 @@ public class Sale {
         this.invoiceNumber = invoiceNumber;
     }
 
-    public LocalDateTime getInvoceDateAndTime() {
-        return invoceDateAndTime;
+    public LocalDate getInvoceDate() {
+        return invoceDate;
     }
 
-    public void setInvoceDateAndTime(LocalDateTime invoceDateAndTime) {
-        this.invoceDateAndTime = invoceDateAndTime;
+    public void setInvoceDate(LocalDate invoceDate) {
+        this.invoceDate = invoceDate;
     }
 
-    public LocalDateTime getDueDateAndTime() {
-        return dueDateAndTime;
+    public LocalDate getDueDate() {
+        return dueDate;
     }
 
-    public void setDueDateAndTime(LocalDateTime dueDateAndTime) {
-        this.dueDateAndTime = dueDateAndTime;
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
     }
 
     public SaleType getSaleType() {
@@ -186,13 +209,13 @@ public class Sale {
         this.deliveryCharges = deliveryCharges;
     }
 
-    public Double getRoundOffAmount() {
-        return roundOffAmount;
-    }
-
-    public void setRoundOffAmount(Double roundOffAmount) {
-        this.roundOffAmount = roundOffAmount;
-    }
+//    public Double getRoundOffAmount() {
+//        return roundOffAmount;
+//    }
+//
+//    public void setRoundOffAmount(Double roundOffAmount) {
+//        this.roundOffAmount = roundOffAmount;
+//    }
 
     public Double getTotalAmount() {
         return totalAmount;
@@ -248,5 +271,37 @@ public class Sale {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
+    }
+
+    public Party getParty() {
+        return party;
+    }
+
+    public void setParty(Party party) {
+        this.party = party;
+    }
+
+    public List<SaleItem> getSaleItem() {
+        return saleItem;
+    }
+
+    public void setSaleItem(List<SaleItem> saleItem) {
+        this.saleItem = saleItem;
+    }
+
+    public List<SalePayment> getSalePayments() {
+        return salePayments;
+    }
+
+    public void setSalePayments(List<SalePayment> salePayments) {
+        this.salePayments = salePayments;
     }
 }

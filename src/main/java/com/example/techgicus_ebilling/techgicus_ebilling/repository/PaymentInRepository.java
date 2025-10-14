@@ -1,0 +1,30 @@
+package com.example.techgicus_ebilling.techgicus_ebilling.repository;
+
+
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.PaymentIn;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Repository
+public interface PaymentInRepository extends JpaRepository<PaymentIn,Long> {
+
+
+    @Query("""
+        SELECT p FROM PaymentIn p 
+        WHERE p.company.companyId = :companyId
+        AND (:partyId IS NULL OR p.party.partyId = :partyId)
+        AND p.paymentDate BETWEEN :startDate AND :endDate
+        Order by p.paymentDate DESC
+    """)
+    List<PaymentIn> findPaymentsByFilters(
+            @Param("companyId") Long companyId,
+            @Param("partyId") Long partyId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+}
