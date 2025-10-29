@@ -14,6 +14,16 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface PartyMapper {
 
+//    Party convertRequestIntoEntity(PartyRequestDto partyRequestDto);
+//
+//    PartyResponseDto convertEntityIntoResponse(Party party);
+//
+//    List<PartyResponseDto> convertPartiesIntoPartyResponses(List<Party> parties);
+//
+//
+//    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+//    void updatePartyFromRequest(PartyRequestDto partyRequestDto, @MappingTarget Party party);
+
     Party convertRequestIntoEntity(PartyRequestDto partyRequestDto);
 
     PartyResponseDto convertEntityIntoResponse(Party party);

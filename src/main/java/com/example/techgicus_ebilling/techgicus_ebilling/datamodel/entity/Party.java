@@ -14,6 +14,8 @@ public class Party {
      @GeneratedValue(strategy = GenerationType.IDENTITY)
      private Long partyId;
 
+     private String name;
+
      private String gstin;
 
      private String phoneNo;
@@ -41,8 +43,9 @@ public class Party {
     public Party() {
     }
 
-    public Party(Long partyId, String gstin, String phoneNo, GstType gstType, State state, String emailId, String billingAddress, String shipingAddress, LocalDateTime createdAt, LocalDateTime updatedAt, Company company) {
+    public Party(Long partyId, String name, String gstin, String phoneNo, GstType gstType, State state, String emailId, String billingAddress, String shipingAddress, LocalDateTime createdAt, LocalDateTime updatedAt, Company company) {
         this.partyId = partyId;
+        this.name = name;
         this.gstin = gstin;
         this.phoneNo = phoneNo;
         this.gstType = gstType;
@@ -54,7 +57,6 @@ public class Party {
         this.updatedAt = updatedAt;
         this.company = company;
     }
-
 
     public Long getPartyId() {
         return partyId;
@@ -142,5 +144,13 @@ public class Party {
 
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

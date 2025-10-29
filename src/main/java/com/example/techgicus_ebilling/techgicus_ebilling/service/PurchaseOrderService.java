@@ -181,7 +181,7 @@ public class PurchaseOrderService {
                 .orElseThrow(()-> new ResourceNotFoundException("Purchase order is not found with id : "+purchaseOrderId));
 
         if(purchaseOrder.getOrderType().equals(OrderType.CLOSE)){
-            throw new PurchaseOrderAlreadyClosedException("Purchase Order is already convert to sale.");
+            throw new PurchaseOrderAlreadyClosedException("Purchase Order is already convert to purchase.");
         }
 
         purchaseOrder.setOrderType(OrderType.CLOSE);

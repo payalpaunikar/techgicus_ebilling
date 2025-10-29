@@ -66,7 +66,7 @@ public class PurchaseOrderController {
     }
 
 
-    @PostMapping("/purchase-order/{purchaseOrderId}/convert/to/sale")
+    @PostMapping("/purchase-order/{purchaseOrderId}/convert/to/purchase")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<PurchaseResponse> convertPurchaseOrderToPurchase(@PathVariable Long purchaseOrderId,
                                                                            @RequestBody PurchaseRequest purchaseRequest){

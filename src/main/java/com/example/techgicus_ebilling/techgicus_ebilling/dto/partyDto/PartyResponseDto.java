@@ -7,6 +7,8 @@ public class PartyResponseDto {
 
     private Long partyId;
 
+    private String name;
+
     private String gstin;
 
     private String phoneNo;
@@ -24,8 +26,9 @@ public class PartyResponseDto {
     public PartyResponseDto() {
     }
 
-    public PartyResponseDto(Long partyId, String gstin, String phoneNo, GstType gstType, State state, String emailId, String billingAddress, String shipingAddress) {
+    public PartyResponseDto(Long partyId, String name, String gstin, String phoneNo, GstType gstType, State state, String emailId, String billingAddress, String shipingAddress) {
         this.partyId = partyId;
+        this.name = name;
         this.gstin = gstin;
         this.phoneNo = phoneNo;
         this.gstType = gstType;
@@ -97,5 +100,13 @@ public class PartyResponseDto {
 
     public void setShipingAddress(String shipingAddress) {
         this.shipingAddress = shipingAddress;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

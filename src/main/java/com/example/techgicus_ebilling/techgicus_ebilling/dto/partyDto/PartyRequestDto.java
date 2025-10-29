@@ -5,6 +5,8 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.S
 
 public class PartyRequestDto {
 
+    private String name;
+
     private String gstin;
 
     private String phoneNo;
@@ -22,7 +24,8 @@ public class PartyRequestDto {
     public PartyRequestDto() {
     }
 
-    public PartyRequestDto(String gstin, String phoneNo, GstType gstType, State state, String emailId, String billingAddress, String shipingAddress) {
+    public PartyRequestDto(String name, String gstin, String phoneNo, GstType gstType, State state, String emailId, String billingAddress, String shipingAddress) {
+        this.name = name;
         this.gstin = gstin;
         this.phoneNo = phoneNo;
         this.gstType = gstType;
@@ -86,5 +89,13 @@ public class PartyRequestDto {
 
     public void setShipingAddress(String shipingAddress) {
         this.shipingAddress = shipingAddress;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

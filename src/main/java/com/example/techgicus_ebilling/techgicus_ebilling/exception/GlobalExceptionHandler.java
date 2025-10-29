@@ -56,6 +56,11 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST,exception.getMessage());
     }
 
+    @ExceptionHandler(DeliveryChallanAlreadyClosedException.class)
+    public ResponseEntity<ErrorResponse> handleDeliveryChallanAlreadyClosedException(DeliveryChallanAlreadyClosedException exception){
+        return buildResponse(HttpStatus.BAD_REQUEST,exception.getMessage());
+    }
+
     public ResponseEntity<ErrorResponse> buildResponse(HttpStatus httpStatus, String message){
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(LocalDateTime.now());
