@@ -1,11 +1,13 @@
 package com.example.techgicus_ebilling.techgicus_ebilling.service;
 
 
+import com.example.techgicus_ebilling.techgicus_ebilling.config.RazorpayConfig;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.SubscriptionPlan;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.User;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.UserSubscription;
-import com.example.techgicus_ebilling.techgicus_ebilling.dto.featureDto.FeatureResponseDto;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.SubscriptionStatus;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.subscriptionPlanDto.*;
+import com.example.techgicus_ebilling.techgicus_ebilling.exception.PaymentProcessingException;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.ResourceNotFoundException;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.UserSubscriptionNotActiveException;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.SubscriptionPlanMapper;
@@ -13,15 +15,20 @@ import com.example.techgicus_ebilling.techgicus_ebilling.mapper.UserSubscription
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.SubscriptionPlanRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.UserRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.UserSubscriptionRepository;
+import com.razorpay.Order;
+import com.razorpay.RazorpayClient;
+import com.razorpay.RazorpayException;
+import org.apache.commons.codec.digest.HmacUtils;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class SubscriptionService {
@@ -31,21 +38,22 @@ public class SubscriptionService {
        private SubscriptionPlanRepository subscriptionPlanRepository;
        private SubscriptionPlanMapper subscriptionPlanMapper;
        private UserSubscriptionPlanMapper userSubscriptionPlanMapper;
+       private RazorpayConfig razorpayConfig;
+       private RazorpayClient razorpayClient;
+
 
      private static final Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
 
     @Autowired
-    public SubscriptionService(UserSubscriptionRepository userSubscriptionRepository, UserRepository userRepository,
-                               SubscriptionPlanRepository subscriptionPlanRepository,
-                               SubscriptionPlanMapper subscriptionPlanMapper,
-                               UserSubscriptionPlanMapper userSubscriptionPlanMapper) {
+    public SubscriptionService(UserSubscriptionRepository userSubscriptionRepository, UserRepository userRepository, SubscriptionPlanRepository subscriptionPlanRepository, SubscriptionPlanMapper subscriptionPlanMapper, UserSubscriptionPlanMapper userSubscriptionPlanMapper, RazorpayConfig razorpayConfig, RazorpayClient razorpayClient) {
         this.userSubscriptionRepository = userSubscriptionRepository;
         this.userRepository = userRepository;
         this.subscriptionPlanRepository = subscriptionPlanRepository;
         this.subscriptionPlanMapper = subscriptionPlanMapper;
         this.userSubscriptionPlanMapper = userSubscriptionPlanMapper;
+        this.razorpayConfig = razorpayConfig;
+        this.razorpayClient = razorpayClient;
     }
-
 
     public List<SubscriptionPlanWithFeatures> getSubscriptionPlansWithFeatures(User currentUser){
 
@@ -65,13 +73,28 @@ public class SubscriptionService {
     }
 
 
-    public BuySubscriptionPlanResponse buySubscription(BuySubscriptionPlanRequest buySubscriptionPlanRequest){
+    @Transactional
+    public InitiateResponse initiateBuySubscription(BuySubscriptionPlanRequest buySubscriptionPlanRequest){
 
         User user = userRepository.findById(buySubscriptionPlanRequest.getUserId())
                 .orElseThrow(()-> new ResourceNotFoundException("User not found with id : "+buySubscriptionPlanRequest.getUserId()));
 
         SubscriptionPlan subscriptionPlan = subscriptionPlanRepository.findById(buySubscriptionPlanRequest.getSubscriptionPlanId())
                 .orElseThrow(()-> new ResourceNotFoundException("Subscription plan not found with id : "+buySubscriptionPlanRequest.getSubscriptionPlanId()));
+
+        // compute paise
+        int amountInPaise = subscriptionPlan.getPrice().multiply(BigDecimal.valueOf(100)).intValueExact();
+
+        JSONObject orderRequest = new JSONObject();
+        orderRequest.put("amount", amountInPaise);
+        orderRequest.put("currency", "INR");
+        orderRequest.put("receipt", "sub_rcpt_" + System.currentTimeMillis());
+        orderRequest.put("payment_capture", 1);
+
+
+        try {
+            Order order = razorpayClient.orders.create(orderRequest);
+
 
         UserSubscription userSubscription = new UserSubscription();
         userSubscription.setSubscriptionPlan(subscriptionPlan);
@@ -81,18 +104,74 @@ public class SubscriptionService {
         userSubscription.setPriceAtPurchase(subscriptionPlan.getPrice());
         userSubscription.setStartDate(LocalDateTime.now());
         userSubscription.setEndDate(LocalDateTime.now().plusDays(subscriptionPlan.getDurationDays()-1));
-        userSubscription.setActive(true);
+        userSubscription.setActive(false);
         userSubscription.setCreatedAt(LocalDateTime.now());
         userSubscription.setUpdatedAt(LocalDateTime.now());
+        userSubscription.setSubscriptionStatus(SubscriptionStatus.PENDING);
+        userSubscription.setRazorpayOrderId(order.get("id"));
 
 
         UserSubscription saveUserSubscription = userSubscriptionRepository.save(userSubscription);
 
-       BuySubscriptionPlanResponse buySubscriptionPlanResponse = userSubscriptionPlanMapper.convertUserSubscriptionPlanIntoResponse(saveUserSubscription);
+        InitiateResponse initiateResponse = new InitiateResponse();
+        initiateResponse.setOrderId(order.get("id"));
+        initiateResponse.setAmount(order.get("amount"));
+        initiateResponse.setCurrency(order.get("currency"));
+        initiateResponse.setKey(razorpayConfig.getKeyId());
+        initiateResponse.setLocalSubscriptionId(saveUserSubscription.getUserSubscriptionId());
 
-       return buySubscriptionPlanResponse;
+        return initiateResponse;
+
+//       BuySubscriptionPlanResponse buySubscriptionPlanResponse = userSubscriptionPlanMapper.convertUserSubscriptionPlanIntoResponse(saveUserSubscription);
+//
+//       return buySubscriptionPlanResponse;
+        } catch (RazorpayException e) {
+            throw new PaymentProcessingException("Failed to create Razorpay order", e);
+        }
 
     }
+
+
+    @Transactional
+    public boolean verifyAndActivateSubscription(String razorpayOrderId, String razorpayPaymentId, String razorpaySignature){
+        String payload = razorpayOrderId + "|" + razorpayPaymentId;
+        String generatedSignature = HmacUtils.hmacSha256Hex(razorpayConfig.getKeySecret(), payload);
+
+        if (!generatedSignature.equals(razorpaySignature)) {
+            return false;
+        }
+
+        UserSubscription subscription = userSubscriptionRepository.findByRazorpayOrderId(razorpayOrderId);
+        if (subscription == null) return false;
+
+        if(subscription.getSubscriptionStatus().equals(SubscriptionStatus.ACTIVE))return true;
+
+        subscription.setRazorpayPaymentId(razorpayPaymentId);
+        subscription.setRazorpaySignature(razorpaySignature);
+        subscription.setSubscriptionStatus(SubscriptionStatus.ACTIVE);
+        subscription.setActive(true);
+        subscription.setUpdatedAt(LocalDateTime.now());
+
+        userSubscriptionRepository.save(subscription);
+
+        return true;
+    }
+
+
+    // fallback: when webhook arrives (same verification using webhook signature)
+    @Transactional
+    public void handlePaymentCaptured(String orderId, String paymentId, int amount) {
+        UserSubscription sub = userSubscriptionRepository.findByRazorpayOrderId(orderId);
+        if (sub == null) return;
+        if (sub.getSubscriptionStatus().equals(SubscriptionStatus.ACTIVE)) return;
+
+        sub.setRazorpayPaymentId(paymentId);
+        sub.setSubscriptionStatus(SubscriptionStatus.ACTIVE);
+        sub.setActive(true);
+        sub.setUpdatedAt(LocalDateTime.now());
+        userSubscriptionRepository.save(sub);
+    }
+
 
 
     public SubscriptionStatusResponse isUserSubscriptionActive(Long userId){

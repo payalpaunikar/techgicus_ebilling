@@ -12,4 +12,6 @@ import java.util.List;
 public interface ExpenseItemRepository extends JpaRepository<ExpenseItem,Long> {
 
     List<ExpenseItem> findAllByCompany(Company company);
+
+
 }

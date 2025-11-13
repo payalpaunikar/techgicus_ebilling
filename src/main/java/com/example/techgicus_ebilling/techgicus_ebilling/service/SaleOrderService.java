@@ -16,12 +16,15 @@ import com.example.techgicus_ebilling.techgicus_ebilling.exception.SaleOrderAlre
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class SaleOrderService {
@@ -263,5 +266,17 @@ public class SaleOrderService {
     }
 
 
+     @Async
+    public CompletableFuture<Double> getTotalOrderOfCurrentYear(Long companyId){
+
+//        Double totalSaleOrder = saleOrderRepository.getTotalOrderOfCurrentYear(companyId);
+
+         Double totalSaleOrder = Optional.ofNullable(
+                 saleOrderRepository.getTotalOrderOfCurrentYear(companyId)
+         ).orElse(0.0);
+
+
+         return CompletableFuture.completedFuture(totalSaleOrder);
+    }
 
 }

@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class ExpenseController {
 
@@ -32,6 +34,26 @@ public class ExpenseController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ExpenseResponse> getExpenseById(@PathVariable Long expenseId){
         return ResponseEntity.ok(expenseService.getExpenseById(expenseId));
+    }
+
+
+    @GetMapping("/company/{companyId}/get/all/expense")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<List<ExpenseResponse>> getAllExpenses(@PathVariable Long companyId){
+        return ResponseEntity.ok(expenseService.getAllExpense(companyId));
+    }
+
+
+    @DeleteMapping("/expense/{expenseId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<String> deleteExpenseById(@PathVariable Long expenseId){
+        return ResponseEntity.ok(expenseService.deleteExpenseById(expenseId));
+    }
+
+    @PutMapping("/expense/{expenseId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<ExpenseResponse> updateExpenseById(@PathVariable Long expenseId,@RequestBody ExpenseRequest expenseRequest){
+       return ResponseEntity.ok(expenseService.updateExpenseById(expenseId,expenseRequest));
     }
 
 }

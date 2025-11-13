@@ -24,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Tag(name = "Subscription Api")
@@ -96,11 +97,22 @@ public class SubscriptionController {
     })
     @PostMapping("/buy/subscription-plan")
     @PreAuthorize("hasAnyAuthority('ADMIN','SUPERADMIN')")
-    public ResponseEntity<BuySubscriptionPlanResponse> buySubscriptionPlan(@RequestBody BuySubscriptionPlanRequest buySubscriptionPlanRequest){
-      return ResponseEntity.ok(subscriptionService.buySubscription(buySubscriptionPlanRequest));
+    public ResponseEntity<InitiateResponse> buySubscriptionPlan(@RequestBody BuySubscriptionPlanRequest buySubscriptionPlanRequest){
+      return ResponseEntity.ok(subscriptionService.initiateBuySubscription(buySubscriptionPlanRequest));
     }
 
 
+    // Frontend calls this after Razorpay checkout handler returns razorpay_* values
+    @PostMapping("/verify-payment")
+    public ResponseEntity<Map<String,String>> verifyPayment(@RequestBody Map<String, String> payload) {
+        String orderId = payload.get("razorpay_order_id");
+        String paymentId = payload.get("razorpay_payment_id");
+        String signature = payload.get("razorpay_signature");
+
+        boolean ok = subscriptionService.verifyAndActivateSubscription(orderId, paymentId, signature);
+        if (ok) return ResponseEntity.ok(Map.of("status", "success"));
+        return ResponseEntity.status(400).body(Map.of("status", "failure"));
+    }
 
     @Operation(summary = "check user subscription is active or not",
             security = {@SecurityRequirement(name = "bearerAuth")},

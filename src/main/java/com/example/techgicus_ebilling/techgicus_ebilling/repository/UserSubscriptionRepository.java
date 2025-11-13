@@ -14,4 +14,8 @@ public interface UserSubscriptionRepository extends JpaRepository<UserSubscripti
 
     @Query("SELECT us FROM UserSubscription us WHERE us.user.userId =:userId AND us.isActive=true ")
     Optional<UserSubscription> findActiveSubscriptionByUserId(@Param("userId")Long userId);
+
+    UserSubscription findByRazorpayOrderId(String orderId);
+
+
 }

@@ -4,16 +4,14 @@ package com.example.techgicus_ebilling.techgicus_ebilling.service;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Category;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Item;
-import com.example.techgicus_ebilling.techgicus_ebilling.dto.itemDto.CreatedProductItem;
-import com.example.techgicus_ebilling.techgicus_ebilling.dto.itemDto.CreatedServiceItem;
-import com.example.techgicus_ebilling.techgicus_ebilling.dto.itemDto.ItemResponse;
-import com.example.techgicus_ebilling.techgicus_ebilling.dto.itemDto.UpdateItemRequest;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.itemDto.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.ResourceNotFoundException;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.ItemMapper;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.CategoryRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.CompanyRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -129,5 +128,22 @@ public class ItemService {
         List<ItemResponse> itemResponses = itemMapper.convertItemListIntoItemResponseList(items);
 
         return itemResponses;
+    }
+
+
+    @Async
+    public CompletableFuture<List<ItemSaleSummaryDto>> getItemSaleSummary(Long companyId){
+        List<ItemSaleSummaryInterface> itemSaleSummaryInterfaces = itemRepository.findAllIteSaleSummary(companyId);
+
+        List<ItemSaleSummaryDto> itemSaleSummaryDtos = itemSaleSummaryInterfaces.stream()
+                .map(itemSaleSummaryInterface -> {
+                    ItemSaleSummaryDto itemSaleSummaryDto = new ItemSaleSummaryDto();
+                    itemSaleSummaryDto.setItemId(itemSaleSummaryInterface.getItemId());
+                    itemSaleSummaryDto.setItemName(itemSaleSummaryInterface.getItemName());
+                    itemSaleSummaryDto.setTotalSaleCount(itemSaleSummaryInterface.getTotalSaleCount());
+                    return itemSaleSummaryDto;
+                }).toList();
+
+        return CompletableFuture.completedFuture(itemSaleSummaryDtos);
     }
 }

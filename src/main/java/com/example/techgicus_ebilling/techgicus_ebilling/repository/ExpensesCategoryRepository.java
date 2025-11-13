@@ -12,4 +12,7 @@ import java.util.List;
 public interface ExpensesCategoryRepository extends JpaRepository<ExpensesCategory,Long> {
 
     List<ExpensesCategory> findAllByCompany(Company company);
+
+
+
 }

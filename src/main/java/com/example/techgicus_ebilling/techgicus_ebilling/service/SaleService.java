@@ -19,6 +19,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,9 +35,9 @@ public class SaleService {
        private PartyMapper partyMapper;
        private SalePaymentRepository salePaymentRepository;
        private SalePaymentMapper salePaymentMapper;
+       private ItemRepository itemRepository;
 
-    @Autowired
-    public SaleService(SaleRepository saleRepository, SaleItemRepository saleItemRepository, SaleMapper saleMapper, CompanyRepository companyRepository, PartyRepository partyRepository, SaleItemMapper saleItemMapper, PartyMapper partyMapper, SalePaymentRepository salePaymentRepository, SalePaymentMapper salePaymentMapper) {
+    public SaleService(SaleRepository saleRepository, SaleItemRepository saleItemRepository, SaleMapper saleMapper, CompanyRepository companyRepository, PartyRepository partyRepository, SaleItemMapper saleItemMapper, PartyMapper partyMapper, SalePaymentRepository salePaymentRepository, SalePaymentMapper salePaymentMapper, ItemRepository itemRepository) {
         this.saleRepository = saleRepository;
         this.saleItemRepository = saleItemRepository;
         this.saleMapper = saleMapper;
@@ -46,6 +47,7 @@ public class SaleService {
         this.partyMapper = partyMapper;
         this.salePaymentRepository = salePaymentRepository;
         this.salePaymentMapper = salePaymentMapper;
+        this.itemRepository = itemRepository;
     }
 
     @Transactional
@@ -85,10 +87,12 @@ public class SaleService {
         List<SaleItem> saleItems = saleItemMapper.convertSaleItemListRequestIntoSaleItemList(saleRequest.getSaleItems());
 
         for(SaleItem saleItem : saleItems){
+            Item item = itemRepository.findByItemNameAndCompany(saleItem.getItemName(),company)
+                            .orElseThrow(()-> new ResourceNotFoundException("Item not found with name : "+saleItem.getItemName()));
             saleItem.setSale(sale);
             saleItem.setCreatedAt(LocalDateTime.now());
             saleItem.setUpdateAt(LocalDateTime.now());
-
+            saleItem.setItem(item);
         }
 
         sale.setSaleItem(saleItems);
@@ -201,8 +205,11 @@ public class SaleService {
         List<SaleItem> saleItems = saleItemMapper.convertSaleItemListRequestIntoSaleItemList(saleRequest.getSaleItems());
 
         for (SaleItem saleItem : saleItems){
+            Item item = itemRepository.findByItemNameAndCompany(saleItem.getItemName(),sale.getCompany())
+                            .orElseThrow(()-> new ResourceNotFoundException("Item not found with name : "+saleItem.getItemName()));
             saleItem.setSale(sale);
             saleItem.setUpdateAt(LocalDateTime.now());
+            saleItem.setItem(item);
 
         }
         sale.getSaleItem().addAll(saleItems);

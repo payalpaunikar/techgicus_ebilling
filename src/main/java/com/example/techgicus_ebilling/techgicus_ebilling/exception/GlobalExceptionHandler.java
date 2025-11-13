@@ -61,6 +61,17 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST,exception.getMessage());
     }
 
+
+    @ExceptionHandler(DashboardException.class)
+    public ResponseEntity<ErrorResponse> handleDashboardException(DashboardException exception){
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR,exception.getMessage());
+    }
+
+    @ExceptionHandler(PaymentProcessingException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentProcessingException(PaymentProcessingException exception){
+        return buildResponse(HttpStatus.BAD_REQUEST,exception.getMessage());
+    }
+
     public ResponseEntity<ErrorResponse> buildResponse(HttpStatus httpStatus, String message){
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(LocalDateTime.now());

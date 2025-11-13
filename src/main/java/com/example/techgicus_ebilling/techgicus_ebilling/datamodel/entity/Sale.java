@@ -14,6 +14,12 @@ import java.util.Set;
 
 
 @Entity
+@Table(
+        name = "sale",
+        indexes = {
+                @Index(name = "idx_company_invoice_date", columnList = "company_id, invoceDate"),
+        }
+ )
 public class Sale {
 
     @Id

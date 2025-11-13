@@ -10,6 +10,12 @@ import java.util.Set;
 
 
 @Entity
+@Table(
+        name = "item",
+        indexes = {
+                @Index(name = "idx_item_name", columnList = "itemName")
+        }
+)
 public class Item {
 
     @Id

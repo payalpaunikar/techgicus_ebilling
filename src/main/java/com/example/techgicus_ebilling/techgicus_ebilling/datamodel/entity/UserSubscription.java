@@ -3,6 +3,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity;
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PaymentStatus;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PaymentType;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.SubscriptionStatus;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -44,32 +45,20 @@ public class UserSubscription {
      @Enumerated(EnumType.STRING)
      private PaymentType paymentType;
 
+     @Enumerated(EnumType.STRING)
+     private SubscriptionStatus subscriptionStatus;
+
+     @Column(unique = true)
+     private String razorpayOrderId;
+     private String razorpayPaymentId;
+     private String razorpaySignature;
+
 
      private LocalDateTime createdAt;
      private LocalDateTime updatedAt;
 
      public UserSubscription() {
      }
-
-
-     public UserSubscription(Long userSubscriptionId, User user, SubscriptionPlan subscriptionPlan, String nameAtPurchase, BigDecimal priceAtPurchase, Integer durationAtPurchase, LocalDateTime startDate, LocalDateTime endDate, Boolean isActive, Boolean isEXpired, Boolean isCancelled, PaymentStatus paymentStatus, PaymentType paymentType, LocalDateTime createdAt, LocalDateTime updatedAt) {
-          this.userSubscriptionId = userSubscriptionId;
-          this.user = user;
-          this.subscriptionPlan = subscriptionPlan;
-          this.nameAtPurchase = nameAtPurchase;
-          this.priceAtPurchase = priceAtPurchase;
-          this.durationAtPurchase = durationAtPurchase;
-          this.startDate = startDate;
-          this.endDate = endDate;
-          this.isActive = isActive;
-          this.isEXpired = isEXpired;
-          this.isCancelled = isCancelled;
-          this.paymentStatus = paymentStatus;
-          this.paymentType = paymentType;
-          this.createdAt = createdAt;
-          this.updatedAt = updatedAt;
-     }
-
 
      public Long getUserSubscriptionId() {
           return userSubscriptionId;
@@ -189,5 +178,37 @@ public class UserSubscription {
 
      public void setUpdatedAt(LocalDateTime updatedAt) {
           this.updatedAt = updatedAt;
+     }
+
+     public SubscriptionStatus getSubscriptionStatus() {
+          return subscriptionStatus;
+     }
+
+     public void setSubscriptionStatus(SubscriptionStatus subscriptionStatus) {
+          this.subscriptionStatus = subscriptionStatus;
+     }
+
+     public String getRazorpayOrderId() {
+          return razorpayOrderId;
+     }
+
+     public void setRazorpayOrderId(String razorpayOrderId) {
+          this.razorpayOrderId = razorpayOrderId;
+     }
+
+     public String getRazorpayPaymentId() {
+          return razorpayPaymentId;
+     }
+
+     public void setRazorpayPaymentId(String razorpayPaymentId) {
+          this.razorpayPaymentId = razorpayPaymentId;
+     }
+
+     public String getRazorpaySignature() {
+          return razorpaySignature;
+     }
+
+     public void setRazorpaySignature(String razorpaySignature) {
+          this.razorpaySignature = razorpaySignature;
      }
 }

@@ -2,13 +2,16 @@ package com.example.techgicus_ebilling.techgicus_ebilling.controller;
 
 
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.expensesCategoryDto.ExpensesCategoryResponse;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.expensesCategoryDto.ExpensesCategoryWithExpenseAmountResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.service.ExpensesCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -52,5 +55,17 @@ public class ExpensesCategoryController {
     public ResponseEntity<String> deleteExpensesCategoryById(@PathVariable Long expensesCategoryId){
         return ResponseEntity.ok(expensesCategoryService.deleteExpensesCategoryById(expensesCategoryId));
     }
+
+
+    @GetMapping("/company/{companyId}/expenses-categories/with/expense-amount/by/filter")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<List<ExpensesCategoryWithExpenseAmountResponse>> getExpensesCategoriesWithExpenseAmount(@PathVariable Long companyId,
+                                                                                                           @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate startDate,
+                                                                                                           @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate endDate){
+      return ResponseEntity.ok(expensesCategoryService.getExpensesCategoriesWithExpenseAmount(companyId,startDate,endDate));
+    }
+
+
+
 
 }

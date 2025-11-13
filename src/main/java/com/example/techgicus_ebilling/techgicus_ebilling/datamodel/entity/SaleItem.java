@@ -16,6 +16,10 @@ public class SaleItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long saleItemId;
 
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
+
     private String itemName;
 
     private String itemHsnCode;
@@ -176,5 +180,13 @@ public class SaleItem {
 
     public void setSale(Sale sale) {
         this.sale = sale;
+    }
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
     }
 }

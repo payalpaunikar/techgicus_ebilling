@@ -4,14 +4,18 @@ package com.example.techgicus_ebilling.techgicus_ebilling.service;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.ExpenseItem;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.expenseItemDto.ExpenseItemRequest;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.expenseItemDto.ExpenseItemWithExpenseAmountResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.expenseItemDto.ExpensesItemResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.ResourceNotFoundException;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.ExpenseItemMapper;
+import com.example.techgicus_ebilling.techgicus_ebilling.repository.AddExpenseItemRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.CompanyRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.ExpenseItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,14 +24,15 @@ public class ExpenseItemService {
        private CompanyRepository companyRepository;
        private ExpenseItemRepository expenseItemRepository;
        private ExpenseItemMapper expenseItemMapper;
+       private AddExpenseItemRepository addExpenseItemRepository;
 
     @Autowired
-    public ExpenseItemService(CompanyRepository companyRepository, ExpenseItemRepository expenseItemRepository, ExpenseItemMapper expenseItemMapper) {
+    public ExpenseItemService(CompanyRepository companyRepository, ExpenseItemRepository expenseItemRepository, ExpenseItemMapper expenseItemMapper, AddExpenseItemRepository addExpenseItemRepository) {
         this.companyRepository = companyRepository;
         this.expenseItemRepository = expenseItemRepository;
         this.expenseItemMapper = expenseItemMapper;
+        this.addExpenseItemRepository = addExpenseItemRepository;
     }
-
 
     public ExpensesItemResponse createExpenseItem(Long companyId, ExpenseItemRequest expenseItemRequest){
         Company company = companyRepository.findById(companyId)
@@ -86,5 +91,22 @@ public class ExpenseItemService {
         expenseItemRepository.delete(expenseItem);
 
         return "Expense Item delete successfully.";
+    }
+
+
+    public List<ExpenseItemWithExpenseAmountResponse> getExpensesItemListWithExpenseAmount(Long companyId, LocalDate startDate,LocalDate endDate){
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(()-> new ResourceNotFoundException("Company not found with id : "+companyId));
+
+        List<ExpenseItemWithExpenseAmountResponse> expenseItemWithExpenseAmountResponses = new ArrayList<>();
+
+        if(startDate == null && endDate == null){
+            expenseItemWithExpenseAmountResponses = addExpenseItemRepository.findAllExpenseItemWithTotalExpenseAmount(company.getCompanyId());
+        }
+        else{
+            expenseItemWithExpenseAmountResponses = addExpenseItemRepository.findExpenseItemSummaryByCompanyAndDateRange(company.getCompanyId(),startDate,endDate);
+        }
+
+        return expenseItemWithExpenseAmountResponses;
     }
 }
