@@ -5,7 +5,8 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.T
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.Unit;
 
 public class SaleItemResponse {
-    private Long saleItemId;
+  //  private Long saleItemId;
+    private Long itemId;
     private String itemName;
     private String itemHsnCode;
     private String itemDescription;
@@ -20,27 +21,14 @@ public class SaleItemResponse {
     public SaleItemResponse() {
     }
 
-    public SaleItemResponse(Long saleItemId, String itemName, String itemHsnCode, String itemDescription, Integer quantity, Unit unit, Double pricePerUnit, TaxType pricePerUnitTaxType, TaxRate taxRate, Double taxAmount, Double totalAmount) {
-        this.saleItemId = saleItemId;
-        this.itemName = itemName;
-        this.itemHsnCode = itemHsnCode;
-        this.itemDescription = itemDescription;
-        this.quantity = quantity;
-        this.unit = unit;
-        this.pricePerUnit = pricePerUnit;
-        this.pricePerUnitTaxType = pricePerUnitTaxType;
-        this.taxRate = taxRate;
-        this.taxAmount = taxAmount;
-        this.totalAmount = totalAmount;
-    }
 
-    public Long getSaleItemId() {
-        return saleItemId;
-    }
-
-    public void setSaleItemId(Long saleItemId) {
-        this.saleItemId = saleItemId;
-    }
+//    public Long getSaleItemId() {
+//        return saleItemId;
+//    }
+//
+//    public void setSaleItemId(Long saleItemId) {
+//        this.saleItemId = saleItemId;
+//    }
 
     public String getItemName() {
         return itemName;
@@ -120,5 +108,13 @@ public class SaleItemResponse {
 
     public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public Long getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(Long itemId) {
+        this.itemId = itemId;
     }
 }

@@ -5,6 +5,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Compan
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Party;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.PaymentIn;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.PaymentOut;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PartyTransactionType;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.paymentInDto.PaymentInRequest;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.paymentInDto.PaymentInResponse;
@@ -18,6 +19,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.repository.PartyReposit
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.PaymentOutRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,16 +33,22 @@ public class PaymentOutService {
         private PartyRepository partyRepository;
         private PartyMapper partyMapper;
         private PaymentOutMapper paymentOutMapper;
+        private PartyLedgerService partyLedgerService;
+        private PartyActivityService partyActivityService;
 
     @Autowired
-    public PaymentOutService(PaymentOutRepository paymentOutRepository, CompanyRepository companyRepository, PartyRepository partyRepository, PartyMapper partyMapper, PaymentOutMapper paymentOutMapper) {
+    public PaymentOutService(PaymentOutRepository paymentOutRepository, CompanyRepository companyRepository, PartyRepository partyRepository, PartyMapper partyMapper, PaymentOutMapper paymentOutMapper, PartyLedgerService partyLedgerService, PartyActivityService partyActivityService) {
         this.paymentOutRepository = paymentOutRepository;
         this.companyRepository = companyRepository;
         this.partyRepository = partyRepository;
         this.partyMapper = partyMapper;
         this.paymentOutMapper = paymentOutMapper;
+        this.partyLedgerService = partyLedgerService;
+        this.partyActivityService = partyActivityService;
     }
 
+
+    @Transactional
     public PaymentOutResponse addPaymentOut(Long companyId, PaymentOutRequest paymentOutRequest){
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(()-> new ResourceNotFoundException("Compnay not found with id : "+companyId));
@@ -53,6 +61,35 @@ public class PaymentOutService {
         paymentOut.setParty(party);
         paymentOut.setCreateAt(LocalDateTime.now());
         paymentOut.setUpdateAt(LocalDateTime.now());
+
+
+        partyLedgerService.addLedgerEntry(
+                paymentOut.getParty(),
+                paymentOut.getCompany(),
+                paymentOut.getPaymentDate(),
+                PartyTransactionType.PAYMENT_OUT,
+                paymentOut.getPaymentOutId(),
+                paymentOut.getReceiptNo(),
+                0.0,
+                paymentOut.getPaidAmount(),
+                0.0,
+                paymentOut.getDescription()
+
+        );
+
+
+        partyActivityService.addActivity(
+                paymentOut.getParty(),
+                paymentOut.getCompany(),
+                paymentOut.getPaymentOutId(),
+                paymentOut.getReceiptNo(),
+                paymentOut.getPaymentDate(),
+                PartyTransactionType.PAYMENT_OUT,
+                paymentOut.getPaidAmount(),
+                0.0,
+                true,
+                paymentOut.getDescription()
+        );
 
         paymentOutRepository.save(paymentOut);
 
@@ -100,6 +137,8 @@ public class PaymentOutService {
         return paymentOutResponse;
     }
 
+
+    @Transactional
     public PaymentOutResponse updatePaymentOutById(Long paymentOutId,PaymentOutRequest paymentOutRequest){
 
         Party party = partyRepository.findById(paymentOutRequest.getPartyId())
@@ -112,6 +151,34 @@ public class PaymentOutService {
         paymentOut.setParty(party);
         paymentOut.setUpdateAt(LocalDateTime.now());
 
+        partyLedgerService.updatePartyLedger(
+                paymentOut.getParty(),
+                paymentOut.getCompany(),
+                paymentOut.getPaymentDate(),
+                PartyTransactionType.PAYMENT_OUT,
+                paymentOut.getPaymentOutId(),
+                paymentOut.getReceiptNo(),
+                0.0,
+                paymentOut.getPaidAmount(),
+                paymentOut.getPaidAmount(),
+                paymentOut.getDescription()
+
+        );
+
+
+        partyActivityService.updatePartyActivity(
+                paymentOut.getParty(),
+                paymentOut.getCompany(),
+                paymentOut.getPaymentOutId(),
+                paymentOut.getReceiptNo(),
+                paymentOut.getPaymentDate(),
+                PartyTransactionType.PAYMENT_OUT,
+                paymentOut.getPaidAmount(),
+                0.0,
+                true,
+                paymentOut.getDescription()
+        );
+
         paymentOutRepository.save(paymentOut);
 
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(paymentOut.getParty());
@@ -121,9 +188,15 @@ public class PaymentOutService {
         return paymentOutResponse;
     }
 
+
+    @Transactional
     public String deletePaymentOutById(Long paymentOutId){
        PaymentOut paymentOut = paymentOutRepository.findById(paymentOutId)
                 .orElseThrow(()-> new ResourceNotFoundException("Payment out not found by id : "+paymentOutId));
+
+        partyLedgerService.deletePartyLedger(PartyTransactionType.PAYMENT_OUT,paymentOut.getPaymentOutId());
+
+        partyActivityService.deletePartyActivity(PartyTransactionType.PAYMENT_OUT,paymentOut.getPaymentOutId());
 
        paymentOutRepository.delete(paymentOut);
 

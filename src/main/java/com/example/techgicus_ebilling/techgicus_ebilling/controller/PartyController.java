@@ -3,8 +3,10 @@ package com.example.techgicus_ebilling.techgicus_ebilling.controller;
 
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyRequestDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyTransactionResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.service.PartyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -56,4 +58,19 @@ public class PartyController {
     public ResponseEntity<String> deletePartyById(@PathVariable Long partyId){
         return ResponseEntity.ok(partyService.deletePartyById(partyId));
     }
+
+
+    @GetMapping("/party/{partyId}/transaction/list")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<PartyTransactionResponse> getPartyAllTransactions(@PathVariable Long partyId,
+                                                                  @RequestParam(defaultValue = "0") int page,
+                                                                  @RequestParam(defaultValue = "10") int size){
+        return partyService.getPartyAllTransactions(partyId,page,size);
+    }
+
+
+
+
+
+
 }

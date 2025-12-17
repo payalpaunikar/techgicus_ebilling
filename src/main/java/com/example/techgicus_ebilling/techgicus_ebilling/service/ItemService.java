@@ -4,21 +4,24 @@ package com.example.techgicus_ebilling.techgicus_ebilling.service;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Category;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Item;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.StockTransaction;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.StockTransactionType;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.itemDto.*;
+import com.example.techgicus_ebilling.techgicus_ebilling.exception.ItemAlreadyExitException;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.ResourceNotFoundException;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.ItemMapper;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.CategoryRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.CompanyRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.ItemRepository;
+import com.example.techgicus_ebilling.techgicus_ebilling.repository.StockTransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -29,29 +32,49 @@ public class ItemService {
          private CompanyRepository companyRepository;
          private CategoryRepository categoryRepository;
          private ItemMapper itemMapper;
+         private StockTransactionRepository stockTransactionRepository;
 
     @Autowired
-    public ItemService(ItemRepository itemRepository, CompanyRepository companyRepository, CategoryRepository categoryRepository, ItemMapper itemMapper) {
+    public ItemService(ItemRepository itemRepository, CompanyRepository companyRepository, CategoryRepository categoryRepository, ItemMapper itemMapper, StockTransactionRepository stockTransactionRepository) {
         this.itemRepository = itemRepository;
         this.companyRepository = companyRepository;
         this.categoryRepository = categoryRepository;
         this.itemMapper = itemMapper;
+        this.stockTransactionRepository = stockTransactionRepository;
     }
 
-
-    public ItemResponse createdProductItemInCompany(CreatedProductItem createdProductItem,Long companyId){
+    @Transactional
+    public ItemResponse createdProductItemInCompany(CreatedProductItem createdProductItem, Long companyId){
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(()-> new ResourceNotFoundException("company not fount with id : "+companyId));
 
         List<Category> categories = categoryRepository.findCategoriesByIds(createdProductItem.getCategoryIds().stream().toList());
+
+        Optional<Item> optionalItem = itemRepository.findByItemNameAndCompany(createdProductItem.getItemName(),company);
+
+       if (optionalItem.isPresent()){
+           throw new ItemAlreadyExitException("Item already exit in the company.");
+       }
 
         Item item = itemMapper.convertCreatedProductItemIntoItem(createdProductItem);
         item.setCompany(company);
         item.setCategories(categories.stream().collect(Collectors.toSet()));
         item.setCreatedAt(LocalDateTime.now());
         item.setUpdatedAt(LocalDateTime.now());
+        item.setTotalStockIn(item.getStockOpeningQty());
+        item.setAvailableStock(item.getTotalStockIn());
+        item.setStockValue(item.getStockPricePerQty() * item.getStockOpeningQty());
+
+        StockTransaction stockTransaction = new StockTransaction();
+        stockTransaction.setItem(item);
+        stockTransaction.setTransactionDate(item.getStockOpeningDate());
+        stockTransaction.setQuantity(item.getStockOpeningQty());
+        stockTransaction.setTransactionType(StockTransactionType.OPENING_STOCK);
+        stockTransaction.setTotalAmount(item.getStockPricePerQty() * item.getStockOpeningQty());
 
         Item saveItem = itemRepository.save(item);
+
+        stockTransactionRepository.save(stockTransaction);
 
         ItemResponse itemResponse = itemMapper.convertItemIntoItemResponse(saveItem);
 
@@ -65,6 +88,12 @@ public class ItemService {
                 .orElseThrow(()-> new ResourceNotFoundException("company not fount with id : "+companyId));
 
         List<Category> categories = categoryRepository.findCategoriesByIds(createdServiceItem.getCategoryIds().stream().toList());
+
+        Optional<Item> optionalItem = itemRepository.findByItemNameAndCompany(createdServiceItem.getItemName(),company);
+
+        if (optionalItem.isPresent()){
+            throw new ItemAlreadyExitException("Item already exit in the company.");
+        }
 
         Item item = itemMapper.convertCreatedServiceItemIntoItem(createdServiceItem);
         item.setCompany(company);
@@ -96,19 +125,26 @@ public class ItemService {
 
         itemRepository.delete(item);
 
-        return "Item delete succefully";
+        return "Item delete successfully.";
     }
 
     public ItemResponse updateItemById(Long itemId, UpdateItemRequest updateItem){
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(()-> new ResourceNotFoundException("Item not found with id : "+itemId));
 
+        Optional<Item> optionalItem = itemRepository.findByItemNameAndCompanyAndItemIdNot(updateItem.getItemName(),item.getCompany(),itemId);
+
+        if (optionalItem.isPresent()){
+            throw new ItemAlreadyExitException("Item already exit in the company.");
+        }
+
          itemMapper.updateItemFromDto(updateItem,item);
 
         List<Category> categories = categoryRepository.findCategoriesByIds(updateItem.getCategoryIds().stream().toList());
 
         item.getCategories().clear();
-        item.setCategories((Set<Category>) categories);
+
+        item.setCategories(new HashSet<>(categories));
 
          Item saveItem = itemRepository.save(item);
 
@@ -131,6 +167,74 @@ public class ItemService {
     }
 
 
+    @Transactional
+    public String updateStock(StockUpdateRequest request,Long itemId) {
+
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Item not found"));
+
+        Double qty = request.getQuantity();
+        Double price = request.getPricePerUnit();
+        LocalDate date = request.getTransactionDate();
+
+        if (qty <= 0) throw new IllegalArgumentException("Quantity must be positive");
+        if (price < 0) throw new IllegalArgumentException("Price must be 0 or positive");
+
+        double oldQty = item.getTotalStockIn();
+        double oldValue = item.getStockValue();
+
+        // ----------- ADD STOCK ------------
+        if (request.getOperationType() == StockTransactionType.ADD_STOCK) {
+
+            double addedValue = qty * price;
+
+
+            item.setTotalStockIn((item.getTotalStockIn() == null ? 0 : oldQty) + qty);
+            item.setAvailableStock(item.getTotalStockIn());
+            item.setStockValue((item.getStockValue() == null ? 0 : oldValue) + addedValue);
+
+            saveStockTransaction(item, qty, addedValue, StockTransactionType.ADD_STOCK, date, null);
+
+        }
+
+        // ----------- REDUCE STOCK ------------
+        else if (request.getOperationType() == StockTransactionType.REDUCE_STOCK) {
+
+            if (item.getAvailableStock() == null || item.getAvailableStock() < qty) {
+                throw new IllegalArgumentException("Insufficient stock to reduce");
+            }
+
+            double reducedValue = qty * price;
+
+            item.setTotalStockIn(oldQty - qty);
+            item.setAvailableStock(item.getTotalStockIn());
+            item.setStockValue(oldValue - reducedValue);
+
+            saveStockTransaction(item, qty, reducedValue, StockTransactionType.REDUCE_STOCK, date, "MANUAL_REDUCE_STOCK");
+        }
+
+        itemRepository.save(item);
+
+        return "Stock updated successfully";
+    }
+
+    private void saveStockTransaction(Item item, Double qty, Double amount,
+                                      StockTransactionType type, LocalDate date,
+                                      String reference) {
+
+        StockTransaction tx = new StockTransaction();
+        tx.setItem(item);
+        tx.setTransactionDate(date);
+        tx.setQuantity(qty);
+        tx.setTotalAmount(amount);
+        tx.setTransactionType(type);
+        tx.setReferenceNumber(reference);// manual operation
+        stockTransactionRepository.save(tx);
+
+    }
+
+
+
     @Async
     public CompletableFuture<List<ItemSaleSummaryDto>> getItemSaleSummary(Long companyId){
         List<ItemSaleSummaryInterface> itemSaleSummaryInterfaces = itemRepository.findAllIteSaleSummary(companyId);
@@ -146,4 +250,10 @@ public class ItemService {
 
         return CompletableFuture.completedFuture(itemSaleSummaryDtos);
     }
+
+
+    
+
+
+
 }

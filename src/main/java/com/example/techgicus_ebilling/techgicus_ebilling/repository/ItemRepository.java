@@ -17,8 +17,12 @@ public interface ItemRepository extends JpaRepository<Item,Long> {
 
     List<Item> findAllByCompany(Company company);
 
+    Optional<Item> findByItemNameAndCompanyAndItemIdNot(String name, Company company,Long itemId);
+
     Optional<Item> findByItemNameAndCompany(String name, Company company);
 
+
+   // List<Item> findAllByItemIdIn(List<Long> ids);
 
     @Query(value = """
             SELECT i.item_id AS itemId,
@@ -36,5 +40,8 @@ public interface ItemRepository extends JpaRepository<Item,Long> {
             GROUP BY i.item_id,i.item_name;
             """,nativeQuery = true)
     List<ItemSaleSummaryInterface> findAllIteSaleSummary(@Param("companyId") Long companyId);
+
+
+
 
 }

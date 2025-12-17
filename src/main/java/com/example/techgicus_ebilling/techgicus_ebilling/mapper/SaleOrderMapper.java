@@ -12,9 +12,19 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(componentModel = "spring")
 public interface SaleOrderMapper {
 
+//      SaleOrder convertRequestToEntity(SaleOrderRequest saleOrderRequest);
+//
+//
+//
+//      SaleOrderResponse convertEntityToResponse(SaleOrder saleOrder);
+//
+//
+//      @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+//      void updateSaleOrder(SaleOrderRequest saleOrderRequest, @MappingTarget SaleOrder saleOrder);
+
       SaleOrder convertRequestToEntity(SaleOrderRequest saleOrderRequest);
 
-//      SaleOrderResponse convertEntityToResponse(SaleOrder saleOrder);
+
 
       SaleOrderResponse convertEntityToResponse(SaleOrder saleOrder);
 

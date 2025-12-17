@@ -1,11 +1,10 @@
 package com.example.techgicus_ebilling.techgicus_ebilling.service;
 
 
-import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
-import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Party;
-import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.PurchaseReturn;
-import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.PurchaseReturnItem;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.*;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PartyTransactionType;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseReturnDto.PurchaseReturnItemRequest;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseReturnDto.PurchaseReturnItemResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseReturnDto.PurchaseReturnRequest;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseReturnDto.PurchaseReturnResponse;
@@ -13,12 +12,10 @@ import com.example.techgicus_ebilling.techgicus_ebilling.exception.ResourceNotFo
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.PartyMapper;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.PurchaseReturnItemMapper;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.PurchaseReturnMapper;
-import com.example.techgicus_ebilling.techgicus_ebilling.repository.CompanyRepository;
-import com.example.techgicus_ebilling.techgicus_ebilling.repository.PartyRepository;
-import com.example.techgicus_ebilling.techgicus_ebilling.repository.PurchaseReturnItemRepository;
-import com.example.techgicus_ebilling.techgicus_ebilling.repository.PurchaseReturnRepository;
+import com.example.techgicus_ebilling.techgicus_ebilling.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,9 +30,12 @@ public class PurchaseReturnService {
      private PartyMapper partyMapper;
      private PurchaseReturnMapper purchaseReturnMapper;
      private PurchaseReturnItemMapper purchaseReturnItemMapper;
+     private PartyLedgerService partyLedgerService;
+     private PartyActivityService partyActivityService;
+     private ItemRepository itemRepository;
 
-     @Autowired
-    public PurchaseReturnService(PurchaseReturnRepository purchaseReturnRepository, PurchaseReturnItemRepository purchaseReturnItemRepository, CompanyRepository companyRepository, PartyRepository partyRepository, PartyMapper partyMapper, PurchaseReturnMapper purchaseReturnMapper, PurchaseReturnItemMapper purchaseReturnItemMapper) {
+    @Autowired
+    public PurchaseReturnService(PurchaseReturnRepository purchaseReturnRepository, PurchaseReturnItemRepository purchaseReturnItemRepository, CompanyRepository companyRepository, PartyRepository partyRepository, PartyMapper partyMapper, PurchaseReturnMapper purchaseReturnMapper, PurchaseReturnItemMapper purchaseReturnItemMapper, PartyLedgerService partyLedgerService, PartyActivityService partyActivityService, ItemRepository itemRepository) {
         this.purchaseReturnRepository = purchaseReturnRepository;
         this.purchaseReturnItemRepository = purchaseReturnItemRepository;
         this.companyRepository = companyRepository;
@@ -43,9 +43,12 @@ public class PurchaseReturnService {
         this.partyMapper = partyMapper;
         this.purchaseReturnMapper = purchaseReturnMapper;
         this.purchaseReturnItemMapper = purchaseReturnItemMapper;
+        this.partyLedgerService = partyLedgerService;
+        this.partyActivityService = partyActivityService;
+        this.itemRepository = itemRepository;
     }
 
-
+    @Transactional
     public PurchaseReturnResponse createPurchaseReturn(Long companyId, PurchaseReturnRequest purchaseReturnRequest){
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(()-> new ResourceNotFoundException("Compnay not found with id : "+companyId));
@@ -58,21 +61,51 @@ public class PurchaseReturnService {
         purchaseReturn.setParty(party);
         purchaseReturn.setCompany(company);
 
-        List<PurchaseReturnItem> purchaseReturnItems = purchaseReturnRequest.getPurchaseReturnItemRequests()
-                .stream()
-                .map(purchaseReturnItemRequest -> {
-                    PurchaseReturnItem purchaseReturnItem = purchaseReturnItemMapper.convertRequestToEntity(purchaseReturnItemRequest);
-                    purchaseReturnItem.setPurchaseReturn(purchaseReturn);
-                    return purchaseReturnItem;
-                }).toList();
+        List<PurchaseReturnItem> purchaseReturnItems = setReturnItemListFields(purchaseReturnRequest.getPurchaseReturnItemRequests(),purchaseReturn);
+
+//        List<PurchaseReturnItem> purchaseReturnItems = purchaseReturnRequest.getPurchaseReturnItemRequests()
+//                .stream()
+//                .map(purchaseReturnItemRequest -> {
+//                    PurchaseReturnItem purchaseReturnItem = purchaseReturnItemMapper.convertRequestToEntity(purchaseReturnItemRequest);
+//                    purchaseReturnItem.setPurchaseReturn(purchaseReturn);
+//                    return purchaseReturnItem;
+//                }).toList();
 
 
         purchaseReturn.setPurchaseReturnItems(purchaseReturnItems);
 
         purchaseReturnRepository.save(purchaseReturn);
 
+        // add party ledger entry in the database
+        partyLedgerService.addLedgerEntry(
+                purchaseReturn.getParty(),
+                purchaseReturn.getCompany(),
+                purchaseReturn.getReturnDate(),
+                PartyTransactionType.PURCHASE_RETURN,
+                purchaseReturn.getPurchaseReturnId(),
+                purchaseReturn.getReturnNo(),
+                purchaseReturn.getTotalAmount(),
+                0.0,
+                purchaseReturn.getBalanceAmount(),
+                purchaseReturn.getDescription()
+        );
+
+        // add party activity entry in the database
+        partyActivityService.addActivity(
+                purchaseReturn.getParty(),
+                purchaseReturn.getCompany(),
+                purchaseReturn.getPurchaseReturnId(),
+                purchaseReturn.getReturnNo(),
+                purchaseReturn.getReturnDate(),
+                PartyTransactionType.PURCHASE_RETURN,
+                purchaseReturn.getTotalAmount(),
+                purchaseReturn.getBalanceAmount(),
+                true,
+                purchaseReturn.getDescription());
+
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(purchaseReturn.getParty());
-        List<PurchaseReturnItemResponse> purchaseReturnItemResponses = purchaseReturnItemMapper.convertEntityListToResponseList(purchaseReturn.getPurchaseReturnItems());
+        List<PurchaseReturnItemResponse> purchaseReturnItemResponses = setReturnItemResponseListFields(purchaseReturn.getPurchaseReturnItems());
+      //  List<PurchaseReturnItemResponse> purchaseReturnItemResponses = purchaseReturnItemMapper.convertEntityListToResponseList(purchaseReturn.getPurchaseReturnItems());
         PurchaseReturnResponse purchaseReturnResponse = purchaseReturnMapper.convertEntityToResponse(purchaseReturn);
         purchaseReturnResponse.setPartyResponseDto(partyResponseDto);
         purchaseReturnResponse.setPurchaseReturnItemResponses(purchaseReturnItemResponses);
@@ -90,7 +123,8 @@ public class PurchaseReturnService {
         List<PurchaseReturnResponse> purchaseReturnResponseList = purchaseReturnList.stream()
                 .map(purchaseReturn -> {
                     PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(purchaseReturn.getParty());
-                    List<PurchaseReturnItemResponse> purchaseReturnItemResponses = purchaseReturnItemMapper.convertEntityListToResponseList(purchaseReturn.getPurchaseReturnItems());
+                    List<PurchaseReturnItemResponse> purchaseReturnItemResponses = setReturnItemResponseListFields(purchaseReturn.getPurchaseReturnItems());
+                   // List<PurchaseReturnItemResponse> purchaseReturnItemResponses = purchaseReturnItemMapper.convertEntityListToResponseList(purchaseReturn.getPurchaseReturnItems());
                     PurchaseReturnResponse purchaseReturnResponse = purchaseReturnMapper.convertEntityToResponse(purchaseReturn);
                     purchaseReturnResponse.setPartyResponseDto(partyResponseDto);
                     purchaseReturnResponse.setPurchaseReturnItemResponses(purchaseReturnItemResponses);
@@ -107,7 +141,8 @@ public class PurchaseReturnService {
                  .orElseThrow(()-> new ResourceNotFoundException("Purchase Return not found with id : "+purchaseReturnId));
 
          PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(purchaseReturn.getParty());
-         List<PurchaseReturnItemResponse> purchaseReturnItemResponses = purchaseReturnItemMapper.convertEntityListToResponseList(purchaseReturn.getPurchaseReturnItems());
+         List<PurchaseReturnItemResponse> purchaseReturnItemResponses = setReturnItemResponseListFields(purchaseReturn.getPurchaseReturnItems());
+        // List<PurchaseReturnItemResponse> purchaseReturnItemResponses = purchaseReturnItemMapper.convertEntityListToResponseList(purchaseReturn.getPurchaseReturnItems());
          PurchaseReturnResponse purchaseReturnResponse = purchaseReturnMapper.convertEntityToResponse(purchaseReturn);
          purchaseReturnResponse.setPartyResponseDto(partyResponseDto);
          purchaseReturnResponse.setPurchaseReturnItemResponses(purchaseReturnItemResponses);
@@ -116,6 +151,7 @@ public class PurchaseReturnService {
     }
 
 
+    @Transactional
     public PurchaseReturnResponse updatePurchaseReturnById(Long purchaseReturnId,PurchaseReturnRequest purchaseReturnRequest){
         PurchaseReturn purchaseReturn = purchaseReturnRepository.findById(purchaseReturnId)
                 .orElseThrow(()-> new ResourceNotFoundException("Purchase Return not found with id : "+purchaseReturnId));
@@ -127,21 +163,52 @@ public class PurchaseReturnService {
         purchaseReturn.setParty(party);
         purchaseReturn.getPurchaseReturnItems().clear();
 
-        List<PurchaseReturnItem> purchaseReturnItems = purchaseReturnRequest.getPurchaseReturnItemRequests()
-                .stream()
-                .map(purchaseReturnItemRequest -> {
-                    PurchaseReturnItem purchaseReturnItem = purchaseReturnItemMapper.convertRequestToEntity(purchaseReturnItemRequest);
-                    purchaseReturnItem.setPurchaseReturn(purchaseReturn);
-                    return purchaseReturnItem;
-                }).toList();
+        List<PurchaseReturnItem> purchaseReturnItems = setReturnItemListFields(purchaseReturnRequest.getPurchaseReturnItemRequests(),purchaseReturn);
+
+//        List<PurchaseReturnItem> purchaseReturnItems = purchaseReturnRequest.getPurchaseReturnItemRequests()
+//                .stream()
+//                .map(purchaseReturnItemRequest -> {
+//                    PurchaseReturnItem purchaseReturnItem = purchaseReturnItemMapper.convertRequestToEntity(purchaseReturnItemRequest);
+//                    purchaseReturnItem.setPurchaseReturn(purchaseReturn);
+//                    return purchaseReturnItem;
+//                }).toList();
 
 
         purchaseReturn.getPurchaseReturnItems().addAll(purchaseReturnItems);
 
         purchaseReturnRepository.save(purchaseReturn);
 
+        // add party ledger entry in the database
+        partyLedgerService.updatePartyLedger(
+                purchaseReturn.getParty(),
+                purchaseReturn.getCompany(),
+                purchaseReturn.getReturnDate(),
+                PartyTransactionType.PURCHASE_RETURN,
+                purchaseReturn.getPurchaseReturnId(),
+                purchaseReturn.getReturnNo(),
+                purchaseReturn.getTotalAmount(),
+                0.0,
+                purchaseReturn.getBalanceAmount(),
+                purchaseReturn.getDescription()
+        );
+
+        // add party activity entry in the database
+        partyActivityService.updatePartyActivity(
+                purchaseReturn.getParty(),
+                purchaseReturn.getCompany(),
+                purchaseReturn.getPurchaseReturnId(),
+                purchaseReturn.getReturnNo(),
+                purchaseReturn.getReturnDate(),
+                PartyTransactionType.PURCHASE_RETURN,
+                purchaseReturn.getTotalAmount(),
+                purchaseReturn.getBalanceAmount(),
+                true,
+                purchaseReturn.getDescription());
+
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(purchaseReturn.getParty());
-        List<PurchaseReturnItemResponse> purchaseReturnItemResponses = purchaseReturnItemMapper.convertEntityListToResponseList(purchaseReturn.getPurchaseReturnItems());
+
+        List<PurchaseReturnItemResponse> purchaseReturnItemResponses = setReturnItemResponseListFields(purchaseReturn.getPurchaseReturnItems());
+       // List<PurchaseReturnItemResponse> purchaseReturnItemResponses = purchaseReturnItemMapper.convertEntityListToResponseList(purchaseReturn.getPurchaseReturnItems());
 
         PurchaseReturnResponse purchaseReturnResponse = purchaseReturnMapper.convertEntityToResponse(purchaseReturn);
         purchaseReturnResponse.setPartyResponseDto(partyResponseDto);
@@ -150,12 +217,57 @@ public class PurchaseReturnService {
         return purchaseReturnResponse;
     }
 
+
+    @Transactional
     public String deletePurchaseReturnById(Long purchaseReturnId){
         PurchaseReturn purchaseReturn = purchaseReturnRepository.findById(purchaseReturnId)
                 .orElseThrow(()-> new ResourceNotFoundException("Purchase Return not found with id : "+purchaseReturnId));
+
+        partyLedgerService.deletePartyLedger(PartyTransactionType.PURCHASE_RETURN,purchaseReturn.getPurchaseReturnId());
+        partyActivityService.deletePartyActivity(PartyTransactionType.PURCHASE_RETURN,purchaseReturn.getPurchaseReturnId());
 
        purchaseReturnRepository.delete(purchaseReturn);
 
        return "Purchase Return delete succefully.";
     }
+
+
+     private PurchaseReturnItem setReturnItemFields(PurchaseReturnItemRequest request,PurchaseReturn purchaseReturn){
+        Item item = itemRepository.findById(request.getItemId())
+                .orElseThrow(()-> new ResourceNotFoundException("Item not found with id "+request.getItemId()));
+
+        PurchaseReturnItem purchaseReturnItem = purchaseReturnItemMapper.convertRequestToEntity(request);
+        purchaseReturnItem.setItem(item);
+        purchaseReturnItem.setPurchaseReturn(purchaseReturn);
+
+        return purchaseReturnItem;
+     }
+
+    private List<PurchaseReturnItem> setReturnItemListFields(List<PurchaseReturnItemRequest> requestList,PurchaseReturn purchaseReturn){
+       List<PurchaseReturnItem> returnItemList = requestList.stream()
+               .map(request-> setReturnItemFields(request,purchaseReturn))
+               .toList();
+
+       return returnItemList;
+    }
+
+
+    private PurchaseReturnItemResponse setReturnItemResponseFields(PurchaseReturnItem returnItem){
+
+        Item item = returnItem.getItem();
+        PurchaseReturnItemResponse response = purchaseReturnItemMapper.convertEntityToResponse(returnItem);
+        response.setName(item.getItemName());
+        response.setItemId(item.getItemId());
+
+        return response;
+    }
+
+    private List<PurchaseReturnItemResponse> setReturnItemResponseListFields(List<PurchaseReturnItem> returnItemList){
+        List<PurchaseReturnItemResponse> responseList = returnItemList.stream()
+                .map(returnItem-> setReturnItemResponseFields(returnItem))
+                .toList();
+
+        return responseList;
+    }
+
 }

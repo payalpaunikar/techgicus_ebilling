@@ -8,6 +8,8 @@ public class SaleReturnItemResponse {
 
     private Long saleReturnItemId;
 
+    private Long itemId;
+
     private String name;
 
     private Integer quantity;
@@ -104,5 +106,13 @@ public class SaleReturnItemResponse {
 
     public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public Long getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(Long itemId) {
+        this.itemId = itemId;
     }
 }

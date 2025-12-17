@@ -2,6 +2,10 @@ package com.example.techgicus_ebilling.techgicus_ebilling.service;
 
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.*;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.ItemType;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PartyTransactionType;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PaymentType;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.StockTransactionType;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleDto.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.InvalidPaymentAmountException;
@@ -11,17 +15,17 @@ import com.example.techgicus_ebilling.techgicus_ebilling.mapper.SaleItemMapper;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.SaleMapper;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.SalePaymentMapper;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
-import java.security.InvalidAlgorithmParameterException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class SaleService {
@@ -36,8 +40,15 @@ public class SaleService {
        private SalePaymentRepository salePaymentRepository;
        private SalePaymentMapper salePaymentMapper;
        private ItemRepository itemRepository;
+       private StockTransactionRepository stockTransactionRepository;
+       private PartyLedgerService partyLedgerService;
+       private PartyActivityService partyActivityService;
+       private StockTransactionService stockTransactionService;
 
-    public SaleService(SaleRepository saleRepository, SaleItemRepository saleItemRepository, SaleMapper saleMapper, CompanyRepository companyRepository, PartyRepository partyRepository, SaleItemMapper saleItemMapper, PartyMapper partyMapper, SalePaymentRepository salePaymentRepository, SalePaymentMapper salePaymentMapper, ItemRepository itemRepository) {
+       private static final Logger log = LoggerFactory.getLogger(SaleService.class);
+
+    @Autowired
+    public SaleService(SaleRepository saleRepository, SaleItemRepository saleItemRepository, SaleMapper saleMapper, CompanyRepository companyRepository, PartyRepository partyRepository, SaleItemMapper saleItemMapper, PartyMapper partyMapper, SalePaymentRepository salePaymentRepository, SalePaymentMapper salePaymentMapper, ItemRepository itemRepository, StockTransactionRepository stockTransactionRepository, PartyLedgerService partyLedgerService, PartyActivityService partyActivityService, StockTransactionService stockTransactionService) {
         this.saleRepository = saleRepository;
         this.saleItemRepository = saleItemRepository;
         this.saleMapper = saleMapper;
@@ -48,6 +59,10 @@ public class SaleService {
         this.salePaymentRepository = salePaymentRepository;
         this.salePaymentMapper = salePaymentMapper;
         this.itemRepository = itemRepository;
+        this.stockTransactionRepository = stockTransactionRepository;
+        this.partyLedgerService = partyLedgerService;
+        this.partyActivityService = partyActivityService;
+        this.stockTransactionService = stockTransactionService;
     }
 
     @Transactional
@@ -58,89 +73,122 @@ public class SaleService {
         Party party = partyRepository.findById(saleRequest.getPartyId())
                 .orElseThrow(()-> new ResourceNotFoundException("Party not found with id : "+saleRequest.getPartyId()));
 
-        Sale sale = saleMapper.convertSaleRequestIntoSale(saleRequest);
-        sale.setCompany(company);
-        sale.setParty(party);
-        sale.setInvoceDate(saleRequest.getInvoceDate());
-        sale.setDueDate(saleRequest.getDueDate());
-        sale.setCreatedAt(LocalDateTime.now());
-        sale.setUpdatedAt(LocalDateTime.now());
-
         // 4️⃣ Handle null-safe numeric fields
-        double receivedAmount = sale.getReceivedAmount() != null ? sale.getReceivedAmount() : 0.0;
-        double totalAmount = sale.getTotalAmount() != null ? sale.getTotalAmount() : 0.0;
+        double receivedAmount = saleRequest.getReceivedAmount() != null ? saleRequest.getReceivedAmount() : 0.0;
+        double totalAmount = saleRequest.getTotalAmount() != null ? saleRequest.getTotalAmount() : 0.0;
 
         // calculate balance
         Double balance = totalAmount - receivedAmount;
-        sale.setBalance(balance);
 
         // set isPaid
-        sale.setPaid(balance <= 0);
+        boolean isPaid = (balance <= 0) ? true : false;
+        boolean isOverDue = false;
 
         // set isOverdue
-        if (sale.getDueDate() != null && sale.getDueDate().isBefore(LocalDate.now()) && balance > 0) {
-            sale.setOverdue(true);
+        if (saleRequest.getDueDate() != null && saleRequest.getDueDate().isBefore(LocalDate.now()) && balance > 0) {
+            isOverDue = true;
         } else {
-            sale.setOverdue(false);
+            isOverDue = false;
         }
 
-        List<SaleItem> saleItems = saleItemMapper.convertSaleItemListRequestIntoSaleItemList(saleRequest.getSaleItems());
+        // set sale fields
+        Sale sale = new Sale();
+        sale = setSaleFields(saleRequest,company,party,balance,isPaid,isOverDue);
 
-        for(SaleItem saleItem : saleItems){
-            Item item = itemRepository.findByItemNameAndCompany(saleItem.getItemName(),company)
-                            .orElseThrow(()-> new ResourceNotFoundException("Item not found with name : "+saleItem.getItemName()));
-            saleItem.setSale(sale);
-            saleItem.setCreatedAt(LocalDateTime.now());
-            saleItem.setUpdateAt(LocalDateTime.now());
-            saleItem.setItem(item);
+        //save sale
+        saleRepository.save(sale);
+
+        List<SaleItem> saleItemList = new ArrayList<>();
+        List<StockTransaction> stockTransactionList = new ArrayList<>();
+        List<SalePayment> payments = new ArrayList<>();
+
+        // convert sales item request list into sale item list
+        for(SaleItemRequest saleItemRequest : saleRequest.getSaleItems()){
+            Item item = itemRepository.findById(saleItemRequest.getItemId())
+                            .orElseThrow(()-> new ResourceNotFoundException("Item not found with id : "+saleItemRequest.getItemId()));
+
+           SaleItem saleItem = new SaleItem();
+           saleItem = setSaleItemFields(saleItemRequest,sale,LocalDateTime.now(),LocalDateTime.now(),item);
+
+           // add sale item in the lsit
+            saleItemList.add(saleItem);
+
+            if(item.getItemType().equals(ItemType.PRODUCT)) {
+                 item = updateStockAfterSale(item,saleItem);
+                 // save item
+                itemRepository.save(item);
+            }
+
+
+            // set stock transaction values
+            StockTransaction stockTransaction = new StockTransaction();
+            stockTransaction =  stockTransactionService.addStockTransaction(item,StockTransactionType.SALE,saleItem.getTotalAmount(),sale.getInvoceDate(),sale.getSaleId().toString());
+
+            // if the item is product then stock transaction quantity add it.
+            if (item.getItemType().equals(ItemType.PRODUCT)) {
+                stockTransaction.setQuantity(saleItem.getQuantity());
+            }
+                // add stock transcation in list
+                stockTransactionList.add(stockTransaction);
+
         }
 
-        sale.setSaleItem(saleItems);
+        sale.setSaleItem(saleItemList);
+        stockTransactionRepository.saveAll(stockTransactionList);
 
-
+        // ---------------------- Payment Details ----------------------
         SalePayment salePayment = new SalePayment();
-        salePayment.setPaymentDescription("Received During Sale");
-        salePayment.setPaymentType(saleRequest.getPaymentType());
-        salePayment.setPaymentDate(saleRequest.getInvoceDate());
-        salePayment.setSale(sale);
-        salePayment.setCreatedAt(LocalDateTime.now());
-        salePayment.setUpdateAt(LocalDateTime.now());
-        salePayment.setAmountPaid(sale.getReceivedAmount());
 
-        sale.setSalePayments(List.of(salePayment));
+        String paymentDescription = "Received During Sale";
+        //set Sale payment
+        salePayment = setSalePaymentFields(paymentDescription,saleRequest.getPaymentType(),
+                sale.getInvoceDate(),sale,sale.getReceivedAmount(),LocalDateTime.now(),LocalDateTime.now(),null,null);
+        // add payment
+        payments.add(salePayment);
 
+        sale.setSalePayments(payments);
 
-       Sale saveSale = saleRepository.save(sale);
-      // List<SaleItem> saleItemList = saleItemRepository.saveAll(saleItems);
+        // add party ledger entry in the database
+        partyLedgerService.addLedgerEntry(
+                sale.getParty(),
+                sale.getCompany(),
+                sale.getInvoceDate(),
+                PartyTransactionType.SALE,
+                sale.getSaleId(),
+                sale.getInvoiceNumber(),
+                sale.getTotalAmount(),
+                0.0,
+                sale.getBalance(),
+                sale.getPaymentDescription()
+        );
 
+        // add party activity entry in the database
+        partyActivityService.addActivity(
+                sale.getParty(),
+                sale.getCompany(),
+                sale.getSaleId(),
+                sale.getInvoiceNumber(),
+                sale.getInvoceDate(),
+                PartyTransactionType.SALE,
+                sale.getTotalAmount(),
+                sale.getBalance(),
+                true,
+                sale.getPaymentDescription());
+
+        saleRepository.save(sale);
+
+        // convert party into party response
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(sale.getParty());
-        List<SaleItemResponse> saleItemResponses = saleItemMapper.convertSaleItemListIntoSaleItmResponseList(sale.getSaleItem());
+      //  List<SaleItemResponse> saleItemResponses = saleItemMapper.convertSaleItemListIntoSaleItmResponseList(sale.getSaleItem());
 
-        SaleResponse saleResponse = saleMapper.convertSaleIntoSaleResponse(saveSale);
-        saleResponse.setPartyResponseDto(partyResponseDto);
-        saleResponse.setSaleItemResponses(saleItemResponses);
-        saleResponse.setInvoceDate(saveSale.getInvoceDate());
-        saleResponse.setDueDate(saveSale.getDueDate());
+        List<SaleItemResponse> saleItemResponses = new ArrayList<>();
+        saleItemResponses = convertSaleItemListIntoResponseList(sale);
 
+        List<SalePaymentResponse> salePaymentResponseList = new ArrayList<>();
+        salePaymentResponseList = convertSalePaymentListIntoSalePaymentResponseList(sale.getSalePayments());
 
-        List<SalePayment> salePayments = saveSale.getSalePayments();
-
-        List<SalePaymentResponse> salePaymentResponses = salePayments.stream()
-                .map(salePayment1 -> {
-                    SalePaymentResponse salePaymentResponse = new SalePaymentResponse();
-                    salePaymentResponse.setPaymentId(salePayment1.getPaymentId());
-                    salePaymentResponse.setPaymentDate(salePayment1.getPaymentDate());
-                    salePaymentResponse.setPaymentType(salePayment1.getPaymentType());
-                    salePaymentResponse.setPaymentDescription(salePayment1.getPaymentDescription());
-                    salePaymentResponse.setAmountPaid(salePayment1.getAmountPaid());
-                    salePaymentResponse.setReceiptNo(salePayment1.getReceiptNo());
-                    salePaymentResponse.setReferenceNumber(salePayment1.getReferenceNumber());
-
-                    return salePaymentResponse;
-                }).toList();
-
-        saleResponse.setSalePaymentResponses(salePaymentResponses);
-
+        SaleResponse saleResponse = new SaleResponse();
+        saleResponse = setSaleResponseField(sale,partyResponseDto,saleItemResponses,sale.getInvoceDate(),sale.getDueDate(),salePaymentResponseList);
 
         return saleResponse;
     }
@@ -153,22 +201,26 @@ public class SaleService {
 
         List<Sale> sales = saleRepository.findAllByCompanyOrderByInvoceDateDesc(company);
 
-        List<SaleResponse> saleResponses = sales.stream()
+        List<SaleResponse> saleResponseList = sales.stream()
                 .map(sale -> {
-
                     PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(sale.getParty());
-                    List<SaleItemResponse> saleItemResponses = saleItemMapper.convertSaleItemListIntoSaleItmResponseList(sale.getSaleItem());
+
+                    //convert saleItem List into sale item response list
+                    List<SaleItemResponse> saleItemResponses = new ArrayList<>();
+                    saleItemResponses = convertSaleItemListIntoResponseList(sale);
+
+                    //convert sale payment list into response list
                     List<SalePaymentResponse> salePaymentResponses = salePaymentMapper.convertSalePaymentListIntoSalePaymentResponseList(sale.getSalePayments());
 
-                    SaleResponse saleResponse = saleMapper.convertSaleIntoSaleResponse(sale);
-                    saleResponse.setPartyResponseDto(partyResponseDto);
-                    saleResponse.setSaleItemResponses(saleItemResponses);
-                    saleResponse.setSalePaymentResponses(salePaymentResponses);
+                    // set sale response field
+                    SaleResponse saleResponse = new SaleResponse();
+                    saleResponse = setSaleResponseField(sale,partyResponseDto,saleItemResponses,sale.getInvoceDate(),sale.getDueDate(),salePaymentResponses);
 
                     return saleResponse;
                 }).toList();
 
-        return saleResponses;
+
+        return saleResponseList;
     }
 
 
@@ -177,14 +229,15 @@ public class SaleService {
                 .orElseThrow(()-> new ResourceNotFoundException("Sale not found with id : "+saleId));
 
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(sale.getParty());
-        List<SaleItemResponse> saleItemResponses = saleItemMapper.convertSaleItemListIntoSaleItmResponseList(sale.getSaleItem());
+
+        //convert sale item list into response list
+        List<SaleItemResponse> saleItemResponses = new ArrayList<>();
+        saleItemResponses = convertSaleItemListIntoResponseList(sale);
+
         List<SalePaymentResponse> salePaymentResponses = salePaymentMapper.convertSalePaymentListIntoSalePaymentResponseList(sale.getSalePayments());
 
-
-        SaleResponse saleResponse = saleMapper.convertSaleIntoSaleResponse(sale);
-        saleResponse.setPartyResponseDto(partyResponseDto);
-        saleResponse.setSaleItemResponses(saleItemResponses);
-        saleResponse.setSalePaymentResponses(salePaymentResponses);
+        SaleResponse saleResponse = new SaleResponse();
+        saleResponse = setSaleResponseField(sale,partyResponseDto,saleItemResponses,sale.getInvoceDate(),sale.getDueDate(),salePaymentResponses);
 
         return saleResponse;
     }
@@ -202,35 +255,134 @@ public class SaleService {
         sale.setParty(party);
 
         sale.getSaleItem().clear();
-        List<SaleItem> saleItems = saleItemMapper.convertSaleItemListRequestIntoSaleItemList(saleRequest.getSaleItems());
 
-        for (SaleItem saleItem : saleItems){
-            Item item = itemRepository.findByItemNameAndCompany(saleItem.getItemName(),sale.getCompany())
-                            .orElseThrow(()-> new ResourceNotFoundException("Item not found with name : "+saleItem.getItemName()));
-            saleItem.setSale(sale);
-            saleItem.setUpdateAt(LocalDateTime.now());
-            saleItem.setItem(item);
+        List<SaleItem> saleItems = new ArrayList<>();
+        List<StockTransaction> stockTransactionList = new ArrayList<>();
 
+        for(SaleItemRequest saleItemRequest : saleRequest.getSaleItems()){
+            Item item = itemRepository.findById(saleItemRequest.getItemId())
+                    .orElseThrow(()-> new ResourceNotFoundException("Item not found with id : "+saleItemRequest.getItemId()));
+
+            SaleItem saleItem = new SaleItem();
+            saleItem = setSaleItemFields(saleItemRequest,sale,sale.getCreatedAt(),LocalDateTime.now(),item);
+
+            if(item.getItemType().equals(ItemType.PRODUCT)) {
+                // management of item stock after sale happend
+                item = updateStockAfterSale(item, saleItem);
+                itemRepository.save(item);
+            }
+
+                StockTransaction stockTransaction = new StockTransaction();
+                stockTransactionService.addStockTransaction(item,StockTransactionType.SALE,saleItem.getTotalAmount(),sale.getInvoceDate(),sale.getSaleId().toString());
+
+                // if the item is product then stock transaction quantity add it.
+                if (item.getItemType().equals(ItemType.PRODUCT)) {
+                    stockTransaction.setQuantity(saleItem.getQuantity());
+                }
+
+                stockTransactionList.add(stockTransaction);
+
+            saleItems.add(saleItem);
         }
-        sale.getSaleItem().addAll(saleItems);
 
-        Sale saveSale = saleRepository.save(sale);
+        List<SalePayment> paymentList = sale.getSalePayments();
+
+        if (paymentList.isEmpty()) {
+            throw new RuntimeException("First payment is missing. Sale data is corrupted.");
+        }
+
+        SalePayment firstPayment = paymentList.get(0); // Only update this
+        String paymentDescription = "Received During Sale";
+        firstPayment = setSalePaymentFields(paymentDescription,saleRequest.getPaymentType(),sale.getInvoceDate(),
+                sale,sale.getReceivedAmount(),LocalDateTime.now(),LocalDateTime.now(),
+                null,null);
+
+
+        //set all sale item list in the sale
+        sale.getSaleItem().addAll(saleItems);
+        sale.setSalePayments(paymentList);
+
+        stockTransactionRepository.saveAll(stockTransactionList);
+
+
+
+        // update party ledger entry in the database
+        partyLedgerService.updatePartyLedger(
+                sale.getParty(),
+                sale.getCompany(),
+                sale.getInvoceDate(),
+                PartyTransactionType.SALE,
+                sale.getSaleId(),
+                sale.getInvoiceNumber(),
+                sale.getTotalAmount(),
+                0.0,
+                sale.getBalance(),
+                sale.getPaymentDescription()
+        );
+
+        // update party activity entry in the database
+        partyActivityService.updatePartyActivity(
+                sale.getParty(),
+                sale.getCompany(),
+                sale.getSaleId(),
+                sale.getInvoiceNumber(),
+                sale.getInvoceDate(),
+                PartyTransactionType.SALE,
+                sale.getTotalAmount(),
+                sale.getBalance(),
+                true,
+                sale.getPaymentDescription());
+
+        saleRepository.save(sale);
+
 
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(party);
-        List<SaleItemResponse> saleItemResponse = saleItemMapper.convertSaleItemListIntoSaleItmResponseList(saveSale.getSaleItem());
-        SaleResponse saleResponse = saleMapper.convertSaleIntoSaleResponse(saveSale);
-        saleResponse.setPartyResponseDto(partyResponseDto);
-        saleResponse.setSaleItemResponses(saleItemResponse);
+        List<SaleItemResponse> saleItemResponses = new ArrayList<>();
+        saleItemResponses = convertSaleItemListIntoResponseList(sale);
+
+
+        List<SalePaymentResponse> salePaymentResponses = new ArrayList<>();
+        salePaymentResponses = convertSalePaymentListIntoSalePaymentResponseList(sale.getSalePayments());
+
+        SaleResponse saleResponse = new SaleResponse();
+        saleResponse = setSaleResponseField(sale,partyResponseDto,saleItemResponses,sale.getInvoceDate(),sale.getDueDate(),salePaymentResponses);
 
         return saleResponse;
     }
 
 
+    @Transactional
     public String deleteSaleById(Long saleId){
         Sale sale = saleRepository.findById(saleId)
                 .orElseThrow(()-> new ResourceNotFoundException("Sale not found with id : "+saleId));
 
+
+
+        sale.getSaleItem().stream()
+                        .forEach(saleItem -> {
+                            Item item = saleItem.getItem();
+
+                            if(item.getItemType().equals(ItemType.PRODUCT)) {
+                                item.setTotalStockIn(item.getTotalStockIn() + saleItem.getQuantity());
+                                item.setStockValue(item.getStockValue() + item.getPurchasePrice());
+                                item.setAvailableStock(item.getTotalStockIn());
+                            }
+
+                                StockTransaction stockTransaction = stockTransactionRepository.findByReferenceNumberAndItemAndTransactionType(
+                                        sale.getSaleId().toString(), item, StockTransactionType.SALE
+                                ).orElseThrow(() -> new ResourceNotFoundException("Stock transaction not found "));
+
+                                stockTransactionRepository.delete(stockTransaction);
+
+                        });
+
+        partyLedgerService.deletePartyLedger(PartyTransactionType.SALE,sale.getSaleId());
+        partyActivityService.deletePartyActivity(PartyTransactionType.SALE,sale.getSaleId());
+
         saleRepository.delete(sale);
+
+
+
 
         return  "Sale delete successfully.";
     }
@@ -250,15 +402,9 @@ public class SaleService {
 
 
         SalePayment salePayment = new SalePayment();
-        salePayment.setSale(sale);
-        salePayment.setPaymentDate(salePaymentRequest.getPaymentDate());
-        salePayment.setPaymentType(salePaymentRequest.getPaymentType());
-        salePayment.setAmountPaid(salePaymentRequest.getAmountPaid());
-        salePayment.setReferenceNumber(salePaymentRequest.getReferenceNumber());
-        salePayment.setPaymentDescription(salePaymentRequest.getPaymentDescription());
-        salePayment.setReceiptNo(salePaymentRequest.getReceiptNo());
-        salePayment.setCreatedAt(LocalDateTime.now());
-        salePayment.setUpdateAt(LocalDateTime.now());
+        salePayment = setSalePaymentFields(salePaymentRequest.getPaymentDescription(),salePaymentRequest.getPaymentType(),
+                salePaymentRequest.getPaymentDate(),sale,salePaymentRequest.getAmountPaid(),LocalDateTime.now(),LocalDateTime.now(),
+                salePaymentRequest.getReceiptNo(),salePaymentRequest.getReferenceNumber());
 
 
 
@@ -272,16 +418,39 @@ public class SaleService {
 
         salePaymentRepository.save(salePayment);
 
+        // update party ledger entry in the database
+        partyLedgerService.updatePartyLedger(
+                sale.getParty(),
+                sale.getCompany(),
+                sale.getInvoceDate(),
+                PartyTransactionType.SALE,
+                sale.getSaleId(),
+                sale.getInvoiceNumber(),
+                sale.getTotalAmount(),
+                0.0,
+                sale.getBalance(),
+                sale.getPaymentDescription()
+        );
+
+        // update party activity entry in the database
+        partyActivityService.updatePartyActivity(
+                sale.getParty(),
+                sale.getCompany(),
+                sale.getSaleId(),
+                sale.getInvoiceNumber(),
+                sale.getInvoceDate(),
+                PartyTransactionType.SALE,
+                sale.getTotalAmount(),
+                sale.getBalance(),
+                true,
+                sale.getPaymentDescription());
+
         saleRepository.save(sale);
 
         SalePaymentResponse salePaymentResponse = new SalePaymentResponse();
-        salePaymentResponse.setPaymentId(salePayment.getPaymentId());
-        salePaymentResponse.setPaymentDate(salePayment.getPaymentDate());
-        salePaymentResponse.setPaymentDescription(salePayment.getPaymentDescription());
-        salePaymentResponse.setPaymentType(salePayment.getPaymentType());
-        salePaymentResponse.setReferenceNumber(salePayment.getReferenceNumber());
-        salePaymentResponse.setAmountPaid(salePayment.getAmountPaid());
-        salePaymentResponse.setReceiptNo(salePayment.getReceiptNo());
+        salePaymentResponse = setSalePaymentResponse(salePayment.getPaymentId(),salePayment.getPaymentDate(),salePayment.getPaymentDescription(),
+                salePayment.getPaymentType(),salePayment.getReferenceNumber(),salePayment.getAmountPaid(),
+                salePayment.getReceiptNo());
 
         return salePaymentResponse;
 
@@ -316,5 +485,142 @@ public class SaleService {
 
         return saleResponses;
     }
+
+
+   private SalePayment setSalePaymentFields(String paymentDescription, PaymentType paymentType,LocalDate paymentDate,
+                                      Sale sale,Double amountPaid,LocalDateTime creationDateAndTime,LocalDateTime updationDateAndTime,
+                                            String receiptNo,String referenceNumber){
+       SalePayment salePayment = new SalePayment();
+       salePayment.setPaymentDescription(paymentDescription);
+       salePayment.setPaymentType(paymentType);
+       salePayment.setPaymentDate(paymentDate);
+       salePayment.setSale(sale);
+       salePayment.setCreatedAt(creationDateAndTime);
+       salePayment.setUpdateAt(updationDateAndTime);
+       salePayment.setAmountPaid(amountPaid);
+       salePayment.setReceiptNo(receiptNo);
+       salePayment.setReferenceNumber(referenceNumber);
+
+       return salePayment;
+   }
+
+
+   private List<SaleItemResponse> convertSaleItemListIntoResponseList(Sale sale){
+       List<SaleItemResponse> saleItemResponses = sale.getSaleItem().stream()
+               .map(saleItem -> {
+                   Item item = saleItem.getItem();
+                   SaleItemResponse saleItemResponse = saleItemMapper.covertSaleItemIntoSaleItemResponse(saleItem);
+                   // saleItemResponse.setSaleItemId(saleItem.getSaleItemId());
+                   saleItemResponse.setItemName(item.getItemName());
+                   saleItemResponse.setItemHsnCode(item.getItemHsn());
+                   saleItemResponse.setUnit(item.getBaseUnit());
+                   saleItemResponse.setItemId(item.getItemId());
+
+                   return saleItemResponse;
+               }).toList();
+
+       return saleItemResponses;
+   }
+
+
+   private List<SalePaymentResponse> convertSalePaymentListIntoSalePaymentResponseList(List<SalePayment> salePayments){
+       List<SalePaymentResponse> salePaymentResponses = salePayments.stream()
+               .map(salePayment1 -> {
+                   SalePaymentResponse salePaymentResponse = new SalePaymentResponse();
+                   salePaymentResponse.setPaymentId(salePayment1.getPaymentId());
+                   salePaymentResponse.setPaymentDate(salePayment1.getPaymentDate());
+                   salePaymentResponse.setPaymentType(salePayment1.getPaymentType());
+                   salePaymentResponse.setPaymentDescription(salePayment1.getPaymentDescription());
+                   salePaymentResponse.setAmountPaid(salePayment1.getAmountPaid());
+                   salePaymentResponse.setReceiptNo(salePayment1.getReceiptNo());
+                   salePaymentResponse.setReferenceNumber(salePayment1.getReferenceNumber());
+
+                   return salePaymentResponse;
+               }).toList();
+
+       return salePaymentResponses;
+   }
+
+
+   public Sale setSaleFields(SaleRequest saleRequest,Company company,Party party,Double balance,boolean isPaid,boolean isOverDue){
+       Sale sale = saleMapper.convertSaleRequestIntoSale(saleRequest);
+       sale.setCompany(company);
+       sale.setParty(party);
+       sale.setInvoceDate(saleRequest.getInvoceDate());
+       sale.setDueDate(saleRequest.getDueDate());
+       sale.setCreatedAt(LocalDateTime.now());
+       sale.setUpdatedAt(LocalDateTime.now());
+       sale.setBalance(balance);
+       sale.setOverdue(isOverDue);
+       sale.setPaid(isPaid);
+
+       return sale;
+   }
+
+
+   public SaleItem setSaleItemFields(SaleItemRequest saleItemRequest, Sale sale, LocalDateTime createdAt, LocalDateTime updateAt, Item item){
+       SaleItem saleItem = saleItemMapper.convertSaleItemRequestIntoSaleItem(saleItemRequest);
+       saleItem.setSale(sale);
+       saleItem.setCreatedAt(createdAt);
+       saleItem.setUpdateAt(updateAt);
+       saleItem.setItem(item);
+
+       return saleItem;
+   }
+
+
+    // management of item stock after sale happend
+   private Item updateStockAfterSale(Item item,SaleItem saleItem){
+       double oldQty = item.getTotalStockIn();
+       double oldValue = item.getStockValue();
+
+       log.info("old qty : "+oldQty);
+
+       log.info("Old value : "+oldValue);
+
+
+       //double avgCost = oldValue / oldQty ;
+
+       double avgCost = (oldQty>0) ? oldValue/oldQty :0.0;
+
+       log.info("Avg  : "+avgCost);
+
+       double reducedValue = (avgCost>0) ? saleItem.getQuantity() * avgCost:0.0;
+
+       log.info("reduced value : "+reducedValue);
+
+       item.setTotalStockIn(oldQty-saleItem.getQuantity());
+       item.setStockValue(oldValue-reducedValue);
+       item.setAvailableStock(item.getTotalStockIn());
+
+       return item;
+   }
+
+   private SaleResponse setSaleResponseField(Sale sale,PartyResponseDto partyResponseDto,List<SaleItemResponse> saleItemResponses,LocalDate inovoiceDate,LocalDate dueDate,
+                                             List<SalePaymentResponse> salePaymentResponses){
+       SaleResponse saleResponse = saleMapper.convertSaleIntoSaleResponse(sale);
+       saleResponse.setPartyResponseDto(partyResponseDto);
+       saleResponse.setSaleItemResponses(saleItemResponses);
+       saleResponse.setInvoceDate(inovoiceDate);
+       saleResponse.setDueDate(dueDate);
+       saleResponse.setSalePaymentResponses(salePaymentResponses);
+       return saleResponse;
+   }
+
+   private SalePaymentResponse setSalePaymentResponse(Long paymentId, LocalDate paymentDate, String paymentDescription,
+                                                      PaymentType paymentType, String referenceNumber, Double amountPaid,
+                                                      String receiptNo){
+       SalePaymentResponse salePaymentResponse = new SalePaymentResponse();
+       salePaymentResponse.setPaymentId(paymentId);
+       salePaymentResponse.setPaymentDate(paymentDate);
+       salePaymentResponse.setPaymentDescription(paymentDescription);
+       salePaymentResponse.setPaymentType(paymentType);
+       salePaymentResponse.setReferenceNumber(referenceNumber);
+       salePaymentResponse.setAmountPaid(amountPaid);
+       salePaymentResponse.setReceiptNo(receiptNo);
+
+       return salePaymentResponse;
+   }
+
 
 }

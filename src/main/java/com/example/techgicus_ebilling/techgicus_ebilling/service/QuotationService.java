@@ -2,9 +2,11 @@ package com.example.techgicus_ebilling.techgicus_ebilling.service;
 
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.*;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PartyTransactionType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PaymentType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.QuotationType;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.quotationDto.QuotationItemRequest;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.quotationDto.QuotationItemResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.quotationDto.QuotationRequest;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.quotationDto.QuotationResponse;
@@ -38,9 +40,12 @@ public class QuotationService {
      private SaleMapper saleMapper;
      private SaleRepository saleRepository;
      private SaleItemMapper saleItemMapper;
+     private PartyLedgerService partyLedgerService;
+     private PartyActivityService partyActivityService;
+     private ItemRepository itemRepository;
 
     @Autowired
-    public QuotationService(QuotationRepository quotationRepository, QuotationItemRepository quotationItemRepository, QuotationMapper quotationMapper, QuotationItemMapper quotationItemMapper, CompanyRepository companyRepository, PartyRepository partyRepository, PartyMapper partyMapper, SaleMapper saleMapper, SaleRepository saleRepository, SaleItemMapper saleItemMapper) {
+    public QuotationService(QuotationRepository quotationRepository, QuotationItemRepository quotationItemRepository, QuotationMapper quotationMapper, QuotationItemMapper quotationItemMapper, CompanyRepository companyRepository, PartyRepository partyRepository, PartyMapper partyMapper, SaleMapper saleMapper, SaleRepository saleRepository, SaleItemMapper saleItemMapper, PartyLedgerService partyLedgerService, PartyActivityService partyActivityService, ItemRepository itemRepository) {
         this.quotationRepository = quotationRepository;
         this.quotationItemRepository = quotationItemRepository;
         this.quotationMapper = quotationMapper;
@@ -51,6 +56,9 @@ public class QuotationService {
         this.saleMapper = saleMapper;
         this.saleRepository = saleRepository;
         this.saleItemMapper = saleItemMapper;
+        this.partyLedgerService = partyLedgerService;
+        this.partyActivityService = partyActivityService;
+        this.itemRepository = itemRepository;
     }
 
     @Transactional
@@ -69,23 +77,40 @@ public class QuotationService {
         quotation.setUpdateAt(LocalDateTime.now());
         quotation.setQuotationType(QuotationType.OPEN);
 
+        List<QuotationItem> quotationItems = setQuotationItemListFields(quotationRequest.getQuotationItemRequests(),quotation);
 
-        List<QuotationItem> quotationItems = quotationRequest.getQuotationItemRequests()
-                .stream()
-                .map(quotationItemRequest -> {
-                    QuotationItem quotationItem = quotationItemMapper.convertQuotationItemRequestIntoQuotationItem(quotationItemRequest);
-                    quotationItem.setQuotation(quotation);
-                    return quotationItem;
-                }).toList();
+
+//        List<QuotationItem> quotationItems = quotationRequest.getQuotationItemRequests()
+//                .stream()
+//                .map(quotationItemRequest -> {
+//                    QuotationItem quotationItem = quotationItemMapper.convertQuotationItemRequestIntoQuotationItem(quotationItemRequest);
+//                    quotationItem.setQuotation(quotation);
+//                    return quotationItem;
+//                }).toList();
 
         quotation.setQuotationItems(quotationItems);
 
         Quotation saveQuotation = quotationRepository.save(quotation);
 
+        // add party activity
+        partyActivityService.addActivity(
+                quotation.getParty(),
+                quotation.getCompany(),
+                quotation.getQuotationId(),
+                quotation.getReferenceNo(),
+                quotation.getInvoiceDate(),
+                PartyTransactionType.QUOTATION,
+                quotation.getTotalAmount(),
+                null,
+                false,
+                quotation.getDescription()
+        );
+
         List<QuotationItem> saveQuotationItemList =  quotationItemRepository.saveAll(quotationItems);
 
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(party);
-        List<QuotationItemResponse> quotationItemResponses = quotationItemMapper.convertQuotationItemListIntoQuotationItemResponseList(saveQuotationItemList);
+        List<QuotationItemResponse> quotationItemResponses = setQuotationItemResponseListFields(quotation.getQuotationItems());
+       // List<QuotationItemResponse> quotationItemResponses = quotationItemMapper.convertQuotationItemListIntoQuotationItemResponseList(saveQuotationItemList);
 
         QuotationResponse quotationResponse = quotationMapper.convertQuotationIntoQuotationResponse(saveQuotation);
         quotationResponse.setPartyResponseDto(partyResponseDto);
@@ -101,7 +126,8 @@ public class QuotationService {
                 .orElseThrow(()-> new ResourceNotFoundException("Quotation not found with id : "+quotationId));
 
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(quotation.getParty());
-        List<QuotationItemResponse> quotationItemResponses = quotationItemMapper.convertQuotationItemListIntoQuotationItemResponseList(quotation.getQuotationItems());
+        List<QuotationItemResponse> quotationItemResponses = setQuotationItemResponseListFields(quotation.getQuotationItems());
+       // List<QuotationItemResponse> quotationItemResponses = quotationItemMapper.convertQuotationItemListIntoQuotationItemResponseList(quotation.getQuotationItems());
 
         QuotationResponse quotationResponse = quotationMapper.convertQuotationIntoQuotationResponse(quotation);
         quotationResponse.setQuotationItemResponses(quotationItemResponses);
@@ -119,7 +145,8 @@ public class QuotationService {
         List<QuotationResponse> quotationResponses = quotations.stream()
                 .map(quotation -> {
                     PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(quotation.getParty());
-                    List<QuotationItemResponse> quotationItemResponses = quotationItemMapper.convertQuotationItemListIntoQuotationItemResponseList(quotation.getQuotationItems());
+                    List<QuotationItemResponse> quotationItemResponses = setQuotationItemResponseListFields(quotation.getQuotationItems());
+                    //List<QuotationItemResponse> quotationItemResponses = quotationItemMapper.convertQuotationItemListIntoQuotationItemResponseList(quotation.getQuotationItems());
                     QuotationResponse quotationResponse = quotationMapper.convertQuotationIntoQuotationResponse(quotation);
                     quotationResponse.setPartyResponseDto(partyResponseDto);
                     quotationResponse.setQuotationItemResponses(quotationItemResponses);
@@ -131,6 +158,7 @@ public class QuotationService {
     }
 
 
+    @Transactional
     public QuotationResponse updateQuotationById(Long quotationId,QuotationRequest quotationRequest){
         Quotation quotation = quotationRepository.findById(quotationId)
                 .orElseThrow(()-> new ResourceNotFoundException("Quotation not found id : "+quotationId));
@@ -142,14 +170,16 @@ public class QuotationService {
 
         quotation.getQuotationItems().clear();
 
-         List<QuotationItem> quotationItems = quotationRequest.getQuotationItemRequests()
-                         .stream()
-                                 .map(quotationItemRequest->{
-                                     QuotationItem quotationItem = quotationItemMapper.convertQuotationItemRequestIntoQuotationItem(quotationItemRequest);
-                                     quotationItem.setQuotation(quotation);
+        List<QuotationItem> quotationItems = setQuotationItemListFields(quotationRequest.getQuotationItemRequests(),quotation);
 
-                                     return quotationItem;
-                                 }).toList();
+//         List<QuotationItem> quotationItems = quotationRequest.getQuotationItemRequests()
+//                         .stream()
+//                                 .map(quotationItemRequest->{
+//                                     QuotationItem quotationItem = quotationItemMapper.convertQuotationItemRequestIntoQuotationItem(quotationItemRequest);
+//                                     quotationItem.setQuotation(quotation);
+//
+//                                     return quotationItem;
+//                                 }).toList();
 
          quotation.getQuotationItems().addAll(quotationItems);
          quotation.setParty(party);
@@ -157,8 +187,24 @@ public class QuotationService {
 
          quotationRepository.save(quotation);
 
+
+        // add party activity
+        partyActivityService.updatePartyActivity(
+                quotation.getParty(),
+                quotation.getCompany(),
+                quotation.getQuotationId(),
+                quotation.getReferenceNo(),
+                quotation.getInvoiceDate(),
+                PartyTransactionType.QUOTATION,
+                quotation.getTotalAmount(),
+                null,
+                false,
+                quotation.getDescription()
+        );
+
          PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(quotation.getParty());
-         List<QuotationItemResponse> quotationItemResponses = quotationItemMapper.convertQuotationItemListIntoQuotationItemResponseList(quotation.getQuotationItems());
+         List<QuotationItemResponse> quotationItemResponses = setQuotationItemResponseListFields(quotation.getQuotationItems());
+        // List<QuotationItemResponse> quotationItemResponses = quotationItemMapper.convertQuotationItemListIntoQuotationItemResponseList(quotation.getQuotationItems());
          QuotationResponse quotationResponse = quotationMapper.convertQuotationIntoQuotationResponse(quotation);
          quotationResponse.setPartyResponseDto(partyResponseDto);
          quotationResponse.setQuotationItemResponses(quotationItemResponses);
@@ -167,9 +213,12 @@ public class QuotationService {
     }
 
 
+    @Transactional
     public String deleteQuotationById(Long quotationId){
         Quotation quotation = quotationRepository.findById(quotationId)
                 .orElseThrow(()-> new ResourceNotFoundException("Quotation not found by id : "+quotationId));
+
+        partyActivityService.deletePartyActivity(PartyTransactionType.QUOTATION,quotation.getQuotationId());
 
         quotationRepository.delete(quotation);
 
@@ -246,6 +295,24 @@ public class QuotationService {
 
         Sale saveSale = saleRepository.save(sale);
 
+        // delete party activity of quotation
+        partyActivityService.deletePartyActivity(PartyTransactionType.QUOTATION,quotation.getQuotationId());
+
+
+        // add party ledger entry in the database
+        partyLedgerService.addLedgerEntry(
+                sale.getParty(),
+                sale.getCompany(),
+                sale.getInvoceDate(),
+                PartyTransactionType.SALE,
+                sale.getSaleId(),
+                sale.getInvoiceNumber(),
+                sale.getTotalAmount(),
+                0.0,
+                sale.getBalance(),
+                sale.getPaymentDescription()
+        );
+
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(sale.getParty());
         List<SaleItemResponse> saleItemResponses = saleItemMapper.convertSaleItemListIntoSaleItmResponseList(sale.getSaleItem());
 
@@ -274,4 +341,44 @@ public class QuotationService {
 
         return saleResponse;
     }
+
+
+    private QuotationItem  setQuotationItemFields(QuotationItemRequest request,Quotation quotation){
+        Item item = itemRepository.findById(request.getItemId())
+                .orElseThrow(()-> new ResourceNotFoundException("Item not found with id : "+request.getItemId()));
+        QuotationItem quotationItem = quotationItemMapper.convertQuotationItemRequestIntoQuotationItem(request);
+        quotationItem.setQuotation(quotation);
+        quotationItem.setItem(item);
+
+        return quotationItem;
+    }
+
+    private List<QuotationItem>  setQuotationItemListFields(List<QuotationItemRequest> requestList,Quotation quotation){
+       List<QuotationItem> quotationItems = requestList.stream()
+               .map(request-> setQuotationItemFields(request,quotation))
+               .toList();
+
+       return quotationItems;
+    }
+
+
+    private QuotationItemResponse setQuotationItemResponseFields(QuotationItem quotationItem){
+        Item item = quotationItem.getItem();
+
+        QuotationItemResponse response = quotationItemMapper.convertQuotationItemIntoQuotationItemResponse(quotationItem);
+        response.setItemId(item.getItemId());
+        response.setItemName(item.getItemName());
+        response.setItemHsnCode(item.getItemHsn());
+
+        return response;
+    }
+
+    private List<QuotationItemResponse> setQuotationItemResponseListFields(List<QuotationItem> quotationItemList){
+        List<QuotationItemResponse> responseList = quotationItemList.stream()
+                .map(item-> setQuotationItemResponseFields(item))
+                .toList();
+
+        return responseList;
+    }
+
 }

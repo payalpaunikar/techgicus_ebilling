@@ -3,11 +3,13 @@ package com.example.techgicus_ebilling.techgicus_ebilling.service;
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.OrderType;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PartyTransactionType;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseDto.PurchaseItemResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseDto.PurchasePaymentResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseDto.PurchaseRequest;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseDto.PurchaseResponse;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseOrderDto.PurchaseOrderItemRequest;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseOrderDto.PurchaseOrderItemResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseOrderDto.PurchaseOrderRequest;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseOrderDto.PurchaseOrderResponse;
@@ -29,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -45,9 +48,12 @@ public class PurchaseOrderService {
        private PurchasePaymentRepository purchasePaymentRepository;
        private PurchasePaymentMapper purchasePaymentMapper;
        private PurchaseItemMapper purchaseItemMapper;
+       private PartyLedgerService partyLedgerService;
+       private PartyActivityService partyActivityService;
+       private ItemRepository itemRepository;
 
     @Autowired
-    public PurchaseOrderService(PurchaseOrderRepository purchaseOrderRepository, CompanyRepository companyRepository, PartyRepository partyRepository, PartyMapper partyMapper, PurchaseOrderItemMapper purchaseOrderItemMapper, PurchaseOrderMapper purchaseOrderMapper, PurchaseMapper purchaseMapper, PurchaseRepository purchaseRepository, PurchasePaymentRepository purchasePaymentRepository, PurchasePaymentMapper purchasePaymentMapper, PurchaseItemMapper purchaseItemMapper) {
+    public PurchaseOrderService(PurchaseOrderRepository purchaseOrderRepository, CompanyRepository companyRepository, PartyRepository partyRepository, PartyMapper partyMapper, PurchaseOrderItemMapper purchaseOrderItemMapper, PurchaseOrderMapper purchaseOrderMapper, PurchaseMapper purchaseMapper, PurchaseRepository purchaseRepository, PurchasePaymentRepository purchasePaymentRepository, PurchasePaymentMapper purchasePaymentMapper, PurchaseItemMapper purchaseItemMapper, PartyLedgerService partyLedgerService, PartyActivityService partyActivityService, ItemRepository itemRepository) {
         this.purchaseOrderRepository = purchaseOrderRepository;
         this.companyRepository = companyRepository;
         this.partyRepository = partyRepository;
@@ -59,8 +65,12 @@ public class PurchaseOrderService {
         this.purchasePaymentRepository = purchasePaymentRepository;
         this.purchasePaymentMapper = purchasePaymentMapper;
         this.purchaseItemMapper = purchaseItemMapper;
+        this.partyLedgerService = partyLedgerService;
+        this.partyActivityService = partyActivityService;
+        this.itemRepository = itemRepository;
     }
 
+    @Transactional
     public PurchaseOrderResponse createdPurchaseOrder(Long companyId, PurchaseOrderRequest purchaseOrderRequest){
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(()-> new ResourceNotFoundException("Compnay not found with id : "+companyId));
@@ -74,24 +84,42 @@ public class PurchaseOrderService {
          purchaseOrder.setParty(party);
          purchaseOrder.setOrderType(OrderType.OPEN);
 
-        List<PurchaseOrderItem> purchaseOrderItems = purchaseOrderRequest.getPurchaseOrderItemRequests()
-                        .stream()
-                                .map(purchaseOrderItemRequest -> {
-                                    PurchaseOrderItem purchaseOrderItem = purchaseOrderItemMapper.convertRequestToEntity(purchaseOrderItemRequest);
-                                    purchaseOrderItem.setPurchaseOrder(purchaseOrder);
-                                    return purchaseOrderItem;
-                                }).toList();
+         List<PurchaseOrderItem> purchaseOrderItems = setPurchaseOrderItemList(purchaseOrderRequest.getPurchaseOrderItemRequests(),purchaseOrder);
+
+//        List<PurchaseOrderItem> purchaseOrderItems = purchaseOrderRequest.getPurchaseOrderItemRequests()
+//                        .stream()
+//                                .map(purchaseOrderItemRequest -> {
+//                                    PurchaseOrderItem purchaseOrderItem = purchaseOrderItemMapper.convertRequestToEntity(purchaseOrderItemRequest);
+//                                    purchaseOrderItem.setPurchaseOrder(purchaseOrder);
+//                                    return purchaseOrderItem;
+//                                }).toList();
 
         purchaseOrder.setPurchaseOrderItems(purchaseOrderItems);
 
         purchaseOrderRepository.save(purchaseOrder);
 
+        // add party activity entry in the database
+        partyActivityService.addActivity(
+                purchaseOrder.getParty(),
+                purchaseOrder.getCompany(),
+                purchaseOrder.getPurchaseOrderId(),
+                purchaseOrder.getOrderNo(),
+                purchaseOrder.getPurchaseDate(),
+                PartyTransactionType.PURCHASE_ORDER,
+                purchaseOrder.getTotalAmount(),
+                purchaseOrder.getBalanceAmount(),
+                false,
+                purchaseOrder.getDescription());
+
+
+
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(party);
-        List<PurchaseOrderItemResponse> purchaseOrderItemResponseList = purchaseOrderItemMapper.convertEntityListToResponseList(purchaseOrder.getPurchaseOrderItems());
+        List<PurchaseOrderItemResponse> orderItemResponses = setPurchaseOrderItemResponseList(purchaseOrder.getPurchaseOrderItems());
+       // List<PurchaseOrderItemResponse> purchaseOrderItemResponseList = purchaseOrderItemMapper.convertEntityListToResponseList(purchaseOrder.getPurchaseOrderItems());
 
         PurchaseOrderResponse purchaseOrderResponse = purchaseOrderMapper.convertEntityToResponse(purchaseOrder);
         purchaseOrderResponse.setPartyResponseDto(partyResponseDto);
-        purchaseOrderResponse.setPurchaseOrderItemResponseList(purchaseOrderItemResponseList);
+        purchaseOrderResponse.setPurchaseOrderItemResponseList(orderItemResponses);
 
         return purchaseOrderResponse;
     }
@@ -105,7 +133,8 @@ public class PurchaseOrderService {
         List<PurchaseOrderResponse> purchaseOrderResponses = purchaseOrders.stream()
                 .map(purchaseOrder -> {
                     PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(purchaseOrder.getParty());
-                    List<PurchaseOrderItemResponse> purchaseOrderItemResponseList = purchaseOrderItemMapper.convertEntityListToResponseList(purchaseOrder.getPurchaseOrderItems());
+                    List<PurchaseOrderItemResponse> purchaseOrderItemResponseList = setPurchaseOrderItemResponseList(purchaseOrder.getPurchaseOrderItems());
+                   // List<PurchaseOrderItemResponse> purchaseOrderItemResponseList = purchaseOrderItemMapper.convertEntityListToResponseList(purchaseOrder.getPurchaseOrderItems());
                     PurchaseOrderResponse purchaseOrderResponse = purchaseOrderMapper.convertEntityToResponse(purchaseOrder);
                     purchaseOrderResponse.setPartyResponseDto(partyResponseDto);
                     purchaseOrderResponse.setPurchaseOrderItemResponseList(purchaseOrderItemResponseList);
@@ -120,7 +149,9 @@ public class PurchaseOrderService {
                 .orElseThrow(()-> new ResourceNotFoundException("Purchase order is not found with id : "+purchaseOrderId));
 
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(purchaseOrder.getParty());
-        List<PurchaseOrderItemResponse> purchaseOrderItemResponseList = purchaseOrderItemMapper.convertEntityListToResponseList(purchaseOrder.getPurchaseOrderItems());
+        List<PurchaseOrderItemResponse> purchaseOrderItemResponseList = setPurchaseOrderItemResponseList(purchaseOrder.getPurchaseOrderItems());
+
+        //  List<PurchaseOrderItemResponse> purchaseOrderItemResponseList = purchaseOrderItemMapper.convertEntityListToResponseList(purchaseOrder.getPurchaseOrderItems());
         PurchaseOrderResponse purchaseOrderResponse = purchaseOrderMapper.convertEntityToResponse(purchaseOrder);
         purchaseOrderResponse.setPartyResponseDto(partyResponseDto);
         purchaseOrderResponse.setPurchaseOrderItemResponseList(purchaseOrderItemResponseList);
@@ -128,6 +159,8 @@ public class PurchaseOrderService {
         return purchaseOrderResponse;
     }
 
+
+    @Transactional
     public PurchaseOrderResponse updatePurchaseOrderById(Long purchaseOrderId, PurchaseOrderRequest orderRequest){
         PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(purchaseOrderId)
                 .orElseThrow(()-> new ResourceNotFoundException("Purchase order is not found with id : "+purchaseOrderId));
@@ -144,20 +177,39 @@ public class PurchaseOrderService {
         purchaseOrder.setParty(party);
         purchaseOrder.getPurchaseOrderItems().clear();
 
-        List<PurchaseOrderItem> purchaseOrderItems = orderRequest.getPurchaseOrderItemRequests()
-                .stream()
-                .map(purchaseOrderItemRequest -> {
-                    PurchaseOrderItem purchaseOrderItem = purchaseOrderItemMapper.convertRequestToEntity(purchaseOrderItemRequest);
-                    purchaseOrderItem.setPurchaseOrder(purchaseOrder);
-                    return purchaseOrderItem;
-                }).toList();
+        List<PurchaseOrderItem> purchaseOrderItems = setPurchaseOrderItemList(orderRequest.getPurchaseOrderItemRequests(),purchaseOrder);
+
+//        List<PurchaseOrderItem> purchaseOrderItems = orderRequest.getPurchaseOrderItemRequests()
+//                .stream()
+//                .map(purchaseOrderItemRequest -> {
+//                    PurchaseOrderItem purchaseOrderItem = purchaseOrderItemMapper.convertRequestToEntity(purchaseOrderItemRequest);
+//                    purchaseOrderItem.setPurchaseOrder(purchaseOrder);
+//                    return purchaseOrderItem;
+//                }).toList();
 
         purchaseOrder.getPurchaseOrderItems().addAll(purchaseOrderItems);
 
         purchaseOrderRepository.save(purchaseOrder);
 
+        // update party activity entry in the database
+        partyActivityService.updatePartyActivity(
+                purchaseOrder.getParty(),
+                purchaseOrder.getCompany(),
+                purchaseOrder.getPurchaseOrderId(),
+                purchaseOrder.getOrderNo(),
+                purchaseOrder.getPurchaseDate(),
+                PartyTransactionType.PURCHASE_ORDER,
+                purchaseOrder.getTotalAmount(),
+                purchaseOrder.getBalanceAmount(),
+                false,
+                purchaseOrder.getDescription());
+
+
+
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(purchaseOrder.getParty());
-        List<PurchaseOrderItemResponse> purchaseOrderItemResponseList = purchaseOrderItemMapper.convertEntityListToResponseList(purchaseOrder.getPurchaseOrderItems());
+        List<PurchaseOrderItemResponse> purchaseOrderItemResponseList = setPurchaseOrderItemResponseList(purchaseOrder.getPurchaseOrderItems());
+
+        // List<PurchaseOrderItemResponse> purchaseOrderItemResponseList = purchaseOrderItemMapper.convertEntityListToResponseList(purchaseOrder.getPurchaseOrderItems());
         PurchaseOrderResponse purchaseOrderResponse = purchaseOrderMapper.convertEntityToResponse(purchaseOrder);
         purchaseOrderResponse.setPartyResponseDto(partyResponseDto);
         purchaseOrderResponse.setPurchaseOrderItemResponseList(purchaseOrderItemResponseList);
@@ -165,9 +217,13 @@ public class PurchaseOrderService {
     }
 
 
+    @Transactional
     public String deletePurchaseOrderById(Long purchaseOrderId){
         PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(purchaseOrderId)
                 .orElseThrow(()-> new ResourceNotFoundException("Purchase order is not found with id : "+purchaseOrderId));
+
+
+        partyActivityService.deletePartyActivity(PartyTransactionType.PURCHASE_ORDER,purchaseOrder.getPurchaseOrderId());
 
         purchaseOrderRepository.delete(purchaseOrder);
 
@@ -223,6 +279,22 @@ public class PurchaseOrderService {
 
         Purchase savePurchase =  purchaseRepository.save(purchase);
 
+        partyActivityService.deletePartyActivity(PartyTransactionType.PURCHASE_ORDER,purchaseOrder.getPurchaseOrderId());
+
+        // add party ledger entry in the database
+        partyLedgerService.addLedgerEntry(
+                purchase.getParty(),
+                purchase.getCompany(),
+                purchase.getBillDate(),
+                PartyTransactionType.PURCHASE,
+                purchase.getPurchaseId(),
+                purchase.getBillNumber(),
+                0.0,
+                purchase.getTotalAmount(),
+                purchase.getBalance(),
+                purchase.getPaymentDescription()
+        );
+
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(party);
         List<PurchaseItemResponse> purchaseItemResponses = purchaseItemMapper.convertPurchaseItemsIntoResponseList(savePurchase.getPurchaseItems());
 
@@ -239,4 +311,45 @@ public class PurchaseOrderService {
         return purchaseResponse;
 
     }
+
+
+    private PurchaseOrderItem setPurchaseOrderItem(PurchaseOrderItemRequest request,PurchaseOrder order){
+        Item item = itemRepository.findById(request.getItemId())
+                .orElseThrow(()-> new ResourceNotFoundException("Item not found with id : "+request.getItemId()));
+        PurchaseOrderItem purchaseOrderItem = purchaseOrderItemMapper.convertRequestToEntity(request);
+        purchaseOrderItem.setItem(item);
+        purchaseOrderItem.setPurchaseOrder(order);
+
+        return purchaseOrderItem;
+    }
+
+
+    private List<PurchaseOrderItem> setPurchaseOrderItemList(List<PurchaseOrderItemRequest> requestList,PurchaseOrder order){
+       List<PurchaseOrderItem> purchaseOrderItems = requestList.stream()
+               .map(request-> setPurchaseOrderItem(request,order))
+               .toList();
+
+       return purchaseOrderItems;
+    }
+
+
+    private PurchaseOrderItemResponse setPurchaseOrderItemResponse(PurchaseOrderItem orderItem){
+        Item item = orderItem.getItem();
+
+        PurchaseOrderItemResponse response = purchaseOrderItemMapper.convertEntityToResponse(orderItem);
+        response.setItemId(item.getItemId());
+        response.setItemName(item.getItemName());
+
+        return response;
+    }
+
+
+    private List<PurchaseOrderItemResponse> setPurchaseOrderItemResponseList(List<PurchaseOrderItem> orderItemList){
+        List<PurchaseOrderItemResponse> responseList = orderItemList.stream()
+                .map(orderItem-> setPurchaseOrderItemResponse(orderItem))
+                .toList();
+
+        return responseList;
+    }
+
 }

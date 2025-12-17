@@ -4,6 +4,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.service;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Party;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.PaymentIn;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PartyTransactionType;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.paymentInDto.PaymentInRequest;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.paymentInDto.PaymentInResponse;
@@ -15,6 +16,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.repository.PartyReposit
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.PaymentInRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,16 +30,22 @@ public class PaymentInService {
          private PaymentInRepository paymentInRepository;
          private PartyMapper partyMapper;
          private PaymentInMapper paymentInMapper;
+         private PartyLedgerService partyLedgerService;
+         private PartyActivityService partyActivityService;
 
     @Autowired
-    public PaymentInService(CompanyRepository companyRepository, PartyRepository partyRepository, PaymentInRepository paymentInRepository, PartyMapper partyMapper, PaymentInMapper paymentInMapper) {
+    public PaymentInService(CompanyRepository companyRepository, PartyRepository partyRepository, PaymentInRepository paymentInRepository, PartyMapper partyMapper, PaymentInMapper paymentInMapper, PartyLedgerService partyLedgerService, PartyActivityService partyActivityService) {
         this.companyRepository = companyRepository;
         this.partyRepository = partyRepository;
         this.paymentInRepository = paymentInRepository;
         this.partyMapper = partyMapper;
         this.paymentInMapper = paymentInMapper;
+        this.partyLedgerService = partyLedgerService;
+        this.partyActivityService = partyActivityService;
     }
 
+
+    @Transactional
     public PaymentInResponse addPaymentIn(Long companyId, PaymentInRequest paymentInRequest){
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(()-> new ResourceNotFoundException("Compnay not found with id : "+companyId));
@@ -50,6 +58,34 @@ public class PaymentInService {
         paymentIn.setParty(party);
         paymentIn.setCreateAt(LocalDateTime.now());
         paymentIn.setUpdateAt(LocalDateTime.now());
+
+        partyLedgerService.addLedgerEntry(
+                paymentIn.getParty(),
+                paymentIn.getCompany(),
+                paymentIn.getPaymentDate(),
+                PartyTransactionType.PAYMENT_IN,
+                paymentIn.getPaymentInId(),
+                paymentIn.getReceiptNo(),
+                paymentIn.getReceivedAmount(),
+                0.0,
+                0.0,
+                paymentIn.getDescription()
+
+        );
+
+
+        partyActivityService.addActivity(
+                paymentIn.getParty(),
+                paymentIn.getCompany(),
+                paymentIn.getPaymentInId(),
+                paymentIn.getReceiptNo(),
+                paymentIn.getPaymentDate(),
+                PartyTransactionType.PAYMENT_IN,
+                paymentIn.getReceivedAmount(),
+                0.0,
+                true,
+                paymentIn.getDescription()
+        );
 
         paymentInRepository.save(paymentIn);
 
@@ -98,6 +134,7 @@ public class PaymentInService {
     }
 
 
+    @Transactional
     public PaymentInResponse updatePaymentInById(Long paymentInId,PaymentInRequest paymentInRequest){
 
         Party party = partyRepository.findById(paymentInRequest.getPartyId())
@@ -110,6 +147,33 @@ public class PaymentInService {
         paymentIn.setParty(party);
         paymentIn.setUpdateAt(LocalDateTime.now());
 
+  partyLedgerService.updatePartyLedger(
+                paymentIn.getParty(),
+                paymentIn.getCompany(),
+                paymentIn.getPaymentDate(),
+                PartyTransactionType.PAYMENT_IN,
+                paymentIn.getPaymentInId(),
+                paymentIn.getReceiptNo(),
+                paymentIn.getReceivedAmount(),
+                0.0,
+                0.0,
+                paymentIn.getDescription()
+
+        );
+
+
+        partyActivityService.updatePartyActivity(
+                paymentIn.getParty(),
+                paymentIn.getCompany(),
+                paymentIn.getPaymentInId(),
+                paymentIn.getReceiptNo(),
+                paymentIn.getPaymentDate(),
+                PartyTransactionType.PAYMENT_IN,
+                paymentIn.getReceivedAmount(),
+                0.0,
+                true,
+                paymentIn.getDescription()
+        );
         paymentInRepository.save(paymentIn);
 
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(paymentIn.getParty());
@@ -120,9 +184,14 @@ public class PaymentInService {
     }
 
 
+    @Transactional
     public String deletePaymentInById(Long paymentInId){
         PaymentIn paymentIn = paymentInRepository.findById(paymentInId)
                 .orElseThrow(()-> new ResourceNotFoundException("Payment in not found by id : "+paymentInId));
+
+        partyLedgerService.deletePartyLedger(PartyTransactionType.PAYMENT_IN,paymentIn.getPaymentInId());
+
+        partyActivityService.deletePartyActivity(PartyTransactionType.PAYMENT_IN,paymentIn.getPaymentInId());
 
         paymentInRepository.delete(paymentIn);
 

@@ -43,8 +43,8 @@ public class SecurityConfig {
       @Autowired
       private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-      @Autowired
-      private SubscriptionFilter subscriptionFilter;
+//      @Autowired
+//      private SubscriptionFilter subscriptionFilter;
 
 
 
@@ -69,7 +69,7 @@ public class SecurityConfig {
                                  "/swagger-ui.html").permitAll()
                          .anyRequest().authenticated())
                  .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                 .addFilterAfter(subscriptionFilter,JWTAuthenticationFilter.class)
+                // .addFilterAfter(subscriptionFilter,JWTAuthenticationFilter.class)
                  .exceptionHandling(ex-> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                  .sessionManagement(session-> session
                          .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

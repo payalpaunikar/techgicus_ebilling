@@ -72,6 +72,16 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST,exception.getMessage());
     }
 
+    @ExceptionHandler(ItemAlreadyExitException.class)
+    public ResponseEntity<ErrorResponse> handleItemAlreadyExitException(ItemAlreadyExitException exception){
+        return buildResponse(HttpStatus.CONFLICT,exception.getMessage());
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException exception){
+        return buildResponse(HttpStatus.BAD_REQUEST,exception.getMessage());
+    }
+
     public ResponseEntity<ErrorResponse> buildResponse(HttpStatus httpStatus, String message){
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(LocalDateTime.now());

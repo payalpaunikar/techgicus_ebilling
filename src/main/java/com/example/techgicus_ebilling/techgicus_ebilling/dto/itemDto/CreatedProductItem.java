@@ -36,7 +36,7 @@ public class CreatedProductItem {
 
     private Double stockOpeningQty;
 
-    private Double stockPrice;
+    private Double stockPricePerQty;
 
     private LocalDate stockOpeningDate;
 
@@ -51,7 +51,7 @@ public class CreatedProductItem {
     public CreatedProductItem() {
     }
 
-    public CreatedProductItem(String itemName, String itemHsn, String itemCode, String description, ItemType itemType, Unit baseUnit, Unit secondaryUnit, Double baseUnitToSecondaryUnit, Set<Long> categoryIds, Double salePrice, TaxType saleTaxType, Double purchasePrice, TaxType purchaseTaxType, TaxRate taxRate, Double stockOpeningQty, Double stockPrice, LocalDate stockOpeningDate, Double minimumStockToMaintain, String openingStockLocation, Double saleDiscountPrice, DiscountType saleDiscountType) {
+    public CreatedProductItem(String itemName, String itemHsn, String itemCode, String description, ItemType itemType, Unit baseUnit, Unit secondaryUnit, Double baseUnitToSecondaryUnit, Set<Long> categoryIds, Double salePrice, TaxType saleTaxType, Double purchasePrice, TaxType purchaseTaxType, TaxRate taxRate, Double stockOpeningQty, Double stockPricePerQty, LocalDate stockOpeningDate, Double minimumStockToMaintain, String openingStockLocation, Double saleDiscountPrice, DiscountType saleDiscountType) {
         this.itemName = itemName;
         this.itemHsn = itemHsn;
         this.itemCode = itemCode;
@@ -67,7 +67,7 @@ public class CreatedProductItem {
         this.purchaseTaxType = purchaseTaxType;
         this.taxRate = taxRate;
         this.stockOpeningQty = stockOpeningQty;
-        this.stockPrice = stockPrice;
+        this.stockPricePerQty = stockPricePerQty;
         this.stockOpeningDate = stockOpeningDate;
         this.minimumStockToMaintain = minimumStockToMaintain;
         this.openingStockLocation = openingStockLocation;
@@ -195,12 +195,12 @@ public class CreatedProductItem {
         this.stockOpeningQty = stockOpeningQty;
     }
 
-    public Double getStockPrice() {
-        return stockPrice;
+    public Double getStockPricePerQty() {
+        return stockPricePerQty;
     }
 
-    public void setStockPrice(Double stockPrice) {
-        this.stockPrice = stockPrice;
+    public void setStockPricePerQty(Double stockPricePerQty) {
+        this.stockPricePerQty = stockPricePerQty;
     }
 
     public LocalDate getStockOpeningDate() {

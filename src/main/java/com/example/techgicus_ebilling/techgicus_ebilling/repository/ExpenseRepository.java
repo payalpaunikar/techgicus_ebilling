@@ -43,5 +43,14 @@ public interface ExpenseRepository extends JpaRepository<Expense,Long> {
     List<ExpensesCategoryWithExpenseAmountResponse> findAllExpensesCategoryWithExpenseAmountByDate(@Param("companyId") Long companyId, @Param("startDate")LocalDate startDate,
                                                                                                    @Param("endDate")LocalDate endDate);
 
+    @Query("""
+    SELECT COALESCE(SUM(e.totalAmount), 0)
+    FROM Expense e
+    WHERE e.company.companyId = :companyId
+    AND e.expenseDate BETWEEN :startDate AND :endDate
+    """)
+    Double sumOtherExpense(@Param("companyId")Long companyId,
+                           @Param("startDate")LocalDate startDate,
+                           @Param("endDate")LocalDate endDate);
 
 }

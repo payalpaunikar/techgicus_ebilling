@@ -15,7 +15,7 @@ public interface ItemMapper {
 
 Item convertCreatedProductItemIntoItem(CreatedProductItem createdProductItem);
 
-   Item convertCreatedServiceItemIntoItem(CreatedServiceItem createdServiceItem);
+    Item convertCreatedServiceItemIntoItem(CreatedServiceItem createdServiceItem);
 
     ItemResponse convertItemIntoItemResponse(Item item);
 

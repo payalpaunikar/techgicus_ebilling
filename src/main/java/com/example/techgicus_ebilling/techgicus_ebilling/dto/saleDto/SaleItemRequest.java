@@ -5,11 +5,12 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.T
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.Unit;
 
 public class SaleItemRequest {
-    private String itemName;
-    private String itemHsnCode;
+    private Long itemId;
+//    private String itemName;
+//    private String itemHsnCode;
     private String itemDescription;
     private Integer quantity;
-    private Unit unit;
+  //  private Unit unit;
     private Double pricePerUnit;
     private TaxType pricePerUnitTaxType;
     private TaxRate taxRate;
@@ -19,34 +20,9 @@ public class SaleItemRequest {
     public SaleItemRequest() {
     }
 
-    public SaleItemRequest(String itemName, String itemHsnCode, String itemDescription, Integer quantity, Unit unit, Double pricePerUnit, TaxType pricePerUnitTaxType, TaxRate taxRate, Double taxAmount, Double totalAmount) {
-        this.itemName = itemName;
-        this.itemHsnCode = itemHsnCode;
-        this.itemDescription = itemDescription;
-        this.quantity = quantity;
-        this.unit = unit;
-        this.pricePerUnit = pricePerUnit;
-        this.pricePerUnitTaxType = pricePerUnitTaxType;
-        this.taxRate = taxRate;
-        this.taxAmount = taxAmount;
-        this.totalAmount = totalAmount;
-    }
 
-    public String getItemName() {
-        return itemName;
-    }
 
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
-    }
 
-    public String getItemHsnCode() {
-        return itemHsnCode;
-    }
-
-    public void setItemHsnCode(String itemHsnCode) {
-        this.itemHsnCode = itemHsnCode;
-    }
 
     public String getItemDescription() {
         return itemDescription;
@@ -64,13 +40,7 @@ public class SaleItemRequest {
         this.quantity = quantity;
     }
 
-    public Unit getUnit() {
-        return unit;
-    }
 
-    public void setUnit(Unit unit) {
-        this.unit = unit;
-    }
 
     public Double getPricePerUnit() {
         return pricePerUnit;
@@ -110,5 +80,13 @@ public class SaleItemRequest {
 
     public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public Long getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(Long itemId) {
+        this.itemId = itemId;
     }
 }

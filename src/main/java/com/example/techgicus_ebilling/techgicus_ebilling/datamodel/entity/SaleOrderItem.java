@@ -12,7 +12,7 @@ public class SaleOrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long saleOrderItemId;
 
-    private String name;
+//    private String name;
 
     private Double quantity;
 
@@ -36,6 +36,18 @@ public class SaleOrderItem {
     @JoinColumn(name = "sale_order_id")
     private SaleOrder saleOrder;
 
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
     public Long getSaleOrderItemId() {
         return saleOrderItemId;
     }
@@ -44,13 +56,13 @@ public class SaleOrderItem {
         this.saleOrderItemId = saleOrderItemId;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+//    public String getName() {
+//        return name;
+//    }
+//
+//    public void setName(String name) {
+//        this.name = name;
+//    }
 
     public Double getQuantity() {
         return quantity;

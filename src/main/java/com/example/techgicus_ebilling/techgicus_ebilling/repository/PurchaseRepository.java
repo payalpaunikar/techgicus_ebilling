@@ -61,5 +61,24 @@ public interface PurchaseRepository extends JpaRepository<Purchase,Long> {
     );
 
 
+    @Query("""
+    SELECT COALESCE(SUM(p.totalAmount), 0)
+    FROM Purchase p
+    WHERE p.company.companyId = :companyId
+    AND p.billDate BETWEEN :startDate AND :endDate
+    """)
+    Double sumPurchaseByDate(@Param("companyId")Long companyId,
+                             @Param("startDate")LocalDate startDate,
+                             @Param("endDate")LocalDate endDate);
 
+
+    @Query("""
+    SELECT COALESCE(SUM(p.totalTaxAmount), 0)
+    FROM Purchase p
+    WHERE p.company.companyId = :companyId
+    AND p.billDate BETWEEN :startDate AND :endDate
+    """)
+    Double sumTaxAmountByDate(@Param("companyId")Long companyId,
+                              @Param("startDate")LocalDate startDate,
+                              @Param("endDate")LocalDate endDate);
 }

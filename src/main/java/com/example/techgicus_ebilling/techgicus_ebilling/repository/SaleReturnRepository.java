@@ -7,6 +7,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.dto.reportDto.SaleRepor
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -47,4 +48,27 @@ public interface SaleReturnRepository extends JpaRepository<SaleReturn,Long> {
             @Param("startDate")LocalDate startDate,
             @Param("endDate")LocalDate endDate
     );
+
+
+
+    @Query("""
+    SELECT COALESCE(SUM(s.totalAmount), 0)
+    FROM SaleReturn s
+    WHERE s.company.companyId = :companyId
+    AND s.returnDate BETWEEN :startDate AND :endDate
+    """)
+    Double sumCreditNoteByDate(@Param("companyId")Long companyId,
+                               @Param("startDate")LocalDate startDate,
+                               @Param("endDate")LocalDate endDate);
+
+
+    @Query("""
+    SELECT COALESCE(SUM(s.totalTaxAmount), 0)
+    FROM SaleReturn s
+    WHERE s.company.companyId = :companyId
+    AND s.returnDate BETWEEN :startDate AND :endDate
+    """)
+    Double sumTaxAmountByDate(@Param("companyId")Long companyId,
+                              @Param("startDate")LocalDate startDate,
+                              @Param("endDate")LocalDate endDate);
 }

@@ -4,7 +4,6 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.T
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.TaxType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.Unit;
 import jakarta.persistence.*;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 import java.time.LocalDateTime;
 
@@ -20,16 +19,16 @@ public class SaleItem {
     @JoinColumn(name = "item_id")
     private Item item;
 
-    private String itemName;
-
-    private String itemHsnCode;
+//    private String itemName;
+//
+//    private String itemHsnCode;
 
     private String itemDescription;
 
-    private Integer quantity;
+    private Double quantity;
 
-    @Enumerated(EnumType.STRING)
-    private Unit unit;
+//    @Enumerated(EnumType.STRING)
+//    private Unit unit;
 
     private Double pricePerUnit;
 
@@ -47,28 +46,14 @@ public class SaleItem {
     @JoinColumn(name = "sale_id")
     private Sale sale;
 
+
+
     private LocalDateTime createdAt;
     private LocalDateTime updateAt;
 
     public SaleItem() {
     }
 
-    public SaleItem(Long saleItemId, String itemName, String itemHsnCode, String itemDescription, Integer quantity, Unit unit, Double pricePerUnit, TaxType pricePerUnitTaxType, TaxRate taxRate, Double taxAmount, Double totalAmount, Sale sale, LocalDateTime createdAt, LocalDateTime updateAt) {
-        this.saleItemId = saleItemId;
-        this.itemName = itemName;
-        this.itemHsnCode = itemHsnCode;
-        this.itemDescription = itemDescription;
-        this.quantity = quantity;
-        this.unit = unit;
-        this.pricePerUnit = pricePerUnit;
-        this.pricePerUnitTaxType = pricePerUnitTaxType;
-        this.taxRate = taxRate;
-        this.taxAmount = taxAmount;
-        this.totalAmount = totalAmount;
-        this.sale = sale;
-        this.createdAt = createdAt;
-        this.updateAt = updateAt;
-    }
 
     public Long getSaleItemId() {
         return saleItemId;
@@ -78,21 +63,6 @@ public class SaleItem {
         this.saleItemId = saleItemId;
     }
 
-    public String getItemName() {
-        return itemName;
-    }
-
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
-    }
-
-    public String getItemHsnCode() {
-        return itemHsnCode;
-    }
-
-    public void setItemHsnCode(String itemHsnCode) {
-        this.itemHsnCode = itemHsnCode;
-    }
 
     public String getItemDescription() {
         return itemDescription;
@@ -102,20 +72,8 @@ public class SaleItem {
         this.itemDescription = itemDescription;
     }
 
-    public Integer getQuantity() {
+    public Double getQuantity() {
         return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public Unit getUnit() {
-        return unit;
-    }
-
-    public void setUnit(Unit unit) {
-        this.unit = unit;
     }
 
     public Double getPricePerUnit() {
@@ -189,4 +147,10 @@ public class SaleItem {
     public void setItem(Item item) {
         this.item = item;
     }
+
+    public void setQuantity(Double quantity) {
+        this.quantity = quantity;
+    }
+
+
 }

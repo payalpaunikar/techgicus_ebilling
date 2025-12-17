@@ -13,7 +13,7 @@ public class PurchaseOrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long purchaseOrderItemId;
 
-    private String itemName;
+   // private String itemName;
 
     private Integer quantity;
 
@@ -37,6 +37,10 @@ public class PurchaseOrderItem {
     @ManyToOne
     @JoinColumn(name = "purchase_order_id")
     private PurchaseOrder purchaseOrder;
+
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
 
     public Long getPurchaseOrderItemId() {
         return purchaseOrderItemId;
@@ -102,13 +106,13 @@ public class PurchaseOrderItem {
         this.totalAmount = totalAmount;
     }
 
-    public String getItemName() {
-        return itemName;
-    }
-
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
-    }
+//    public String getItemName() {
+//        return itemName;
+//    }
+//
+//    public void setItemName(String itemName) {
+//        this.itemName = itemName;
+//    }
 
     public PurchaseOrder getPurchaseOrder() {
         return purchaseOrder;
@@ -124,5 +128,13 @@ public class PurchaseOrderItem {
 
     public void setTotalTaxAmount(Double totalTaxAmount) {
         this.totalTaxAmount = totalTaxAmount;
+    }
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
     }
 }

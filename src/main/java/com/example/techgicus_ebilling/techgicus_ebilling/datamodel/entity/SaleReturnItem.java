@@ -39,6 +39,18 @@ public class SaleReturnItem {
     @JoinColumn(name = "sale_return_id")
     private SaleReturn saleReturn;
 
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
     public Long getSaleReturnItemId() {
         return saleReturnItemId;
     }

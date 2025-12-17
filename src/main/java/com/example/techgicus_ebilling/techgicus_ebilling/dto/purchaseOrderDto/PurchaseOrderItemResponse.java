@@ -8,6 +8,8 @@ public class PurchaseOrderItemResponse {
 
     private Long purchaseOrderItemId;
 
+    private Long itemId;
+
     private String itemName;
 
     private Integer quantity;
@@ -104,5 +106,13 @@ public class PurchaseOrderItemResponse {
 
     public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public Long getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(Long itemId) {
+        this.itemId = itemId;
     }
 }

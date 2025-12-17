@@ -1,10 +1,8 @@
 package com.example.techgicus_ebilling.techgicus_ebilling.controller;
 
 
-import com.example.techgicus_ebilling.techgicus_ebilling.dto.reportDto.PurchaseReportDto;
-import com.example.techgicus_ebilling.techgicus_ebilling.dto.reportDto.SaleReportDto;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.reportDto.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.service.ReportService;
-import com.example.techgicus_ebilling.techgicus_ebilling.service.SaleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -59,5 +57,58 @@ public class ReportController {
     }
 
 
+
+
+    @GetMapping("/party/{partyId}/statement/list")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<PartyStatement> getPartyStatementList(@PathVariable Long partyId,
+                                                      @RequestParam String period,
+                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate startDate,
+                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+                                                      ){
+
+        return reportService.getPartyStatementList(period,startDate,endDate,partyId);
+
+    }
+
+
+
+    @GetMapping("/company/{companyId}/parties/report")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<PartyReport> getAllPartyReports(@PathVariable Long companyId){
+        return reportService.getAllPartyReports(companyId);
+    }
+
+
+
+    @GetMapping("/company/{companyId}/profit-loss/report")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ProfitAndLossReport generateProfitAndLossReport(@PathVariable Long companyId,
+                                                           @RequestParam String period,
+                                                           @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate startDate,
+                                                           @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate){
+
+        return reportService.generateProfitAndLoss(companyId,period,startDate,endDate);
+    }
+
+
+    @GetMapping("/company/{companyId}/bill-wise/profit-loss/report")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<BillWiseProfitAndLossSummary> generateBillWiseProfitAndLossReport(@PathVariable Long companyId,
+                                                                                  @RequestParam String period,
+                                                                                  @RequestParam(required = false) Long partyId,
+                                                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate startDate,
+                                                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate){
+
+        return reportService.generatedBillWiseProfitAndLossReport(period,partyId,companyId,startDate,endDate);
+    }
+
+
+
+    @GetMapping("/sale/{saleId}/bill-wise/profit-loss/details")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public BillWiseProfitAndLossDetail getBillWiseProfitAndLossDetailsBySaleId(@PathVariable Long saleId){
+        return reportService.getBillWiseProfitAndLossDetailBySaleId(saleId);
+    }
 
 }

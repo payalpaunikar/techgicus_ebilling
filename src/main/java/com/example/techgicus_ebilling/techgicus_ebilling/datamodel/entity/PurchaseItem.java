@@ -15,16 +15,16 @@ public class PurchaseItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long purchaseItemId;
 
-    private String itemName;
-
-    private String itemHsnCode;
+//    private String itemName;
+//
+//    private String itemHsnCode;
 
     private String itemDescription;
 
-    private Integer quantity;
+    private Double quantity;
 
-    @Enumerated(EnumType.STRING)
-    private Unit unit;
+//    @Enumerated(EnumType.STRING)
+//    private Unit unit;
 
     private Double pricePerUnit;
 
@@ -42,28 +42,16 @@ public class PurchaseItem {
     @JoinColumn(name = "purchase_id")
     private Purchase purchase;
 
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
+
     private LocalDateTime createdAt;
     private LocalDateTime updateAt;
 
     public PurchaseItem() {
     }
 
-    public PurchaseItem(Long purchaseItemId, String itemName, String itemHsnCode, String itemDescription, Integer quantity, Unit unit, Double pricePerUnit, TaxType pricePerUnitTaxType, TaxRate taxRate, Double totalTaxAmount, Double totalAmount, Purchase purchase, LocalDateTime createdAt, LocalDateTime updateAt) {
-        this.purchaseItemId = purchaseItemId;
-        this.itemName = itemName;
-        this.itemHsnCode = itemHsnCode;
-        this.itemDescription = itemDescription;
-        this.quantity = quantity;
-        this.unit = unit;
-        this.pricePerUnit = pricePerUnit;
-        this.pricePerUnitTaxType = pricePerUnitTaxType;
-        this.taxRate = taxRate;
-        this.totalTaxAmount = totalTaxAmount;
-        this.totalAmount = totalAmount;
-        this.purchase = purchase;
-        this.createdAt = createdAt;
-        this.updateAt = updateAt;
-    }
 
     public Long getPurchaseItemId() {
         return purchaseItemId;
@@ -71,22 +59,6 @@ public class PurchaseItem {
 
     public void setPurchaseItemId(Long purchaseItemId) {
         this.purchaseItemId = purchaseItemId;
-    }
-
-    public String getItemName() {
-        return itemName;
-    }
-
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
-    }
-
-    public String getItemHsnCode() {
-        return itemHsnCode;
-    }
-
-    public void setItemHsnCode(String itemHsnCode) {
-        this.itemHsnCode = itemHsnCode;
     }
 
     public String getItemDescription() {
@@ -97,20 +69,12 @@ public class PurchaseItem {
         this.itemDescription = itemDescription;
     }
 
-    public Integer getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
-    }
-
-    public Unit getUnit() {
-        return unit;
-    }
-
-    public void setUnit(Unit unit) {
-        this.unit = unit;
     }
 
     public Double getPricePerUnit() {
@@ -175,5 +139,13 @@ public class PurchaseItem {
 
     public void setUpdateAt(LocalDateTime updateAt) {
         this.updateAt = updateAt;
+    }
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
     }
 }

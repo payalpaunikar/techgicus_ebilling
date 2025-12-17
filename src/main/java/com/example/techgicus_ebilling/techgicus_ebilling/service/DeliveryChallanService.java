@@ -3,6 +3,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.service;
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.ChallanType;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PartyTransactionType;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.deliveryChallanDto.DeliveryChallanItemRequest;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.deliveryChallanDto.DeliveryChallanItemResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.deliveryChallanDto.DeliveryChallanRequest;
@@ -17,12 +18,14 @@ import com.example.techgicus_ebilling.techgicus_ebilling.exception.ResourceNotFo
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.*;
 import jakarta.persistence.Lob;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,8 +41,13 @@ public class DeliveryChallanService {
     private SaleRepository saleRepository;
     private SaleItemMapper saleItemMapper;
     private SaleMapper saleMapper;
+    private PartyActivityService partyActivityService;
+    private PartyLedgerService partyLedgerService;
+    private ItemRepository itemRepository;
 
-    public DeliveryChallanService(DeliveryChallanRepository deliveryChallanRepository, DeliveryChallanItemRepository deliveryChallanItemRepository, DeliveryChallanMapper deliveryChallanMapper, DeliveryChallanItemMapper deliveryChallanItemMapper, CompanyRepository companyRepository, PartyRepository partyRepository, PartyMapper partyMapper, SaleRepository saleRepository, SaleItemMapper saleItemMapper, SaleMapper saleMapper) {
+
+    @Autowired
+    public DeliveryChallanService(DeliveryChallanRepository deliveryChallanRepository, DeliveryChallanItemRepository deliveryChallanItemRepository, DeliveryChallanMapper deliveryChallanMapper, DeliveryChallanItemMapper deliveryChallanItemMapper, CompanyRepository companyRepository, PartyRepository partyRepository, PartyMapper partyMapper, SaleRepository saleRepository, SaleItemMapper saleItemMapper, SaleMapper saleMapper, PartyActivityService partyActivityService, PartyLedgerService partyLedgerService, ItemRepository itemRepository) {
         this.deliveryChallanRepository = deliveryChallanRepository;
         this.deliveryChallanItemRepository = deliveryChallanItemRepository;
         this.deliveryChallanMapper = deliveryChallanMapper;
@@ -50,9 +58,12 @@ public class DeliveryChallanService {
         this.saleRepository = saleRepository;
         this.saleItemMapper = saleItemMapper;
         this.saleMapper = saleMapper;
+        this.partyActivityService = partyActivityService;
+        this.partyLedgerService = partyLedgerService;
+        this.itemRepository = itemRepository;
     }
 
-
+    @Transactional
     public DeliveryChallanResponse createDeliveryChallan(Long companyId, DeliveryChallanRequest deliveryChallanRequest){
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(()-> new ResourceNotFoundException("Company not found with id : "+companyId));
@@ -65,20 +76,40 @@ public class DeliveryChallanService {
         deliveryChallan.setCompany(company);
         deliveryChallan.setChallanType(ChallanType.OPEN);
 
-        List<DeliveryChallanItem> deliveryChallanItems = deliveryChallanRequest.getDeliveryChallanItemRequests()
-                .stream()
-                .map(deliveryChallanItemRequest -> {
-                    DeliveryChallanItem deliveryChallanItem = deliveryChallanItemMapper.convertRequestToEntity(deliveryChallanItemRequest);
-                    deliveryChallanItem.setDeliveryChallan(deliveryChallan);
-                    return deliveryChallanItem;
-                }).toList();
 
-        deliveryChallan.setDeliveryChallanItems(deliveryChallanItems);
+        List<DeliveryChallanItem> deliveryChallanItemList = new ArrayList<>();
+        deliveryChallanItemList = setChallanItemListFields(deliveryChallanRequest.getDeliveryChallanItemRequests(),deliveryChallan);
+
+//        List<DeliveryChallanItem> deliveryChallanItems = deliveryChallanRequest.getDeliveryChallanItemRequests()
+//                .stream()
+//                .map(deliveryChallanItemRequest -> {
+//                    DeliveryChallanItem deliveryChallanItem = deliveryChallanItemMapper.convertRequestToEntity(deliveryChallanItemRequest);
+//                    deliveryChallanItem.setDeliveryChallan(deliveryChallan);
+//                    return deliveryChallanItem;
+//                }).toList();
+
+        deliveryChallan.setDeliveryChallanItems(deliveryChallanItemList);
+
 
         deliveryChallanRepository.save(deliveryChallan);
 
+        // add party activity
+        partyActivityService.addActivity(
+                party,
+                company,
+                deliveryChallan.getDeliveryChallanId(),
+                deliveryChallan.getChallanNo(),
+                deliveryChallan.getChallanDate(),
+                PartyTransactionType.DELIVERY_CHALLAN,
+                deliveryChallan.getTotalAmount(),
+                null,
+                false,
+                deliveryChallan.getDescription()
+        );
+
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(deliveryChallan.getParty());
-        List<DeliveryChallanItemResponse> deliveryChallanItemResponses = deliveryChallanItemMapper.convertEntityListToResponseList(deliveryChallan.getDeliveryChallanItems());
+        List<DeliveryChallanItemResponse> deliveryChallanItemResponses = setChallanItemResponseList(deliveryChallan.getDeliveryChallanItems());
+       // List<DeliveryChallanItemResponse> deliveryChallanItemResponses = deliveryChallanItemMapper.convertEntityListToResponseList(deliveryChallan.getDeliveryChallanItems());
 
         DeliveryChallanResponse deliveryChallanResponse = deliveryChallanMapper.convertEntityToResponse(deliveryChallan);
         deliveryChallanResponse.setPartyResponseDto(partyResponseDto);
@@ -97,7 +128,8 @@ public class DeliveryChallanService {
         List<DeliveryChallanResponse> deliveryChallanResponses = deliveryChallans.stream()
                 .map(deliveryChallan -> {
                     PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(deliveryChallan.getParty());
-                    List<DeliveryChallanItemResponse> deliveryChallanItemResponses = deliveryChallanItemMapper.convertEntityListToResponseList(deliveryChallan.getDeliveryChallanItems());
+                    List<DeliveryChallanItemResponse> deliveryChallanItemResponses = setChallanItemResponseList(deliveryChallan.getDeliveryChallanItems());
+                   // List<DeliveryChallanItemResponse> deliveryChallanItemResponses = deliveryChallanItemMapper.convertEntityListToResponseList(deliveryChallan.getDeliveryChallanItems());
                     DeliveryChallanResponse deliveryChallanResponse = deliveryChallanMapper.convertEntityToResponse(deliveryChallan);
                     deliveryChallanResponse.setPartyResponseDto(partyResponseDto);
                     deliveryChallanResponse.setDeliveryChallanItemResponses(deliveryChallanItemResponses);
@@ -113,7 +145,9 @@ public class DeliveryChallanService {
                 .orElseThrow(()-> new ResourceNotFoundException("Delivery Challan not not with id : "+deliveryChallanId));
 
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(deliveryChallan.getParty());
-        List<DeliveryChallanItemResponse> deliveryChallanItemResponses = deliveryChallanItemMapper.convertEntityListToResponseList(deliveryChallan.getDeliveryChallanItems());
+        List<DeliveryChallanItemResponse> deliveryChallanItemResponses = setChallanItemResponseList(deliveryChallan.getDeliveryChallanItems());
+
+       // List<DeliveryChallanItemResponse> deliveryChallanItemResponses = deliveryChallanItemMapper.convertEntityListToResponseList(deliveryChallan.getDeliveryChallanItems());
 
         DeliveryChallanResponse deliveryChallanResponse = deliveryChallanMapper.convertEntityToResponse(deliveryChallan);
         deliveryChallanResponse.setPartyResponseDto(partyResponseDto);
@@ -122,6 +156,8 @@ public class DeliveryChallanService {
         return deliveryChallanResponse;
     }
 
+
+    @Transactional
     public DeliveryChallanResponse updateDeliveryChallanById(Long deliveryChallanId,DeliveryChallanRequest deliveryChallanRequest){
         DeliveryChallan deliveryChallan = deliveryChallanRepository.findById(deliveryChallanId)
                 .orElseThrow(()-> new ResourceNotFoundException("Delivery Challan not not with id : "+deliveryChallanId));
@@ -137,31 +173,57 @@ public class DeliveryChallanService {
         deliveryChallan.setParty(party);
         deliveryChallan.getDeliveryChallanItems().clear();
 
-        List<DeliveryChallanItem> deliveryChallanItems = deliveryChallanRequest.getDeliveryChallanItemRequests()
-                .stream()
-                .map(deliveryChallanItemRequest -> {
-                    DeliveryChallanItem deliveryChallanItem = deliveryChallanItemMapper.convertRequestToEntity(deliveryChallanItemRequest);
-                    deliveryChallanItem.setDeliveryChallan(deliveryChallan);
-                    return deliveryChallanItem;
-                }).toList();
+        List<DeliveryChallanItem> challanItemList = new ArrayList<>();
+        challanItemList = setChallanItemListFields(deliveryChallanRequest.getDeliveryChallanItemRequests(),deliveryChallan);
 
-        deliveryChallan.getDeliveryChallanItems().addAll(deliveryChallanItems);
+//        List<DeliveryChallanItem> deliveryChallanItems = deliveryChallanRequest.getDeliveryChallanItemRequests()
+//                .stream()
+//                .map(deliveryChallanItemRequest -> {
+//                    DeliveryChallanItem deliveryChallanItem = deliveryChallanItemMapper.convertRequestToEntity(deliveryChallanItemRequest);
+//                    deliveryChallanItem.setDeliveryChallan(deliveryChallan);
+//                    return deliveryChallanItem;
+//                }).toList();
+
+        deliveryChallan.getDeliveryChallanItems().addAll(challanItemList);
 
         deliveryChallanRepository.save(deliveryChallan);
 
+
+        // update party activity
+        partyActivityService.updatePartyActivity(
+                party,
+                deliveryChallan.getCompany(),
+                deliveryChallan.getDeliveryChallanId(),
+                deliveryChallan.getChallanNo(),
+                deliveryChallan.getChallanDate(),
+                PartyTransactionType.DELIVERY_CHALLAN,
+                deliveryChallan.getTotalAmount(),
+                null,
+                false,
+                deliveryChallan.getDescription()
+        );
+
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(deliveryChallan.getParty());
-        List<DeliveryChallanItemResponse> deliveryChallanItemResponses = deliveryChallanItemMapper.convertEntityListToResponseList(deliveryChallan.getDeliveryChallanItems());
+        List<DeliveryChallanItemResponse> challanItemResponses = setChallanItemResponseList(deliveryChallan.getDeliveryChallanItems());
+
+       // List<DeliveryChallanItemResponse> deliveryChallanItemResponses = deliveryChallanItemMapper.convertEntityListToResponseList(deliveryChallan.getDeliveryChallanItems());
 
         DeliveryChallanResponse deliveryChallanResponse = deliveryChallanMapper.convertEntityToResponse(deliveryChallan);
         deliveryChallanResponse.setPartyResponseDto(partyResponseDto);
-        deliveryChallanResponse.setDeliveryChallanItemResponses(deliveryChallanItemResponses);
+        deliveryChallanResponse.setDeliveryChallanItemResponses(challanItemResponses);
 
         return deliveryChallanResponse;
     }
 
+
+    @Transactional
     public String deleteDeliveryChallanById(Long deliveryChallanId){
         DeliveryChallan deliveryChallan = deliveryChallanRepository.findById(deliveryChallanId)
                 .orElseThrow(()-> new ResourceNotFoundException("Delivery Challan not not with id : "+deliveryChallanId));
+
+        //delete party activity
+        partyActivityService.deletePartyActivity(PartyTransactionType.DELIVERY_CHALLAN,
+                deliveryChallan.getDeliveryChallanId());
 
         deliveryChallanRepository.delete(deliveryChallan);
 
@@ -234,6 +296,24 @@ public class DeliveryChallanService {
 
         saleRepository.save(sale);
 
+        // delete party activity of quotation
+        partyActivityService.deletePartyActivity(PartyTransactionType.DELIVERY_CHALLAN,deliveryChallan.getDeliveryChallanId());
+
+
+        // add party ledger entry in the database
+        partyLedgerService.addLedgerEntry(
+                sale.getParty(),
+                sale.getCompany(),
+                sale.getInvoceDate(),
+                PartyTransactionType.SALE,
+                sale.getSaleId(),
+                sale.getInvoiceNumber(),
+                sale.getTotalAmount(),
+                0.0,
+                sale.getBalance(),
+                sale.getPaymentDescription()
+        );
+
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(sale.getParty());
         List<SaleItemResponse> saleItemResponses = saleItemMapper.convertSaleItemListIntoSaleItmResponseList(sale.getSaleItem());
 
@@ -258,4 +338,59 @@ public class DeliveryChallanService {
 
         return saleResponse;
     }
+
+
+    private DeliveryChallanItem setChallanItemFields(DeliveryChallanItemRequest request,DeliveryChallan deliveryChallan){
+
+        Item item = findItemById(request.getItemId());
+
+        DeliveryChallanItem challanItem = deliveryChallanItemMapper.convertRequestToEntity(request);
+        challanItem.setItem(item);
+        challanItem.setDeliveryChallan(deliveryChallan);
+
+        return challanItem;
+    }
+
+    private List<DeliveryChallanItem> setChallanItemListFields(List<DeliveryChallanItemRequest> requestList,DeliveryChallan deliveryChallan){
+
+        List<DeliveryChallanItem> challanItemList = requestList.stream()
+                .map(request -> setChallanItemFields(request, deliveryChallan))
+                .toList();
+
+        return challanItemList;
+    }
+
+
+
+    private Item findItemById(Long itemId){
+         Item item = itemRepository.findById(itemId)
+                 .orElseThrow(()-> new ResourceNotFoundException("Item not found with id : "+itemId));
+
+         return item;
+    }
+
+
+    private DeliveryChallanItemResponse setChallanItemResponse(DeliveryChallanItem challanItem){
+        Item item = challanItem.getItem();
+
+        DeliveryChallanItemResponse challanItemResponse = new DeliveryChallanItemResponse();
+        challanItemResponse = deliveryChallanItemMapper.convertEntityToResponse(challanItem);
+        challanItemResponse.setItemId(item.getItemId());
+        challanItemResponse.setName(item.getItemName());
+
+        return challanItemResponse;
+    }
+
+    private List<DeliveryChallanItemResponse> setChallanItemResponseList(List<DeliveryChallanItem> challanItemList){
+        List<DeliveryChallanItemResponse> challanItemResponses = challanItemList.stream()
+                .map(challanItem -> {
+                    DeliveryChallanItemResponse response = new DeliveryChallanItemResponse();
+                    response = setChallanItemResponse(challanItem);
+                    return response;
+                })
+                .toList();
+
+        return challanItemResponses;
+    }
+
 }

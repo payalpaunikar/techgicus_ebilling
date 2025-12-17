@@ -13,9 +13,9 @@ public class QuotationItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long quotationItemId;
 
-    private String itemName;
-
-    private String itemHsnCode;
+//    private String itemName;
+//
+//    private String itemHsnCode;
 
     private String itemDescription;
 
@@ -40,23 +40,35 @@ public class QuotationItem {
     @JoinColumn(name = "quotation_id")
     private Quotation quotation;
 
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
     public QuotationItem() {
     }
 
-    public QuotationItem(Long quotationItemId, String itemName, String itemHsnCode, String itemDescription, Integer quantity, Unit unit, Double pricePerUnit, TaxType pricePerUnitTaxType, TaxRate taxRate, Double totalTaxAmount, Double totalAmount, Quotation quotation) {
-        this.quotationItemId = quotationItemId;
-        this.itemName = itemName;
-        this.itemHsnCode = itemHsnCode;
-        this.itemDescription = itemDescription;
-        this.quantity = quantity;
-        this.unit = unit;
-        this.pricePerUnit = pricePerUnit;
-        this.pricePerUnitTaxType = pricePerUnitTaxType;
-        this.taxRate = taxRate;
-        this.totalTaxAmount = totalTaxAmount;
-        this.totalAmount = totalAmount;
-        this.quotation = quotation;
-    }
+//    public QuotationItem(Long quotationItemId, String itemName, String itemHsnCode, String itemDescription, Integer quantity, Unit unit, Double pricePerUnit, TaxType pricePerUnitTaxType, TaxRate taxRate, Double totalTaxAmount, Double totalAmount, Quotation quotation) {
+//        this.quotationItemId = quotationItemId;
+//        this.itemName = itemName;
+//        this.itemHsnCode = itemHsnCode;
+//        this.itemDescription = itemDescription;
+//        this.quantity = quantity;
+//        this.unit = unit;
+//        this.pricePerUnit = pricePerUnit;
+//        this.pricePerUnitTaxType = pricePerUnitTaxType;
+//        this.taxRate = taxRate;
+//        this.totalTaxAmount = totalTaxAmount;
+//        this.totalAmount = totalAmount;
+//        this.quotation = quotation;
+//    }
 
     public Long getQuotationItemId() {
         return quotationItemId;
@@ -66,21 +78,21 @@ public class QuotationItem {
         this.quotationItemId = quotationItemId;
     }
 
-    public String getItemName() {
-        return itemName;
-    }
-
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
-    }
-
-    public String getItemHsnCode() {
-        return itemHsnCode;
-    }
-
-    public void setItemHsnCode(String itemHsnCode) {
-        this.itemHsnCode = itemHsnCode;
-    }
+//    public String getItemName() {
+//        return itemName;
+//    }
+//
+//    public void setItemName(String itemName) {
+//        this.itemName = itemName;
+//    }
+//
+//    public String getItemHsnCode() {
+//        return itemHsnCode;
+//    }
+//
+//    public void setItemHsnCode(String itemHsnCode) {
+//        this.itemHsnCode = itemHsnCode;
+//    }
 
     public String getItemDescription() {
         return itemDescription;

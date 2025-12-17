@@ -6,6 +6,8 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.U
 
 public class DeliveryChallanItemRequest {
 
+    private Long itemId;
+
     private String name;
 
     private Integer quantity;
@@ -94,5 +96,13 @@ public class DeliveryChallanItemRequest {
 
     public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public Long getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(Long itemId) {
+        this.itemId = itemId;
     }
 }

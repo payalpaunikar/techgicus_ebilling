@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -65,13 +67,19 @@ public class Item {
 
      private Double stockOpeningQty;
 
-     private Double stockPrice;
+     private Double stockPricePerQty;
 
      private LocalDate stockOpeningDate;
 
      private Double minimumStockToMaintain;
 
      private String openingStockLocation;
+
+
+    private Double totalStockIn;
+    private Double reservedStock;  // items allocated but not yet sold (like pending orders)
+    private Double availableStock;
+    private Double stockValue;
 
 
      @ManyToMany
@@ -82,13 +90,17 @@ public class Item {
      )
      private Set<Category> categories = new HashSet<>();
 
+
+     @OneToMany(mappedBy = "item",cascade = CascadeType.ALL,orphanRemoval = true)
+     List<StockTransaction> stockTransactions = new ArrayList<>();
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public Item() {
     }
 
-    public Item(Long itemId, String itemName, String itemHsn, String itemCode, String description, ItemType itemType, Unit baseUnit, Unit secondaryUnit, Double baseUnitToSecondaryUnit, Double salePrice, Double saleDiscountPrice, DiscountType saleDiscountType, TaxType saleTaxType, Double purchasePrice, TaxType purchaseTaxType, TaxRate taxRate, Company company, Double stockOpeningQty, Double stockPrice, LocalDate stockOpeningDate, Double minimumStockToMaintain, String openingStockLocation, Set<Category> categories, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Item(Long itemId, String itemName, String itemHsn, String itemCode, String description, ItemType itemType, Unit baseUnit, Unit secondaryUnit, Double baseUnitToSecondaryUnit, Double salePrice, Double saleDiscountPrice, DiscountType saleDiscountType, TaxType saleTaxType, Double purchasePrice, TaxType purchaseTaxType, TaxRate taxRate, Company company, Double stockOpeningQty, Double stockPricePerQty, LocalDate stockOpeningDate, Double minimumStockToMaintain, String openingStockLocation, Double totalStockIn, Double reservedStock, Double availableStock, Double stockValue, Set<Category> categories, List<StockTransaction> stockTransactions, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.itemHsn = itemHsn;
@@ -107,11 +119,16 @@ public class Item {
         this.taxRate = taxRate;
         this.company = company;
         this.stockOpeningQty = stockOpeningQty;
-        this.stockPrice = stockPrice;
+        this.stockPricePerQty = stockPricePerQty;
         this.stockOpeningDate = stockOpeningDate;
         this.minimumStockToMaintain = minimumStockToMaintain;
         this.openingStockLocation = openingStockLocation;
+        this.totalStockIn = totalStockIn;
+        this.reservedStock = reservedStock;
+        this.availableStock = availableStock;
+        this.stockValue = stockValue;
         this.categories = categories;
+        this.stockTransactions = stockTransactions;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -276,12 +293,12 @@ public class Item {
         this.stockOpeningQty = stockOpeningQty;
     }
 
-    public Double getStockPrice() {
-        return stockPrice;
+    public Double getStockPricePerQty() {
+        return stockPricePerQty;
     }
 
-    public void setStockPrice(Double stockPrice) {
-        this.stockPrice = stockPrice;
+    public void setStockPricePerQty(Double stockPricePerQty) {
+        this.stockPricePerQty = stockPricePerQty;
     }
 
     public LocalDate getStockOpeningDate() {
@@ -314,5 +331,45 @@ public class Item {
 
     public void setCategories(Set<Category> categories) {
         this.categories = categories;
+    }
+
+    public Double getTotalStockIn() {
+        return totalStockIn;
+    }
+
+    public void setTotalStockIn(Double totalStockIn) {
+        this.totalStockIn = totalStockIn;
+    }
+
+    public Double getReservedStock() {
+        return reservedStock;
+    }
+
+    public void setReservedStock(Double reservedStock) {
+        this.reservedStock = reservedStock;
+    }
+
+    public Double getAvailableStock() {
+        return availableStock;
+    }
+
+    public void setAvailableStock(Double availableStock) {
+        this.availableStock = availableStock;
+    }
+
+    public Double getStockValue() {
+        return stockValue;
+    }
+
+    public void setStockValue(Double stockValue) {
+        this.stockValue = stockValue;
+    }
+
+    public List<StockTransaction> getStockTransactions() {
+        return stockTransactions;
+    }
+
+    public void setStockTransactions(List<StockTransaction> stockTransactions) {
+        this.stockTransactions = stockTransactions;
     }
 }

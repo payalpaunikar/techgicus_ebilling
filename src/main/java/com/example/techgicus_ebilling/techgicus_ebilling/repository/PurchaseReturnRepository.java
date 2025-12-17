@@ -46,4 +46,27 @@ public interface PurchaseReturnRepository extends JpaRepository<PurchaseReturn,L
             @Param("startDate")LocalDate startDate,
             @Param("endDate")LocalDate endDate
     );
+
+
+
+    @Query("""
+    SELECT COALESCE(SUM(p.totalAmount), 0)
+    FROM PurchaseReturn p
+    WHERE p.company.companyId = :companyId
+    AND p.returnDate BETWEEN :startDate AND :endDate
+    """)
+    Double sumDebitNoteByDate(@Param("companyId")Long companyId,
+                              @Param("startDate")LocalDate startDate,
+                              @Param("endDate")LocalDate endDate);
+
+
+    @Query("""
+    SELECT COALESCE(SUM(p.totalTaxAmount), 0)
+    FROM PurchaseReturn p
+    WHERE p.company.companyId = :companyId
+    AND p.returnDate BETWEEN :startDate AND :endDate
+    """)
+    Double sumTaxAmountByDate(@Param("companyId")Long companyId,
+                              @Param("startDate")LocalDate startDate,
+                              @Param("endDate")LocalDate endDate);
 }

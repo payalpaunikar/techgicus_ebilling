@@ -41,7 +41,7 @@ public class ItemResponse {
 
     private Double stockOpeningQty;
 
-    private Double stockPrice;
+    private Double stockPricePerQty;
 
     private LocalDate stockOpeningDate;
 
@@ -49,34 +49,46 @@ public class ItemResponse {
 
     private String openingStockLocation;
 
+    private Double totalStockIn;
+    private Double reservedStock;  // items allocated but not yet sold (like pending orders)
+    private Double availableStock;
+    private Double stockValue;
+
     private Set<CategoryResponse> categories;
 
     public ItemResponse() {
     }
 
-    public ItemResponse(Long itemId, String itemName, String itemHsn, String itemCode, String description, ItemType itemType, Unit baseUnit, Unit secondaryUnit, Double baseUnitToSecondaryUnit, Double salePrice, Double saleDiscountPrice, DiscountType saleDiscountType, TaxType saleTaxType, Double purchasePrice, TaxType purchaseTaxType, TaxRate taxRate, Double stockOpeningQty, Double stockPrice, LocalDate stockOpeningDate, Double minimumStockToMaintain, String openingStockLocation, Set<CategoryResponse> categories) {
-        this.itemId = itemId;
-        this.itemName = itemName;
-        this.itemHsn = itemHsn;
-        this.itemCode = itemCode;
-        this.description = description;
-        this.itemType = itemType;
-        this.baseUnit = baseUnit;
-        this.secondaryUnit = secondaryUnit;
-        this.baseUnitToSecondaryUnit = baseUnitToSecondaryUnit;
-        this.salePrice = salePrice;
-        this.saleDiscountPrice = saleDiscountPrice;
-        this.saleDiscountType = saleDiscountType;
-        this.saleTaxType = saleTaxType;
-        this.purchasePrice = purchasePrice;
-        this.purchaseTaxType = purchaseTaxType;
-        this.taxRate = taxRate;
-        this.stockOpeningQty = stockOpeningQty;
-        this.stockPrice = stockPrice;
-        this.stockOpeningDate = stockOpeningDate;
-        this.minimumStockToMaintain = minimumStockToMaintain;
-        this.openingStockLocation = openingStockLocation;
-        this.categories = categories;
+    public Double getTotalStockIn() {
+        return totalStockIn;
+    }
+
+    public void setTotalStockIn(Double totalStockIn) {
+        this.totalStockIn = totalStockIn;
+    }
+
+    public Double getReservedStock() {
+        return reservedStock;
+    }
+
+    public void setReservedStock(Double reservedStock) {
+        this.reservedStock = reservedStock;
+    }
+
+    public Double getAvailableStock() {
+        return availableStock;
+    }
+
+    public void setAvailableStock(Double availableStock) {
+        this.availableStock = availableStock;
+    }
+
+    public Double getStockValue() {
+        return stockValue;
+    }
+
+    public void setStockValue(Double stockValue) {
+        this.stockValue = stockValue;
     }
 
     public Long getItemId() {
@@ -207,6 +219,16 @@ public class ItemResponse {
         this.taxRate = taxRate;
     }
 
+
+
+    public Set<CategoryResponse> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Set<CategoryResponse> categories) {
+        this.categories = categories;
+    }
+
     public Double getStockOpeningQty() {
         return stockOpeningQty;
     }
@@ -215,12 +237,12 @@ public class ItemResponse {
         this.stockOpeningQty = stockOpeningQty;
     }
 
-    public Double getStockPrice() {
-        return stockPrice;
+    public Double getStockPricePerQty() {
+        return stockPricePerQty;
     }
 
-    public void setStockPrice(Double stockPrice) {
-        this.stockPrice = stockPrice;
+    public void setStockPricePerQty(Double stockPricePerQty) {
+        this.stockPricePerQty = stockPricePerQty;
     }
 
     public LocalDate getStockOpeningDate() {
@@ -245,14 +267,6 @@ public class ItemResponse {
 
     public void setOpeningStockLocation(String openingStockLocation) {
         this.openingStockLocation = openingStockLocation;
-    }
-
-    public Set<CategoryResponse> getCategories() {
-        return categories;
-    }
-
-    public void setCategories(Set<CategoryResponse> categories) {
-        this.categories = categories;
     }
 }
 

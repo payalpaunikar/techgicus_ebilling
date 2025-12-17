@@ -11,6 +11,15 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface SaleItemMapper {
 
+//
+//    List<SaleItem> convertSaleItemListRequestIntoSaleItemList(List<SaleItemRequest> saleItemRequests);
+//
+//    SaleItem convertSaleItemRequestIntoSaleItem(SaleItemRequest saleItemRequest);
+//
+//    List<SaleItemResponse> convertSaleItemListIntoSaleItmResponseList(List<SaleItem> saleItems);
+//
+//    SaleItemResponse covertSaleItemIntoSaleItemResponse(SaleItem saleItem);
+
 
     List<SaleItem> convertSaleItemListRequestIntoSaleItemList(List<SaleItemRequest> saleItemRequests);
 
@@ -18,6 +27,6 @@ public interface SaleItemMapper {
 
     List<SaleItemResponse> convertSaleItemListIntoSaleItmResponseList(List<SaleItem> saleItems);
 
-    SaleItemResponse covertSaleIntoSaleItemResponse(SaleItem saleItem);
+    SaleItemResponse covertSaleItemIntoSaleItemResponse(SaleItem saleItem);
 
 }

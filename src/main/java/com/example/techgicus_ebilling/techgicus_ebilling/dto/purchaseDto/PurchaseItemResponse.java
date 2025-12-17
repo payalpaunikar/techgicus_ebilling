@@ -8,6 +8,8 @@ public class PurchaseItemResponse {
 
     private Long purchaseItemId;
 
+    private Long itemId;
+
     private String itemName;
 
     private String itemHsnCode;
@@ -130,5 +132,13 @@ public class PurchaseItemResponse {
 
     public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public Long getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(Long itemId) {
+        this.itemId = itemId;
     }
 }

@@ -14,7 +14,11 @@ public class DeliveryChallanItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long deliveryChallanItemId;
 
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
+
+//    private String name;
 
     private Integer quantity;
 
@@ -47,13 +51,13 @@ public class DeliveryChallanItem {
         this.deliveryChallanItemId = deliveryChallanItemId;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+//    public String getName() {
+//        return name;
+//    }
+//
+//    public void setName(String name) {
+//        this.name = name;
+//    }
 
     public Integer getQuantity() {
         return quantity;
@@ -125,5 +129,13 @@ public class DeliveryChallanItem {
 
     public void setDeliveryChallan(DeliveryChallan deliveryChallan) {
         this.deliveryChallan = deliveryChallan;
+    }
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
     }
 }

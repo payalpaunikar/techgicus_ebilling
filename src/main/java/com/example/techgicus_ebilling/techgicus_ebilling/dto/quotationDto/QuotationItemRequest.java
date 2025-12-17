@@ -5,6 +5,9 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.T
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.Unit;
 
 public class QuotationItemRequest {
+
+    private Long itemId;
+
     private String itemName;
 
     private String itemHsnCode;
@@ -29,7 +32,8 @@ public class QuotationItemRequest {
     public QuotationItemRequest() {
     }
 
-    public QuotationItemRequest(String itemName, String itemHsnCode, String itemDescription, Integer quantity, Unit unit, Double pricePerUnit, TaxType pricePerUnitTaxType, TaxRate taxRate, Double totalTaxAmount, Double totalAmount) {
+    public QuotationItemRequest(Long itemId, String itemName, String itemHsnCode, String itemDescription, Integer quantity, Unit unit, Double pricePerUnit, TaxType pricePerUnitTaxType, TaxRate taxRate, Double totalTaxAmount, Double totalAmount) {
+        this.itemId = itemId;
         this.itemName = itemName;
         this.itemHsnCode = itemHsnCode;
         this.itemDescription = itemDescription;
@@ -120,5 +124,13 @@ public class QuotationItemRequest {
 
     public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public Long getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(Long itemId) {
+        this.itemId = itemId;
     }
 }

@@ -7,11 +7,13 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.B
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.State;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.companyDto.CompanyResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.companyDto.UpdateCompanyRequest;
+import com.example.techgicus_ebilling.techgicus_ebilling.exception.BadRequestException;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.ResourceNotFoundException;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.CompanyMapper;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.CompanyRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.endpoints.internal.Value;
@@ -155,7 +157,12 @@ public class CompanyService {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(()-> new ResourceNotFoundException("Company not found with id : "+companyId));
 
-        companyRepository.delete(company);
+        try {
+            companyRepository.delete(company);
+        }
+        catch (DataIntegrityViolationException exception){
+            throw new BadRequestException("Cannot delete company because it contain the transaction, please delete all transaction of before delete the company.");
+        }
 
         return "Company Delete succefully.";
     }

@@ -5,6 +5,9 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.T
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.Unit;
 
 public class SaleOrderItemRequest {
+
+    private Long itemId;
+
     private String name;
 
     private Double quantity;
@@ -92,5 +95,13 @@ public class SaleOrderItemRequest {
 
     public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public Long getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(Long itemId) {
+        this.itemId = itemId;
     }
 }

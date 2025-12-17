@@ -13,7 +13,7 @@ public class PurchaseReturnItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long purchaseReturnItemId;
 
-    private String name;
+//    private String name;
 
     private Integer quantity;
 
@@ -39,6 +39,17 @@ public class PurchaseReturnItem {
     @JoinColumn(name = "purchase_return_id")
     private PurchaseReturn purchaseReturn;
 
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
+    }
 
     public Long getPurchaseReturnItemId() {
         return purchaseReturnItemId;
@@ -48,13 +59,13 @@ public class PurchaseReturnItem {
         this.purchaseReturnItemId = purchaseReturnItemId;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+//    public String getName() {
+//        return name;
+//    }
+//
+//    public void setName(String name) {
+//        this.name = name;
+//    }
 
     public Integer getQuantity() {
         return quantity;
@@ -127,4 +138,6 @@ public class PurchaseReturnItem {
     public void setPurchaseReturn(PurchaseReturn purchaseReturn) {
         this.purchaseReturn = purchaseReturn;
     }
+
+
 }

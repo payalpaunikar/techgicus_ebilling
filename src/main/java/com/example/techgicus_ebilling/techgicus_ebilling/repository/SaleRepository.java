@@ -32,6 +32,8 @@ public interface SaleRepository extends JpaRepository<Sale,Long> {
                                @Param("endDate")LocalDate endDate);
 
 
+
+
     @Query(value = """
     SELECT 
         SUM(
@@ -131,4 +133,20 @@ public interface SaleRepository extends JpaRepository<Sale,Long> {
             @Param("startDate")LocalDate startDate,
             @Param("endDate")LocalDate endDate
     );
+
+
+
+    @Query("""
+    SELECT COALESCE(SUM(s.totalTaxAmount), 0)
+    FROM Sale s
+    WHERE s.company.companyId = :companyId
+    AND s.invoceDate BETWEEN :startDate AND :endDate
+    """)
+    Double sumTaxAmountByDate(@Param("companyId")Long companyId,
+                              @Param("startDate")LocalDate startDate,
+                              @Param("endDate")LocalDate endDate);
+
+
+
+
 }
