@@ -30,7 +30,7 @@ public class ReportController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<SaleReportDto>> getSaleReport(@PathVariable Long companyId,
                                                              @RequestParam(required = false) Long partyId,
-                                                             @RequestParam String period,
+                                                             @RequestParam(defaultValue = "Year") String period,
                                                              @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate startDate,
                                                              @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
                                                              @RequestParam(required = false) String saleTxnType
@@ -45,7 +45,7 @@ public class ReportController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<PurchaseReportDto>> getPurchaseReport(@PathVariable Long companyId,
                                                                      @RequestParam(required = false) Long partyId,
-                                                                     @RequestParam String period,
+                                                                     @RequestParam(defaultValue = "Year") String period,
                                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate startDate,
                                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
                                                                      @RequestParam(required = false) String purchaseTxnType
@@ -62,7 +62,7 @@ public class ReportController {
     @GetMapping("/party/{partyId}/statement/list")
     @PreAuthorize("hasAuthority('ADMIN')")
     public List<PartyStatement> getPartyStatementList(@PathVariable Long partyId,
-                                                      @RequestParam String period,
+                                                      @RequestParam(defaultValue = "Year") String period,
                                                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate startDate,
                                                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
                                                       ){
@@ -84,7 +84,7 @@ public class ReportController {
     @GetMapping("/company/{companyId}/profit-loss/report")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ProfitAndLossReport generateProfitAndLossReport(@PathVariable Long companyId,
-                                                           @RequestParam String period,
+                                                           @RequestParam(defaultValue = "Year") String period,
                                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate startDate,
                                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate){
 
@@ -95,7 +95,7 @@ public class ReportController {
     @GetMapping("/company/{companyId}/bill-wise/profit-loss/report")
     @PreAuthorize("hasAuthority('ADMIN')")
     public List<BillWiseProfitAndLossSummary> generateBillWiseProfitAndLossReport(@PathVariable Long companyId,
-                                                                                  @RequestParam String period,
+                                                                                  @RequestParam(defaultValue = "Year") String period,
                                                                                   @RequestParam(required = false) Long partyId,
                                                                                   @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)LocalDate startDate,
                                                                                   @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate){
