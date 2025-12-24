@@ -469,6 +469,7 @@ public class ReportService {
        partyStatement.setCreditAmount(partyLedger.getCreditAmount());
        partyStatement.setDebitAmount(partyLedger.getDebitAmount());
        partyStatement.setRunningBalance(partyLedger.getRunningBalance());
+       partyStatement.setTransactionType(partyLedger.getType());
 
        return partyStatement;
     }
