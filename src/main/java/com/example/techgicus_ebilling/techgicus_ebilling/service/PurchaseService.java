@@ -9,6 +9,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.S
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseDto.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleDto.*;
+import com.example.techgicus_ebilling.techgicus_ebilling.exception.BadRequestException;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.InvalidPaymentAmountException;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.ResourceNotFoundException;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.PartyMapper;
@@ -247,6 +248,25 @@ public class PurchaseService {
         Party party = partyRepository.findById(purchaseRequest.getPartyId())
                 .orElseThrow(()-> new ResourceNotFoundException("Party not found with id : "+purchaseRequest.getPartyId()));
 
+        if(purchase.getSendAmount() > purchaseRequest.getTotalAmount()){
+            throw new IllegalArgumentException("Total amount cannot be less than the already received amount");
+        }
+
+        List<PurchasePayment> purchasePaymentList = purchase.getPurchasePayments();
+
+        // 🔴 RULE 1: Block update if multiple payments exist
+        if (purchasePaymentList.size() > 1  && purchase.getSendAmount() != purchaseRequest.getSendAmount()) {
+            throw new BadRequestException(
+                    "Purchase cannot be updated because multiple payments are already done."
+            );
+        }
+
+//        PurchasePayment firstPayment = purchasePaymentList.get(0);
+//        double previousReceivedAmount = purchase.getSendAmount();
+//
+//        if (previousReceivedAmount>firstPayment.getAmountPaid()){
+//
+//        }
 
         purchaseMapper.updatePurchaseByDto(purchaseRequest,purchase);
         purchase.setParty(party);
@@ -299,16 +319,14 @@ public class PurchaseService {
         }
 
 
-        List<PurchasePayment> purchasePaymentList = purchase.getPurchasePayments();
-
         if (purchasePaymentList.isEmpty()) {
             throw new RuntimeException("First payment is missing. Sale data is corrupted.");
         }
 
         PurchasePayment firstPayment = purchasePaymentList.get(0);
         String paymentDescription = "Paid During Purchase";
-        firstPayment = setPurchasePaymentFields(paymentDescription,purchaseRequest.getPaymentType(),
-                purchase.getBillDate(),purchase,purchase.getSendAmount(),LocalDateTime.now(),LocalDateTime.now(),
+         updateSalePayment(firstPayment,paymentDescription,purchaseRequest.getPaymentType(),
+                purchase.getBillDate(),purchase.getSendAmount(),LocalDateTime.now(),
                 null,null);
 
         purchase.getPurchaseItems().addAll(purchaseItems);
@@ -537,6 +555,25 @@ public class PurchaseService {
         purchasePayment.setReferenceNumber(referenceNumber);
 
         return purchasePayment;
+    }
+
+    private void updateSalePayment(
+            PurchasePayment purchasePayment,
+            String paymentDescription,
+            PaymentType paymentType,
+            LocalDate paymentDate,
+            Double amountPaid,
+            LocalDateTime updationDateAndTime,
+            String receiptNo,
+            String referenceNumber
+    ) {
+        purchasePayment.setPaymentDescription(paymentDescription);
+        purchasePayment.setPaymentType(paymentType);
+        purchasePayment.setPaymentDate(paymentDate);
+        purchasePayment.setAmountPaid(amountPaid);
+        purchasePayment.setUpdateAt(updationDateAndTime);
+        purchasePayment.setReceiptNo(receiptNo);
+        purchasePayment.setReferenceNumber(referenceNumber);
     }
 
     private PurchaseResponse setPurchaseResponseField(Purchase purchase, PartyResponseDto partyResponseDto, List<PurchaseItemResponse> purchaseItemResponses,

@@ -62,6 +62,8 @@ public class PaymentOutService {
         paymentOut.setCreateAt(LocalDateTime.now());
         paymentOut.setUpdateAt(LocalDateTime.now());
 
+        paymentOutRepository.save(paymentOut);
+
 
         partyLedgerService.addLedgerEntry(
                 paymentOut.getParty(),
@@ -91,7 +93,7 @@ public class PaymentOutService {
                 paymentOut.getDescription()
         );
 
-        paymentOutRepository.save(paymentOut);
+
 
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(party);
 

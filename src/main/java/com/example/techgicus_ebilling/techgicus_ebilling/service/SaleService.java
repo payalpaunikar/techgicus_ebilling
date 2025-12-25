@@ -8,6 +8,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.P
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.StockTransactionType;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleDto.*;
+import com.example.techgicus_ebilling.techgicus_ebilling.exception.BadRequestException;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.InvalidPaymentAmountException;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.ResourceNotFoundException;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.PartyMapper;
@@ -251,6 +252,20 @@ public class SaleService {
         Party party = partyRepository.findById(saleRequest.getPartyId())
                         .orElseThrow(() -> new ResourceNotFoundException("Party not found with id : "+saleRequest.getPartyId()));
 
+
+        if(sale.getReceivedAmount()>saleRequest.getTotalAmount()){
+            throw new IllegalArgumentException("Total amount cannot be less than the already received amount");
+        }
+
+        List<SalePayment> paymentList = sale.getSalePayments();
+
+        // 🔴 RULE 1: Block update if multiple payments exist
+        if (paymentList.size() > 1  && sale.getReceivedAmount() != saleRequest.getReceivedAmount()) {
+            throw new BadRequestException(
+                    "Sale cannot be updated because multiple payments are already done."
+            );
+        }
+
         saleMapper.updateSaleFromDto(saleRequest,sale);
         sale.setParty(party);
 
@@ -285,7 +300,7 @@ public class SaleService {
             saleItems.add(saleItem);
         }
 
-        List<SalePayment> paymentList = sale.getSalePayments();
+
 
         if (paymentList.isEmpty()) {
             throw new RuntimeException("First payment is missing. Sale data is corrupted.");
@@ -293,8 +308,8 @@ public class SaleService {
 
         SalePayment firstPayment = paymentList.get(0); // Only update this
         String paymentDescription = "Received During Sale";
-        firstPayment = setSalePaymentFields(paymentDescription,saleRequest.getPaymentType(),sale.getInvoceDate(),
-                sale,sale.getReceivedAmount(),LocalDateTime.now(),LocalDateTime.now(),
+         updateSalePayment(firstPayment,paymentDescription,saleRequest.getPaymentType(),sale.getInvoceDate(),
+                sale.getReceivedAmount(),LocalDateTime.now(),
                 null,null);
 
 
@@ -504,8 +519,28 @@ public class SaleService {
        return salePayment;
    }
 
+    private void updateSalePayment(
+            SalePayment salePayment,
+            String paymentDescription,
+            PaymentType paymentType,
+            LocalDate paymentDate,
+            Double amountPaid,
+            LocalDateTime updationDateAndTime,
+            String receiptNo,
+            String referenceNumber
+    ) {
+        salePayment.setPaymentDescription(paymentDescription);
+        salePayment.setPaymentType(paymentType);
+        salePayment.setPaymentDate(paymentDate);
+        salePayment.setAmountPaid(amountPaid);
+        salePayment.setUpdateAt(updationDateAndTime);
+        salePayment.setReceiptNo(receiptNo);
+        salePayment.setReferenceNumber(referenceNumber);
+    }
 
-   private List<SaleItemResponse> convertSaleItemListIntoResponseList(Sale sale){
+
+
+    private List<SaleItemResponse> convertSaleItemListIntoResponseList(Sale sale){
        List<SaleItemResponse> saleItemResponses = sale.getSaleItem().stream()
                .map(saleItem -> {
                    Item item = saleItem.getItem();

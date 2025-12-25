@@ -5,10 +5,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.OrderType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PartyTransactionType;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
-import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseDto.PurchaseItemResponse;
-import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseDto.PurchasePaymentResponse;
-import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseDto.PurchaseRequest;
-import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseDto.PurchaseResponse;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseDto.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseOrderDto.PurchaseOrderItemRequest;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseOrderDto.PurchaseOrderItemResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseOrderDto.PurchaseOrderRequest;
@@ -255,13 +252,30 @@ public class PurchaseOrderService {
         purchase.setIsPaid(purchaseRequest.getIsPaid());
         purchase.setOverdue(purchaseRequest.getIsOverdue());
 
+        List<PurchaseItem> purchaseItems = new ArrayList<>();
 
-        List<PurchaseItem> purchaseItems = purchaseItemMapper.convertPurchaseItemRequestListIntoPurchaseItemList(purchaseRequest.getPurchaseItemRequests());
-        for(PurchaseItem purchaseItem : purchaseItems){
+        for (PurchaseItemRequest purchaseItemRequest : purchaseRequest.getPurchaseItemRequests()){
+         PurchaseItem purchaseItem = purchaseItemMapper.convertPurchaseItemRequestIntoPurchaseItem(purchaseItemRequest);
+            Item item = itemRepository.findById(purchaseItemRequest.getItemId())
+                    .orElseThrow(()-> new ResourceNotFoundException("Item not found with id : "+purchaseItemRequest.getItemId()));
+
             purchaseItem.setPurchase(purchase);
+            purchaseItem.setItem(item);
             purchaseItem.setCreatedAt(LocalDateTime.now());
             purchaseItem.setUpdateAt(LocalDateTime.now());
+            purchaseItems.add(purchaseItem);
         }
+
+//        List<PurchaseItem> purchaseItems = purchaseItemMapper.convertPurchaseItemRequestListIntoPurchaseItemList(purchaseRequest.getPurchaseItemRequests());
+//        for(PurchaseItem purchaseItem : purchaseItems){
+//            Item item = itemRepository.findById(purchaseItem.getItemId())
+//                    .orElseThrow(()-> new ResourceNotFoundException("Item not found with id : "+purchaseItems.getItemId()));
+//
+//            purchaseItem.setPurchase(purchase);
+//            purchaseItem.setItem(item);
+//            purchaseItem.setCreatedAt(LocalDateTime.now());
+//            purchaseItem.setUpdateAt(LocalDateTime.now());
+//        }
 
         purchase.setPurchaseItems(purchaseItems);
 
