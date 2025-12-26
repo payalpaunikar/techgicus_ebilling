@@ -219,8 +219,9 @@ public class PurchaseOrderService {
         PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(purchaseOrderId)
                 .orElseThrow(()-> new ResourceNotFoundException("Purchase order is not found with id : "+purchaseOrderId));
 
-
-        partyActivityService.deletePartyActivity(PartyTransactionType.PURCHASE_ORDER,purchaseOrder.getPurchaseOrderId());
+        if (purchaseOrder.getOrderType().equals(OrderType.OPEN)) {
+            partyActivityService.deletePartyActivity(PartyTransactionType.PURCHASE_ORDER, purchaseOrder.getPurchaseOrderId());
+        }
 
         purchaseOrderRepository.delete(purchaseOrder);
 

@@ -221,9 +221,11 @@ public class DeliveryChallanService {
         DeliveryChallan deliveryChallan = deliveryChallanRepository.findById(deliveryChallanId)
                 .orElseThrow(()-> new ResourceNotFoundException("Delivery Challan not not with id : "+deliveryChallanId));
 
-        //delete party activity
-        partyActivityService.deletePartyActivity(PartyTransactionType.DELIVERY_CHALLAN,
-                deliveryChallan.getDeliveryChallanId());
+        if (deliveryChallan.getChallanType().equals(ChallanType.OPEN)) {
+            //delete party activity
+            partyActivityService.deletePartyActivity(PartyTransactionType.DELIVERY_CHALLAN,
+                    deliveryChallan.getDeliveryChallanId());
+        }
 
         deliveryChallanRepository.delete(deliveryChallan);
 

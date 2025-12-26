@@ -218,7 +218,9 @@ public class QuotationService {
         Quotation quotation = quotationRepository.findById(quotationId)
                 .orElseThrow(()-> new ResourceNotFoundException("Quotation not found by id : "+quotationId));
 
-        partyActivityService.deletePartyActivity(PartyTransactionType.QUOTATION,quotation.getQuotationId());
+        if (quotation.getQuotationType().equals(QuotationType.OPEN)) {
+            partyActivityService.deletePartyActivity(PartyTransactionType.QUOTATION, quotation.getQuotationId());
+        }
 
         quotationRepository.delete(quotation);
 

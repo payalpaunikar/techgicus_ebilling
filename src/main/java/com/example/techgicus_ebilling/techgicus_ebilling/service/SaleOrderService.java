@@ -213,7 +213,9 @@ public class SaleOrderService {
         SaleOrder saleOrder =saleOrderRepository.findById(saleOrderId)
                 .orElseThrow(()-> new ResourceNotFoundException("Sale Order not found by id : "+saleOrderId));
 
-        partyActivityService.deletePartyActivity(PartyTransactionType.SALE_ORDER,saleOrder.getSaleOrderId());
+        if (saleOrder.getOrderType().equals(OrderType.OPEN)) {
+            partyActivityService.deletePartyActivity(PartyTransactionType.SALE_ORDER, saleOrder.getSaleOrderId());
+        }
 
         saleOrderRepository.delete(saleOrder);
 
