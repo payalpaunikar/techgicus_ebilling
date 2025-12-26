@@ -74,6 +74,10 @@ public class SaleService {
         Party party = partyRepository.findById(saleRequest.getPartyId())
                 .orElseThrow(()-> new ResourceNotFoundException("Party not found with id : "+saleRequest.getPartyId()));
 
+        if(saleRequest.getTotalAmount()<saleRequest.getReceivedAmount()){
+            throw new IllegalArgumentException("Total amount cannot be less than received amount");
+        }
+
         // 4️⃣ Handle null-safe numeric fields
         double receivedAmount = saleRequest.getReceivedAmount() != null ? saleRequest.getReceivedAmount() : 0.0;
         double totalAmount = saleRequest.getTotalAmount() != null ? saleRequest.getTotalAmount() : 0.0;

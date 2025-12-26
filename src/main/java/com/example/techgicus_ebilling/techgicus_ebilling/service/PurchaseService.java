@@ -70,6 +70,10 @@ public class PurchaseService {
         Party party = partyRepository.findById(purchaseRequest.getPartyId())
                 .orElseThrow(()-> new ResourceNotFoundException("Party not found with id : "+purchaseRequest.getPartyId()));
 
+        if(purchaseRequest.getTotalAmount() < purchaseRequest.getSendAmount()){
+            throw new IllegalArgumentException("Total amount cannot be less than  received amount");
+        }
+
         Double paidAmount = purchaseRequest.getSendAmount() != null ?purchaseRequest.getSendAmount():0.0 ;
         Double totalAmount = purchaseRequest.getTotalAmount() != null ? purchaseRequest.getTotalAmount() : 0.0;
 
