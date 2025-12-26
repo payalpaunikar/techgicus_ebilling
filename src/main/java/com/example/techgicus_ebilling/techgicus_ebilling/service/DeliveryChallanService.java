@@ -274,8 +274,12 @@ public class DeliveryChallanService {
         List<SaleItem> saleItems = saleRequest.getSaleItems()
                 .stream()
                 .map(saleItemRequest -> {
+                    Item item = itemRepository.findById(saleItemRequest.getItemId())
+                            .orElseThrow(()-> new ResourceNotFoundException("Item not found with id : "+saleItemRequest.getItemId()));
+
                     SaleItem saleItem = saleItemMapper.convertSaleItemRequestIntoSaleItem(saleItemRequest);
                     saleItem.setSale(sale);
+                    saleItem.setItem(item);
                     saleItem.setCreatedAt(LocalDateTime.now());
                     saleItem.setUpdateAt(LocalDateTime.now());
                     return saleItem;

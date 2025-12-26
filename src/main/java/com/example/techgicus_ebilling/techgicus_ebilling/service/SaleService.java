@@ -253,8 +253,8 @@ public class SaleService {
                         .orElseThrow(() -> new ResourceNotFoundException("Party not found with id : "+saleRequest.getPartyId()));
 
 
-        if(sale.getReceivedAmount()>saleRequest.getTotalAmount()){
-            throw new IllegalArgumentException("Total amount cannot be less than the already received amount");
+        if(saleRequest.getTotalAmount()<saleRequest.getReceivedAmount()){
+            throw new IllegalArgumentException("Total amount cannot be less than received amount");
         }
 
         List<SalePayment> paymentList = sale.getSalePayments();
@@ -262,7 +262,8 @@ public class SaleService {
         // 🔴 RULE 1: Block update if multiple payments exist
         if (paymentList.size() > 1  && sale.getReceivedAmount() != saleRequest.getReceivedAmount()) {
             throw new BadRequestException(
-                    "Sale cannot be updated because multiple payments are already done."
+                    "Received amount cannot be modified because multiple payments already exist. " +
+                            "Please update payments instead to maintain audit consistency."
             );
         }
 

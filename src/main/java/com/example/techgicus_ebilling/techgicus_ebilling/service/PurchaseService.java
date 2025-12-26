@@ -177,8 +177,6 @@ public class PurchaseService {
         Purchase savePurchase =  purchaseRepository.save(purchase);
 
 
-
-
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(party);
         List<PurchaseItemResponse> purchaseItemResponses = purchaseItemMapper.convertPurchaseItemsIntoResponseList(savePurchase.getPurchaseItems());
 
@@ -248,8 +246,8 @@ public class PurchaseService {
         Party party = partyRepository.findById(purchaseRequest.getPartyId())
                 .orElseThrow(()-> new ResourceNotFoundException("Party not found with id : "+purchaseRequest.getPartyId()));
 
-        if(purchase.getSendAmount() > purchaseRequest.getTotalAmount()){
-            throw new IllegalArgumentException("Total amount cannot be less than the already received amount");
+        if(purchaseRequest.getTotalAmount() < purchaseRequest.getSendAmount()){
+            throw new IllegalArgumentException("Total amount cannot be less than  received amount");
         }
 
         List<PurchasePayment> purchasePaymentList = purchase.getPurchasePayments();
@@ -257,7 +255,8 @@ public class PurchaseService {
         // 🔴 RULE 1: Block update if multiple payments exist
         if (purchasePaymentList.size() > 1  && purchase.getSendAmount() != purchaseRequest.getSendAmount()) {
             throw new BadRequestException(
-                    "Purchase cannot be updated because multiple payments are already done."
+                    "Received amount cannot be modified because multiple payments already exist. " +
+                            "Please update payments instead to maintain audit consistency."
             );
         }
 
