@@ -44,7 +44,9 @@ public class CompanyService {
                               String address, BussinessType bussinessType, String gstin,
                               String bussinessCategory, State state,
                               MultipartFile logo, MultipartFile signature,
-                              Long userId){
+                              Long userId,String bankName,String accountNo,
+                                        String ifscCode,String accountHolderName,
+                                        String upiId){
 
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new ResourceNotFoundException("User not found with id : "+userId));
@@ -76,6 +78,11 @@ public class CompanyService {
             newCompany.setGstin(gstin);
             newCompany.setCreatedAt(LocalDateTime.now());
             newCompany.setUpdateAt(LocalDateTime.now());
+            newCompany.setBankName(bankName);
+            newCompany.setAccountNo(accountNo);
+            newCompany.setIfscCode(ifscCode);
+            newCompany.setAccountHolderName(accountHolderName);
+            newCompany.setUpiId(upiId);
 
             Company saveCompany = companyRepository.save(newCompany);
 
@@ -109,7 +116,9 @@ public class CompanyService {
     public CompanyResponse updateCompanyByCompanyId(Long companyId,String bussinessName, String bussinessDescription, String phoneNo, String emailId,
                                                     String address, BussinessType bussinessType, String gstin,
                                                     String bussinessCategory, State state,
-                                                    MultipartFile logo, MultipartFile signature){
+                                                    MultipartFile logo, MultipartFile signature,String bankName,String accountNo,
+                                                    String ifscCode,String accountHolderName,
+                                                    String upiId){
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(()-> new ResourceNotFoundException("Company not found with id : "+companyId));
 
@@ -137,6 +146,11 @@ public class CompanyService {
             company.setPhoneNo(phoneNo);
             company.setAddress(address);
             company.setUpdateAt(LocalDateTime.now());
+            company.setBankName(bankName);
+            company.setAccountNo(accountNo);
+            company.setIfscCode(ifscCode);
+            company.setAccountHolderName(accountHolderName);
+            company.setUpiId(upiId);
 
             Company saveCompany =  companyRepository.save(company);
 

@@ -17,6 +17,11 @@ public class CompanyResponse {
     private State state;
     private String logoUrl;
     private String signatureUrl;
+    private String bankName;
+    private String accountNo;
+    private String ifscCode;
+    private String accountHolderName;
+    private String upiId;
 
     public CompanyResponse() {
     }
@@ -134,5 +139,45 @@ public class CompanyResponse {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
+    }
+
+    public String getAccountNo() {
+        return accountNo;
+    }
+
+    public void setAccountNo(String accountNo) {
+        this.accountNo = accountNo;
+    }
+
+    public String getIfscCode() {
+        return ifscCode;
+    }
+
+    public void setIfscCode(String ifscCode) {
+        this.ifscCode = ifscCode;
+    }
+
+    public String getAccountHolderName() {
+        return accountHolderName;
+    }
+
+    public void setAccountHolderName(String accountHolderName) {
+        this.accountHolderName = accountHolderName;
+    }
+
+    public String getUpiId() {
+        return upiId;
+    }
+
+    public void setUpiId(String upiId) {
+        this.upiId = upiId;
     }
 }

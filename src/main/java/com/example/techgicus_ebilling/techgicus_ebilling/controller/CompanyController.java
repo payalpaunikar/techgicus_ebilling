@@ -39,11 +39,17 @@ public class CompanyController {
             @RequestPart(value = "state",required = true) String state,
             @RequestPart(value = "logo",required = false) MultipartFile logo,
             @RequestPart(value = "signature",required = false)  MultipartFile signature,
+            @RequestPart(value = "bankName",required = true) String bankName,
+            @RequestPart(value = "accountNo",required = true) String accountNo,
+            @RequestPart(value = "ifscCode",required = true) String ifscCode,
+            @RequestPart(value = "accountHolderName",required = true) String accountHolderName,
+            @RequestPart(value = "upiId",required = true) String upiId,
             @PathVariable Long ownerId
 
     ){
         return ResponseEntity.ok(companyService.createCompany(bussinessName,businessDescription,phoneNo,emailId,address,BussinessType.valueOf(bussinessType.toUpperCase()),
-                gstin,bussinessCategory,State.valueOf(state.toUpperCase()),logo,signature,ownerId));
+                gstin,bussinessCategory,State.valueOf(state.toUpperCase()),logo,signature,ownerId,bankName,accountNo,
+                ifscCode,accountHolderName,upiId));
     }
 
 
@@ -67,10 +73,16 @@ public class CompanyController {
                                                                     @RequestPart(value = "bussinessCategory",required = false) String bussinessCategory,
                                                                     @RequestPart(value = "state",required = true) String state,
                                                                     @RequestPart(value = "logo",required = false) MultipartFile logo,
-                                                                    @RequestPart(value = "signature",required = false)  MultipartFile signature){
+                                                                    @RequestPart(value = "signature",required = false)  MultipartFile signature,
+                                                                    @RequestPart(value = "bankName",required = true) String bankName,
+                                                                    @RequestPart(value = "accountNo",required = true) String accountNo,
+                                                                    @RequestPart(value = "ifscCode",required = true) String ifscCode,
+                                                                    @RequestPart(value = "accountHolderName",required = true) String accountHolderName,
+                                                                    @RequestPart(value = "upiId",required = false) String upiId){
        return ResponseEntity.ok(companyService.updateCompanyByCompanyId(companyId,bussinessName,
                businessDescription,phoneNo,emailId,
-               address,BussinessType.valueOf(bussinessType.toUpperCase()),gstin,bussinessCategory,State.valueOf(state.toUpperCase()),logo,signature));
+               address,BussinessType.valueOf(bussinessType.toUpperCase()),gstin,bussinessCategory,State.valueOf(state.toUpperCase()),logo,signature,bankName,accountNo,
+               ifscCode,accountHolderName,upiId));
     }
 
 

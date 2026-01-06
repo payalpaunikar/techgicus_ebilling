@@ -38,6 +38,16 @@ public class Company {
 
     private String signatureUrl;
 
+    private String bankName;
+
+    private String accountNo;
+
+    private String ifscCode;
+
+    private String accountHolderName;
+
+    private String upiId;
+
     @ManyToOne
     @JoinColumn(name = "company_owner_id",nullable = false)
     private User companyOwner;
@@ -185,5 +195,45 @@ public class Company {
 
     public void setCompanyOwner(User companyOwner) {
         this.companyOwner = companyOwner;
+    }
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
+    }
+
+    public String getAccountNo() {
+        return accountNo;
+    }
+
+    public void setAccountNo(String accountNo) {
+        this.accountNo = accountNo;
+    }
+
+    public String getIfscCode() {
+        return ifscCode;
+    }
+
+    public void setIfscCode(String ifscCode) {
+        this.ifscCode = ifscCode;
+    }
+
+    public String getAccountHolderName() {
+        return accountHolderName;
+    }
+
+    public void setAccountHolderName(String accountHolderName) {
+        this.accountHolderName = accountHolderName;
+    }
+
+    public String getUpiId() {
+        return upiId;
+    }
+
+    public void setUpiId(String upiId) {
+        this.upiId = upiId;
     }
 }

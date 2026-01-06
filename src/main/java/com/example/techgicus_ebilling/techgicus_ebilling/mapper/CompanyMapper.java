@@ -13,6 +13,11 @@ public interface CompanyMapper {
 
     @Mapping(target = "businessDescription",source = "businessDescription")
     @Mapping(target = "phoneNo",source = "phoneNo")
+    @Mapping(target = "bankName",source = "bankName")
+    @Mapping(target = "accountNo",source = "accountNo")
+    @Mapping(target = "ifscCode",source = "ifscCode")
+    @Mapping(target = "accountHolderName",source = "accountHolderName")
+    @Mapping(target = "upiId",source = "upiId")
     CompanyResponse convertCompanyIntoCompanyResponse(Company company);
 
     List<CompanyResponse> convertCompaniesIntoCompanyRsponses(List<Company> companies);
