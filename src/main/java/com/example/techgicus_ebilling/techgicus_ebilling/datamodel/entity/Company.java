@@ -56,6 +56,8 @@ public class Company {
 
     private LocalDateTime updateAt;
 
+    private String city;
+
     public Company() {
     }
 
@@ -235,5 +237,13 @@ public class Company {
 
     public void setUpiId(String upiId) {
         this.upiId = upiId;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

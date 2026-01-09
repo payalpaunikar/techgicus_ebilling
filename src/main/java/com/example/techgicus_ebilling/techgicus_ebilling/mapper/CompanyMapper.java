@@ -18,6 +18,7 @@ public interface CompanyMapper {
     @Mapping(target = "ifscCode",source = "ifscCode")
     @Mapping(target = "accountHolderName",source = "accountHolderName")
     @Mapping(target = "upiId",source = "upiId")
+    @Mapping(target = "city",source = "city")
     CompanyResponse convertCompanyIntoCompanyResponse(Company company);
 
     List<CompanyResponse> convertCompaniesIntoCompanyRsponses(List<Company> companies);

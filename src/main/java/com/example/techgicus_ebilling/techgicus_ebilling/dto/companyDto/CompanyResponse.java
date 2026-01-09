@@ -22,6 +22,7 @@ public class CompanyResponse {
     private String ifscCode;
     private String accountHolderName;
     private String upiId;
+    private String city;
 
     public CompanyResponse() {
     }
@@ -179,5 +180,13 @@ public class CompanyResponse {
 
     public void setUpiId(String upiId) {
         this.upiId = upiId;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

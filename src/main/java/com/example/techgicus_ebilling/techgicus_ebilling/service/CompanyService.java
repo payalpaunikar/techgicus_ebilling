@@ -40,13 +40,13 @@ public class CompanyService {
     }
 
     public CompanyResponse createCompany(String bussinessName,
-                              String bussinessDescription, String phoneNo, String emailId,
-                              String address, BussinessType bussinessType, String gstin,
-                              String bussinessCategory, State state,
-                              MultipartFile logo, MultipartFile signature,
-                              Long userId,String bankName,String accountNo,
-                                        String ifscCode,String accountHolderName,
-                                        String upiId){
+                                         String bussinessDescription, String phoneNo, String emailId,
+                                         String address, BussinessType bussinessType, String gstin,
+                                         String bussinessCategory, State state,
+                                         MultipartFile logo, MultipartFile signature,
+                                         Long userId, String bankName, String accountNo,
+                                         String ifscCode, String accountHolderName,
+                                         String upiId, String city){
 
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new ResourceNotFoundException("User not found with id : "+userId));
@@ -83,6 +83,7 @@ public class CompanyService {
             newCompany.setIfscCode(ifscCode);
             newCompany.setAccountHolderName(accountHolderName);
             newCompany.setUpiId(upiId);
+            newCompany.setCity(city);
 
             Company saveCompany = companyRepository.save(newCompany);
 
@@ -118,7 +119,7 @@ public class CompanyService {
                                                     String bussinessCategory, State state,
                                                     MultipartFile logo, MultipartFile signature,String bankName,String accountNo,
                                                     String ifscCode,String accountHolderName,
-                                                    String upiId){
+                                                    String upiId,String city){
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(()-> new ResourceNotFoundException("Company not found with id : "+companyId));
 
@@ -151,6 +152,7 @@ public class CompanyService {
             company.setIfscCode(ifscCode);
             company.setAccountHolderName(accountHolderName);
             company.setUpiId(upiId);
+            company.setCity(city);
 
             Company saveCompany =  companyRepository.save(company);
 
