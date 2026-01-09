@@ -5,6 +5,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.SaleIt
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleDto.SaleItemRequest;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleDto.SaleItemResponse;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -27,6 +28,11 @@ public interface SaleItemMapper {
 
     List<SaleItemResponse> convertSaleItemListIntoSaleItmResponseList(List<SaleItem> saleItems);
 
+
+    @Mapping(
+            target = "taxRatePercentage",
+            expression = "java(saleItem.getTaxRate() != null ? saleItem.getTaxRate().getRateWithPercent() : \"0%\")"
+    )
     SaleItemResponse covertSaleItemIntoSaleItemResponse(SaleItem saleItem);
 
 }

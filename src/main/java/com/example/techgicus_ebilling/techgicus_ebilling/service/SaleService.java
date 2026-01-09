@@ -89,6 +89,7 @@ public class SaleService {
         boolean isPaid = (balance <= 0) ? true : false;
         boolean isOverDue = false;
 
+
         // set isOverdue
         if (saleRequest.getDueDate() != null && saleRequest.getDueDate().isBefore(LocalDate.now()) && balance > 0) {
             isOverDue = true;
@@ -181,6 +182,7 @@ public class SaleService {
                 sale.getPaymentDescription());
 
         saleRepository.save(sale);
+        double totalTaxRate = calculateTotalTaxRate(sale);
 
         // convert party into party response
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(sale.getParty());
@@ -193,7 +195,7 @@ public class SaleService {
         salePaymentResponseList = convertSalePaymentListIntoSalePaymentResponseList(sale.getSalePayments());
 
         SaleResponse saleResponse = new SaleResponse();
-        saleResponse = setSaleResponseField(sale,partyResponseDto,saleItemResponses,sale.getInvoceDate(),sale.getDueDate(),salePaymentResponseList);
+        saleResponse = setSaleResponseField(sale,partyResponseDto,saleItemResponses,sale.getInvoceDate(),sale.getDueDate(),salePaymentResponseList,totalTaxRate);
 
         return saleResponse;
     }
@@ -206,6 +208,7 @@ public class SaleService {
 
         List<Sale> sales = saleRepository.findAllByCompanyOrderByInvoceDateDesc(company);
 
+
         List<SaleResponse> saleResponseList = sales.stream()
                 .map(sale -> {
                     PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(sale.getParty());
@@ -216,10 +219,11 @@ public class SaleService {
 
                     //convert sale payment list into response list
                     List<SalePaymentResponse> salePaymentResponses = salePaymentMapper.convertSalePaymentListIntoSalePaymentResponseList(sale.getSalePayments());
-
+                    double totalTaxRate = calculateTotalTaxRate(sale);
                     // set sale response field
                     SaleResponse saleResponse = new SaleResponse();
-                    saleResponse = setSaleResponseField(sale,partyResponseDto,saleItemResponses,sale.getInvoceDate(),sale.getDueDate(),salePaymentResponses);
+                    saleResponse = setSaleResponseField(sale,partyResponseDto,saleItemResponses,sale.getInvoceDate(),sale.getDueDate(),salePaymentResponses,
+                            totalTaxRate);
 
                     return saleResponse;
                 }).toList();
@@ -241,8 +245,11 @@ public class SaleService {
 
         List<SalePaymentResponse> salePaymentResponses = salePaymentMapper.convertSalePaymentListIntoSalePaymentResponseList(sale.getSalePayments());
 
+        double totalTaxRate = calculateTotalTaxRate(sale);
+
         SaleResponse saleResponse = new SaleResponse();
-        saleResponse = setSaleResponseField(sale,partyResponseDto,saleItemResponses,sale.getInvoceDate(),sale.getDueDate(),salePaymentResponses);
+        saleResponse = setSaleResponseField(sale,partyResponseDto,saleItemResponses,sale.getInvoceDate(),sale.getDueDate(),salePaymentResponses,
+                totalTaxRate);
 
         return saleResponse;
     }
@@ -364,8 +371,10 @@ public class SaleService {
         List<SalePaymentResponse> salePaymentResponses = new ArrayList<>();
         salePaymentResponses = convertSalePaymentListIntoSalePaymentResponseList(sale.getSalePayments());
 
+        double totalTaxRate = calculateTotalTaxRate(sale);
         SaleResponse saleResponse = new SaleResponse();
-        saleResponse = setSaleResponseField(sale,partyResponseDto,saleItemResponses,sale.getInvoceDate(),sale.getDueDate(),salePaymentResponses);
+        saleResponse = setSaleResponseField(sale,partyResponseDto,saleItemResponses,sale.getInvoceDate(),sale.getDueDate(),salePaymentResponses,
+                totalTaxRate);
 
         return saleResponse;
     }
@@ -637,13 +646,14 @@ public class SaleService {
    }
 
    private SaleResponse setSaleResponseField(Sale sale,PartyResponseDto partyResponseDto,List<SaleItemResponse> saleItemResponses,LocalDate inovoiceDate,LocalDate dueDate,
-                                             List<SalePaymentResponse> salePaymentResponses){
+                                             List<SalePaymentResponse> salePaymentResponses,double totalTaxRate){
        SaleResponse saleResponse = saleMapper.convertSaleIntoSaleResponse(sale);
        saleResponse.setPartyResponseDto(partyResponseDto);
        saleResponse.setSaleItemResponses(saleItemResponses);
        saleResponse.setInvoceDate(inovoiceDate);
        saleResponse.setDueDate(dueDate);
        saleResponse.setSalePaymentResponses(salePaymentResponses);
+       saleResponse.setTotalTaxRate(totalTaxRate);
        return saleResponse;
    }
 
@@ -661,6 +671,18 @@ public class SaleService {
 
        return salePaymentResponse;
    }
+
+
+    private double calculateTotalTaxRate(Sale sale) {
+        if (sale.getSaleItem() == null) {
+            return 0.0;
+        }
+
+        return sale.getSaleItem().stream()
+                .filter(item -> item.getTaxRate() != null)
+                .mapToDouble(item -> item.getTaxRate().getRate())
+                .sum();
+    }
 
 
 }

@@ -2,6 +2,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.repository;
 
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Party;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Sale;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.reportDto.SaleReportDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.revenueDto.MonthlyRevenue;
@@ -17,6 +18,8 @@ import java.util.List;
 public interface SaleRepository extends JpaRepository<Sale,Long> {
 
     List<Sale> findAllByCompanyOrderByInvoceDateDesc(Company company);
+
+    Sale findByInvoiceNumberAndParty(String invoiceNo, Party party);
 
 
     @Query("""

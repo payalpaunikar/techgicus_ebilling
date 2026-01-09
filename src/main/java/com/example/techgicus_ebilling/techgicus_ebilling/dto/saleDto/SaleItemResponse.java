@@ -15,6 +15,8 @@ public class SaleItemResponse {
     private Double pricePerUnit;
     private TaxType pricePerUnitTaxType;
     private TaxRate taxRate;
+
+    private String taxRatePercentage;
     private Double taxAmount;
     private Double totalAmount;
 
@@ -116,5 +118,13 @@ public class SaleItemResponse {
 
     public void setItemId(Long itemId) {
         this.itemId = itemId;
+    }
+
+    public String getTaxRatePercentage() {
+        return taxRatePercentage;
+    }
+
+    public void setTaxRatePercentage(String taxRatePercentage) {
+        this.taxRatePercentage = taxRatePercentage;
     }
 }

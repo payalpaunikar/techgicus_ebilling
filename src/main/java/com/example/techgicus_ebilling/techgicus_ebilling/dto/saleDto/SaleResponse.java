@@ -22,6 +22,7 @@ public class SaleResponse {
     private String paymentDescription;
     private Double totalAmountWithoutTax;
     private Double totalTaxAmount;
+    private Double totalTaxRate;
     private Double deliveryCharges;
     private Double totalAmount;
     private Double receivedAmount;
@@ -228,5 +229,13 @@ public class SaleResponse {
 
     public void setSalePaymentResponses(List<SalePaymentResponse> salePaymentResponses) {
         this.salePaymentResponses = salePaymentResponses;
+    }
+
+    public Double getTotalTaxRate() {
+        return totalTaxRate;
+    }
+
+    public void setTotalTaxRate(Double totalTaxRate) {
+        this.totalTaxRate = totalTaxRate;
     }
 }
