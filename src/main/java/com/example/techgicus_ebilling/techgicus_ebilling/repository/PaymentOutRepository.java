@@ -1,6 +1,7 @@
 package com.example.techgicus_ebilling.techgicus_ebilling.repository;
 
 
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.PaymentIn;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.PaymentOut;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,8 @@ import java.util.List;
 
 @Repository
 public interface PaymentOutRepository extends JpaRepository<PaymentOut,Long> {
+
+    long countByCompany(Company company);
 
     @Query("""
         SELECT p FROM PaymentOut p 

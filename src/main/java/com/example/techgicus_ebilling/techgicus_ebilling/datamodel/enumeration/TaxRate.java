@@ -50,4 +50,18 @@ public enum TaxRate {
     public String getRateWithPercent() {
         return rate + "%";
     }
+
+    public static TaxRate covertStringToTaxRate(String taxRateStr){
+      if (taxRateStr == null || taxRateStr.isBlank()){
+          return NONE;
+      }
+
+      String newTaxRate = taxRateStr
+              .replace("@","")
+              .replace("%","")
+              .trim()
+              .toUpperCase();
+
+      return TaxRate.valueOf(newTaxRate);
+    }
 }

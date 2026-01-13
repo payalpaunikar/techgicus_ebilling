@@ -10,6 +10,7 @@ public enum Unit {
     NUMBERS,
     PAIRS,
     TABLETS,
+    LITRE,
     MILLITRE,
     BUNDLES,
     BOX,

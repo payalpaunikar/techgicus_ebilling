@@ -15,6 +15,8 @@ import java.util.List;
 @Repository
 public interface PurchaseReturnRepository extends JpaRepository<PurchaseReturn,Long> {
 
+    long countByCompany(Company company);
+
     List<PurchaseReturn> findAllByCompanyAndReturnDateBetween(Company company, LocalDate startDate, LocalDate endDate);
 
 
@@ -26,8 +28,8 @@ public interface PurchaseReturnRepository extends JpaRepository<PurchaseReturn,L
             pu.party.name AS name,
             pu.party.gstin AS gstin,
             pu.party.phoneNo AS phoneNo,
-            pu.billNo AS billNumber,
-            pu.billDate AS billDate,
+            pu.returnNo AS billNumber,
+            pu.returnDate AS billDate,
             pu.paymentType AS paymentType,
             pu.description AS paymentDescription,
             pu.totalAmount AS totalAmount,
@@ -37,7 +39,7 @@ public interface PurchaseReturnRepository extends JpaRepository<PurchaseReturn,L
             FROM PurchaseReturn pu
             WHERE pu.company.companyId = :companyId
             AND (:partyId IS NULL OR pu.party.partyId = :partyId)
-            AND pu.billDate BETWEEN :startDate AND :endDate
+            AND pu.returnDate BETWEEN :startDate AND :endDate
             ORDER BY pu.billDate DESC
             """)
     List<PurchaseReportDto> findPurchaseReport(

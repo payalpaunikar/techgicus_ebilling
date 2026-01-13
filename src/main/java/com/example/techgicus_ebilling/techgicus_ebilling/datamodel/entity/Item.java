@@ -36,9 +36,11 @@ public class Item {
     private ItemType itemType;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 50)
     private Unit baseUnit;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 50)
     private Unit secondaryUnit;
 
     private Double baseUnitToSecondaryUnit;

@@ -1,5 +1,6 @@
 package com.example.techgicus_ebilling.techgicus_ebilling.repository;
 
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.PurchaseOrder;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.SaleOrder;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.OrderType;
@@ -12,6 +13,8 @@ import java.util.List;
 
 @Repository
 public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder,Long> {
+
+    long countByCompany(Company company);
 
     @Query("""
             SELECT p FROM PurchaseOrder p

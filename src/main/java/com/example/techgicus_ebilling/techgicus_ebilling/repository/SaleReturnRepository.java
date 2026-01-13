@@ -7,17 +7,20 @@ import com.example.techgicus_ebilling.techgicus_ebilling.dto.reportDto.SaleRepor
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SaleReturnRepository extends JpaRepository<SaleReturn,Long> {
 
+    long countByCompany(Company company);
 
-    List<SaleReturn> findAllByCompanyAndInvoiceDateBetween(Company company, LocalDate startDate, LocalDate endDate);
+    List<SaleReturn> findAllByCompanyAndReturnDateBetweenOrderByReturnDateDesc(Company company, LocalDate startDate, LocalDate endDate);
+
+    Optional<SaleReturn> findByReturnNoAndCompany(String invoiceNo, Company company);
 
 
     @Query("""
@@ -28,8 +31,8 @@ public interface SaleReturnRepository extends JpaRepository<SaleReturn,Long> {
             s.party.name AS name,
             s.party.gstin AS gstin,
             s.party.phoneNo AS phoneNo,
-            s.invoiceNo AS invoiceNumber,
-            s.invoiceDate AS invoceDate,
+            s.returnNo AS invoiceNumber,
+            s.returnDate AS invoceDate,
             s.paymentType AS paymentType,
             s.description AS paymentDescription,
             s.totalAmount AS totalAmount,
@@ -39,8 +42,8 @@ public interface SaleReturnRepository extends JpaRepository<SaleReturn,Long> {
             FROM SaleReturn s
             WHERE s.company.companyId = :companyId
             AND (:partyId IS NULL OR s.party.partyId = :partyId)
-            AND s.invoiceDate BETWEEN :startDate AND :endDate
-            ORDER BY s.invoiceDate DESC
+            AND s.returnDate BETWEEN :startDate AND :endDate
+            ORDER BY s.returnDate DESC
             """)
     List<SaleReportDto> findSalesReport(
             @Param("companyId")Long companyId,

@@ -14,6 +14,9 @@ import java.util.List;
 @Repository
 public interface SaleOrderRepository extends JpaRepository<SaleOrder,Long> {
 
+
+    long countByCompany(Company company);
+
     @Query("""
             SELECT s FROM SaleOrder s
             WHERE s.company.companyId = :companyId

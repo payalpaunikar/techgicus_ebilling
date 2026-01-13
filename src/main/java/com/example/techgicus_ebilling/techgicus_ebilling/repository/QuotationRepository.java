@@ -11,5 +11,7 @@ import java.util.List;
 @Repository
 public interface QuotationRepository extends JpaRepository<Quotation,Long> {
 
+    long countByCompany(Company company);
+
     List<Quotation> findAllByCompany(Company company);
 }

@@ -516,7 +516,7 @@ public class SaleService {
     }
 
 
-   private SalePayment setSalePaymentFields(String paymentDescription, PaymentType paymentType,LocalDate paymentDate,
+   public SalePayment setSalePaymentFields(String paymentDescription, PaymentType paymentType,LocalDate paymentDate,
                                       Sale sale,Double amountPaid,LocalDateTime creationDateAndTime,LocalDateTime updationDateAndTime,
                                             String receiptNo,String referenceNumber){
        SalePayment salePayment = new SalePayment();
@@ -533,7 +533,7 @@ public class SaleService {
        return salePayment;
    }
 
-    private void updateSalePayment(
+    public void updateSalePayment(
             SalePayment salePayment,
             String paymentDescription,
             PaymentType paymentType,

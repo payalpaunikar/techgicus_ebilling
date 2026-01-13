@@ -17,6 +17,8 @@ import java.util.List;
 @Repository
 public interface PurchaseRepository extends JpaRepository<Purchase,Long> {
 
+    long countByCompany(Company company);
+
     List<Purchase> findAllByCompanyOrderByBillDateDesc(Company company);
 
     @Query("""

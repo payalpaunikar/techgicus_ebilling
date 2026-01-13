@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SaleRepository extends JpaRepository<Sale,Long> {
@@ -20,6 +21,10 @@ public interface SaleRepository extends JpaRepository<Sale,Long> {
     List<Sale> findAllByCompanyOrderByInvoceDateDesc(Company company);
 
     Sale findByInvoiceNumberAndParty(String invoiceNo, Party party);
+
+    Optional<Sale> findByInvoiceNumberAndCompany(String invoiceNo, Company company);
+
+    long countByCompany(Company company);
 
 
     @Query("""

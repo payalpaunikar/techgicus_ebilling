@@ -14,6 +14,8 @@ import java.util.List;
 @Repository
 public interface DeliveryChallanRepository extends JpaRepository<DeliveryChallan,Long> {
 
+    long countByCompany(Company company);
+
     @Query("""
             SELECT d FROM DeliveryChallan d
             WHERE d.company = :company 

@@ -4,8 +4,6 @@ package com.example.techgicus_ebilling.techgicus_ebilling.service;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PartyTransactionType;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
-import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleOrderDto.SaleOrderItemRequest;
-import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleOrderDto.SaleOrderItemResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleReturnDto.SaleReturnItemRequest;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleReturnDto.SaleReturnItemResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleReturnDto.SaleReturnRequest;
@@ -21,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class SaleReturnService {
@@ -122,7 +119,7 @@ public class SaleReturnService {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(()-> new ResourceNotFoundException("Compnay not found with id : "+companyId));
 
-        List<SaleReturn> saleReturns = saleReturnRepository.findAllByCompanyAndInvoiceDateBetween(company,startDate,endDate);
+        List<SaleReturn> saleReturns = saleReturnRepository.findAllByCompanyAndReturnDateBetweenOrderByReturnDateDesc(company,startDate,endDate);
 
         List<SaleReturnResponse> saleReturnResponses = saleReturns.stream()
                 .map(saleReturn -> {
