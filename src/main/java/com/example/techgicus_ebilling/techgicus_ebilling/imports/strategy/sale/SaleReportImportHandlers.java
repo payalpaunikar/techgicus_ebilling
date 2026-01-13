@@ -7,7 +7,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SaleReportImportHandler implements ImportHandler {
+public class SaleReportImportHandlers implements ImportHandler {
 
 
     @Override

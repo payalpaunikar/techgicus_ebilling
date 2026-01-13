@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -44,6 +45,11 @@ public interface PartyRepository extends JpaRepository<Party,Long> {
                      p.shipingAddress
              """)
      List<PartyReportProjection> getAllPartyReport(@Param("companyId")Long companyId);
+
+
+    Optional<Party> findByNameAndPhoneNo(String name, String phoneNo);
+
+    Optional<Party> findByName(String name);
 
 
 }

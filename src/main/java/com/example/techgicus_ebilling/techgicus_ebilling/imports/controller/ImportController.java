@@ -1,7 +1,7 @@
-package com.example.techgicus_ebilling.techgicus_ebilling.controller;
+package com.example.techgicus_ebilling.techgicus_ebilling.imports.controller;
 
 
-import com.example.techgicus_ebilling.techgicus_ebilling.service.ImportProcessingService;
+import com.example.techgicus_ebilling.techgicus_ebilling.imports.service.ImportProcessingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

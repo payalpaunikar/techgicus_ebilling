@@ -14,6 +14,8 @@ import java.util.List;
 public interface CategoryRepository extends JpaRepository<Category,Long> {
     List<Category> findAllByCompany(Company company);
 
+    Category findByCategoryNameAndCompany(String categoryName,Company company);
+
     @Query(value = "SELECT * From category where category_id IN(:ids)",nativeQuery = true)
     List<Category> findCategoriesByIds(@Param("ids")List<Long> ids);
 }
