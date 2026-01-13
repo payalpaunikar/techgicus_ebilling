@@ -129,6 +129,42 @@
 			<version>1.15</version>
 		</dependency>
 
+		<!-- Spring Batch -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-batch</artifactId>
+		</dependency>
+
+
+		<!-- This helps us read Excel files (.xlsx) -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>5.2.3</version>
+		</dependency>
+
+		<!-- This library helps us open both ZIP and RAR files easily -->
+		<!-- Apache Commons Compress – supports ZIP, RAR, 7z, etc. -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.26.1</version>
+		</dependency>
+
+		<!-- Apache Commons IO – REQUIRED for FileTimes -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.16.1</version>  <!-- Must be 2.16.0 or higher -->
+		</dependency>
+
+		<!-- For RAR support specifically -->
+		<dependency>
+			<groupId>com.github.junrar</groupId>
+			<artifactId>junrar</artifactId>
+			<version>7.5.5</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
