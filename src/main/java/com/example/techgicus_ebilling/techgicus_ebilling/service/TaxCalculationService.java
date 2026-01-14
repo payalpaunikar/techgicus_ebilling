@@ -6,121 +6,68 @@ import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleDto.SaleItemRes
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.TaxableItem;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TaxCalculationService {
 
-    public List<ItemTaxSummaryResponse> calculateTaxSummary(List<? extends TaxableItem> items) {
+    public List<ItemTaxSummaryResponse> calculateTaxSummary(
+            List<? extends TaxableItem> items) {
+
         List<ItemTaxSummaryResponse> taxSummaryList = new ArrayList<>();
 
-        double firstTaxRate = items.get(0).getTaxRate().getRate();
-        String firstHsnCode = items.get(0).getItemHsnCode();
+        if (items == null || items.isEmpty()) {
+            return taxSummaryList;
+        }
 
+        // 🔹 Group by HSN + Tax Rate
+        Map<String, List<TaxableItem>> groupedItems =
+                items.stream()
+                        .collect(Collectors.groupingBy(
+                                item -> item.getItemHsnCode() + "_" + item.getTaxRate().getRate()
+                        ));
 
+        // 🔹 Process each group separately
+        for (List<TaxableItem> group : groupedItems.values()) {
 
-        boolean isTaxRateEqual = items.stream()
-                .allMatch(item -> Double.compare(item.getTaxRate().getRate(), firstTaxRate) == 0);
+            TaxableItem firstItem = group.get(0);
 
-        boolean isTaxRateAndHsnEqual = items.stream()
-                .allMatch(item ->
-                        Double.compare(item.getTaxRate().getRate(), firstTaxRate) == 0
-                                && Objects.equals(item.getItemHsnCode(), firstHsnCode)
-                );
+            String hsnCode = firstItem.getItemHsnCode();
+            double taxRate = firstItem.getTaxRate().getRate();
 
-        if (isTaxRateAndHsnEqual){
-
-            double taxAmount = items.stream()
+            double totalTaxAmount = group.stream()
                     .mapToDouble(TaxableItem::getTaxAmount)
                     .sum();
 
-            double totalAmount = items.stream()
+            double totalAmount = group.stream()
                     .mapToDouble(TaxableItem::getTotalAmount)
                     .sum();
 
-            ItemTaxSummaryResponse summary = new ItemTaxSummaryResponse();
-            //summary.setItemName(item.getItemName());
-             summary.setHsnCode(items.get(0).getItemHsnCode());
-
-            double taxPaybleAmount = totalAmount-taxAmount;
-
-            double roundTaxPaybleAmount = Math.floor(taxPaybleAmount*100)/100;
-
-            summary.setTaxableAmount(roundTaxPaybleAmount); // base amount for tax
-
-            double halfTaxRate = firstTaxRate/2.0;
-            System.out.println("Tax amount : "+taxAmount);
-            double halfTaxAmount = taxAmount/2.0;
-            System.out.println("half Tax amount : "+halfTaxAmount);
-
-
-            double roundHalfTaxAmount = Math.floor(halfTaxAmount*100)/100;
-            System.out.println("round Tax amount : "+roundHalfTaxAmount);
-
-
-            // Calculate CGST
-            TaxComponentResponse cgst = new TaxComponentResponse();
-
-            cgst.setRate(halfTaxRate);
-            cgst.setAmount(roundHalfTaxAmount);
-            summary.setCgst(cgst);
-
-            // Calculate SGST
-            TaxComponentResponse sgst = new TaxComponentResponse();
-            sgst.setRate(halfTaxRate);
-            sgst.setAmount(roundHalfTaxAmount);
-            summary.setSgst(sgst);
-
-            // Total Tax Amount
-            summary.setTotalTaxAmount(taxAmount);
-
-            taxSummaryList.add(summary);
-
-            return  taxSummaryList;
-        }
-
-
-        for (TaxableItem item : items) {
-
-            double taxAmount = item.getTaxAmount();
+            double taxableAmount = totalAmount - totalTaxAmount;
 
             ItemTaxSummaryResponse summary = new ItemTaxSummaryResponse();
-            //summary.setItemName(item.getItemName());
-             summary.setHsnCode(item.getItemHsnCode());
+            summary.setHsnCode(hsnCode);
+            summary.setTaxableAmount(round2(taxableAmount));
 
-            double taxPaybleAmount = item.getTotalAmount()-taxAmount;
+            double halfTaxRate = taxRate / 2.0;
+            double halfTaxAmount = totalTaxAmount / 2.0;
 
-            double roundTaxPaybleAmount = Math.floor(taxPaybleAmount*100)/100;
-
-            summary.setTaxableAmount(roundTaxPaybleAmount); // base amount for tax
-
-            double halfTaxRate = item.getTaxRate().getRate()/2.0;
-            System.out.println("Tax amount : "+taxAmount);
-            double halfTaxAmount = taxAmount/2.0;
-            System.out.println("half Tax amount : "+halfTaxAmount);
-
-
-            double roundHalfTaxAmount = Math.floor(halfTaxAmount*100)/100;
-            System.out.println("round Tax amount : "+roundHalfTaxAmount);
-
-
-            // Calculate CGST
+            // CGST
             TaxComponentResponse cgst = new TaxComponentResponse();
-
             cgst.setRate(halfTaxRate);
-            cgst.setAmount(roundHalfTaxAmount);
+            cgst.setAmount(round2(halfTaxAmount));
             summary.setCgst(cgst);
 
-            // Calculate SGST
+            // SGST
             TaxComponentResponse sgst = new TaxComponentResponse();
             sgst.setRate(halfTaxRate);
-            sgst.setAmount(roundHalfTaxAmount);
+            sgst.setAmount(round2(halfTaxAmount));
             summary.setSgst(sgst);
 
-            // Total Tax Amount
-            summary.setTotalTaxAmount(taxAmount);
+            summary.setTotalTaxAmount(round2(totalTaxAmount));
 
             taxSummaryList.add(summary);
         }
@@ -128,9 +75,12 @@ public class TaxCalculationService {
         return taxSummaryList;
     }
 
-
-
-
-
+    // 🔹 Proper rounding to 2 decimal places
+    private double round2(double value) {
+        return BigDecimal.valueOf(value)
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
+    }
 }
+
 
