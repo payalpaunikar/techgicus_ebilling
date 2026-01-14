@@ -3,8 +3,9 @@ package com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.TaxRate;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.TaxType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.Unit;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.TaxableItem;
 
-public class PurchaseItemResponse {
+public class PurchaseItemResponse implements TaxableItem {
 
     private Long purchaseItemId;
 
@@ -140,5 +141,10 @@ public class PurchaseItemResponse {
 
     public void setItemId(Long itemId) {
         this.itemId = itemId;
+    }
+
+    @Override
+    public Double getTaxAmount() {
+        return getTotalTaxAmount();
     }
 }

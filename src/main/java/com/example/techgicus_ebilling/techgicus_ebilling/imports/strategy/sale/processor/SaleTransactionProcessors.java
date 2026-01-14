@@ -4,7 +4,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.imports.strategy.sale.
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PaymentType;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.dto.SaleRowData;
-import com.example.techgicus_ebilling.techgicus_ebilling.imports.strategy.TransactionProcessor;
+import com.example.techgicus_ebilling.techgicus_ebilling.imports.strategy.TransactionProcessors;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import static com.example.techgicus_ebilling.techgicus_ebilling.imports.utill.Ex
 import static com.example.techgicus_ebilling.techgicus_ebilling.imports.utill.ExcelUtil.getCellString;
 
 @Service
-public class SaleTransactionProcessor implements TransactionProcessor {
+public class SaleTransactionProcessors implements TransactionProcessors {
     @Override
     public boolean supports(String transactionType) {
         return false;

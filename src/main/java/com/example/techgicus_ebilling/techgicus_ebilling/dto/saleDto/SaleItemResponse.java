@@ -3,8 +3,9 @@ package com.example.techgicus_ebilling.techgicus_ebilling.dto.saleDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.TaxRate;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.TaxType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.Unit;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.TaxableItem;
 
-public class SaleItemResponse {
+public class SaleItemResponse implements TaxableItem {
   //  private Long saleItemId;
     private Long itemId;
     private String itemName;

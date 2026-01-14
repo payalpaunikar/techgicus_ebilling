@@ -4,6 +4,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.repository;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Purchase;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Sale;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.SaleReturn;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.reportDto.PurchaseReportDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.reportDto.SaleReportDto;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +19,9 @@ import java.util.List;
 public interface PurchaseRepository extends JpaRepository<Purchase,Long> {
 
     long countByCompany(Company company);
+
+    Purchase findTopByCompanyOrderByPurchaseIdDesc(Company company);
+
 
     List<Purchase> findAllByCompanyOrderByBillDateDesc(Company company);
 

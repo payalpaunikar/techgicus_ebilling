@@ -3,10 +3,10 @@ package com.example.techgicus_ebilling.techgicus_ebilling.dto.saleDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PaymentType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.SaleType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.State;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.ItemTaxSummaryResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class SaleResponse {
@@ -34,6 +34,8 @@ public class SaleResponse {
     private List<SaleItemResponse> saleItemResponses;
 
     private List<SalePaymentResponse> salePaymentResponses;
+
+    private List<ItemTaxSummaryResponse> taxSummary;
 
     public SaleResponse() {
     }
@@ -237,5 +239,13 @@ public class SaleResponse {
 
     public void setTotalTaxRate(Double totalTaxRate) {
         this.totalTaxRate = totalTaxRate;
+    }
+
+    public List<ItemTaxSummaryResponse> getTaxSummary() {
+        return taxSummary;
+    }
+
+    public void setTaxSummary(List<ItemTaxSummaryResponse> taxSummary) {
+        this.taxSummary = taxSummary;
     }
 }

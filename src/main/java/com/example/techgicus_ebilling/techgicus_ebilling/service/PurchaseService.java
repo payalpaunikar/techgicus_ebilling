@@ -8,7 +8,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.P
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.StockTransactionType;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseDto.*;
-import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleDto.*;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.ItemTaxSummaryResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.BadRequestException;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.InvalidPaymentAmountException;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.ResourceNotFoundException;
@@ -17,7 +17,6 @@ import com.example.techgicus_ebilling.techgicus_ebilling.mapper.PurchaseItemMapp
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.PurchaseMapper;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.PurchasePaymentMapper;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,23 +42,24 @@ public class PurchaseService {
         private PartyLedgerService partyLedgerService;
         private StockTransactionService stockTransactionService;
         private PartyActivityService partyActivityService;
+        private final TaxCalculationService taxCalculationService;
 
-    @Autowired
-    public PurchaseService(CompanyRepository companyRepository, PartyRepository partyRepository, PurchaseRepository purchaseRepository, PurchaseItemRepository purchaseItemRepository, PurchaseMapper purchaseMapper, PurchaseItemMapper purchaseItemMapper, PartyMapper partyMapper, PurchasePaymentMapper purchasePaymentMapper, PurchasePaymentRepository purchasePaymentRepository, ItemRepository itemRepository, StockTransactionRepository stockTransactionRepository, PartyLedgerService partyLedgerService, StockTransactionService stockTransactionService, PartyActivityService partyActivityService) {
-        this.companyRepository = companyRepository;
-        this.partyRepository = partyRepository;
-        this.purchaseRepository = purchaseRepository;
-        this.purchaseItemRepository = purchaseItemRepository;
-        this.purchaseMapper = purchaseMapper;
-        this.purchaseItemMapper = purchaseItemMapper;
-        this.partyMapper = partyMapper;
-        this.purchasePaymentMapper = purchasePaymentMapper;
-        this.purchasePaymentRepository = purchasePaymentRepository;
-        this.itemRepository = itemRepository;
-        this.stockTransactionRepository = stockTransactionRepository;
-        this.partyLedgerService = partyLedgerService;
-        this.stockTransactionService = stockTransactionService;
+    public PurchaseService(TaxCalculationService taxCalculationService, PartyActivityService partyActivityService, StockTransactionService stockTransactionService, PartyLedgerService partyLedgerService, StockTransactionRepository stockTransactionRepository, ItemRepository itemRepository, PurchasePaymentRepository purchasePaymentRepository, PurchasePaymentMapper purchasePaymentMapper, PartyMapper partyMapper, PurchaseItemMapper purchaseItemMapper, PurchaseMapper purchaseMapper, PurchaseItemRepository purchaseItemRepository, PurchaseRepository purchaseRepository, PartyRepository partyRepository, CompanyRepository companyRepository) {
+        this.taxCalculationService = taxCalculationService;
         this.partyActivityService = partyActivityService;
+        this.stockTransactionService = stockTransactionService;
+        this.partyLedgerService = partyLedgerService;
+        this.stockTransactionRepository = stockTransactionRepository;
+        this.itemRepository = itemRepository;
+        this.purchasePaymentRepository = purchasePaymentRepository;
+        this.purchasePaymentMapper = purchasePaymentMapper;
+        this.partyMapper = partyMapper;
+        this.purchaseItemMapper = purchaseItemMapper;
+        this.purchaseMapper = purchaseMapper;
+        this.purchaseItemRepository = purchaseItemRepository;
+        this.purchaseRepository = purchaseRepository;
+        this.partyRepository = partyRepository;
+        this.companyRepository = companyRepository;
     }
 
     @Transactional
@@ -189,8 +189,11 @@ public class PurchaseService {
           List<PurchasePaymentResponse> purchasePaymentResponseList = new ArrayList<>();
           purchasePaymentResponseList.add(purchasePaymentResponse);
 
+         List<ItemTaxSummaryResponse> taxSummaryResponses = taxCalculationService.calculateTaxSummary(purchaseItemResponses);
+
          PurchaseResponse purchaseResponse = new PurchaseResponse();
          purchaseResponse = setPurchaseResponseField(purchase,partyResponseDto,purchaseItemResponses,purchasePaymentResponseList);
+         purchaseResponse.setTaxSummary(taxSummaryResponses);
 
         return purchaseResponse;
 
@@ -213,10 +216,13 @@ public class PurchaseService {
                     purchaseItemResponses = convertPurchaseItemIntoResponseList(purchase.getPurchaseItems());
                     List<PurchasePaymentResponse> purchasePaymentResponses = purchasePaymentMapper.convertPurchasePaymentListIntoPurchasePaymentResponseList(purchase.getPurchasePayments());
 
+                    List<ItemTaxSummaryResponse> taxSummaryResponses = taxCalculationService.calculateTaxSummary(purchaseItemResponses);
+
+
                     PurchaseResponse purchaseResponse = purchaseMapper.convertPurchaseIntoPurchaseResponse(purchase);
                      purchaseResponse = setPurchaseResponseField(purchase,partyResponseDto,purchaseItemResponses,purchasePaymentResponses);
-
-                    return purchaseResponse;
+                     purchaseResponse.setTaxSummary(taxSummaryResponses);
+                     return purchaseResponse;
                 }).toList();
         return purchaseResponses;
     }
@@ -235,8 +241,12 @@ public class PurchaseService {
        // List<PurchaseItemResponse> purchaseItemResponses = purchaseItemMapper.convertPurchaseItemsIntoResponseList(purchase.getPurchaseItems());
         List<PurchasePaymentResponse> purchasePaymentResponses = purchasePaymentMapper.convertPurchasePaymentListIntoPurchasePaymentResponseList(purchase.getPurchasePayments());
 
+        List<ItemTaxSummaryResponse> taxSummaryResponses = taxCalculationService.calculateTaxSummary(purchaseItemResponses);
+
+
         PurchaseResponse purchaseResponse = new PurchaseResponse();
         purchaseResponse = setPurchaseResponseField(purchase,partyResponseDto,purchaseItemResponses,purchasePaymentResponses);
+        purchaseResponse.setTaxSummary(taxSummaryResponses);
 
         return purchaseResponse;
     }
@@ -371,9 +381,12 @@ public class PurchaseService {
       List<PurchaseItemResponse> purchaseItemResponses = purchaseItemMapper.convertPurchaseItemsIntoResponseList(savePurchase.getPurchaseItems());
 
       List<PurchasePaymentResponse>purchasePaymentResponseList = purchasePaymentMapper.convertPurchasePaymentListIntoPurchasePaymentResponseList(purchasePaymentList);
+        List<ItemTaxSummaryResponse> taxSummaryResponses = taxCalculationService.calculateTaxSummary(purchaseItemResponses);
 
-      PurchaseResponse purchaseResponse = purchaseMapper.convertPurchaseIntoPurchaseResponse(savePurchase);
+
+        PurchaseResponse purchaseResponse = purchaseMapper.convertPurchaseIntoPurchaseResponse(savePurchase);
       purchaseResponse = setPurchaseResponseField(purchase,partyResponseDto,purchaseItemResponses,purchasePaymentResponseList);
+      purchaseResponse.setTaxSummary(taxSummaryResponses);
 
       return purchaseResponse;
     }

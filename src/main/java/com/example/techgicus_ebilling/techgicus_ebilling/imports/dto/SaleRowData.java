@@ -14,6 +14,8 @@ public class SaleRowData {
     private LocalDate dueDate;
     private String description;
     private boolean paid;
+    private String partyName;
+    private String partyPhone;
 
     public LocalDate getInvoiceDate() {
         return invoiceDate;
@@ -85,5 +87,21 @@ public class SaleRowData {
 
     public void setPaid(boolean paid) {
         this.paid = paid;
+    }
+
+    public String getPartyName() {
+        return partyName;
+    }
+
+    public void setPartyName(String partyName) {
+        this.partyName = partyName;
+    }
+
+    public String getPartyPhone() {
+        return partyPhone;
+    }
+
+    public void setPartyPhone(String partyPhone) {
+        this.partyPhone = partyPhone;
     }
 }

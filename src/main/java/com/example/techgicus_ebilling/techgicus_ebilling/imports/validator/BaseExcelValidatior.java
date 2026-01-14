@@ -1,4 +1,4 @@
-package com.example.techgicus_ebilling.techgicus_ebilling.imports.excel;
+package com.example.techgicus_ebilling.techgicus_ebilling.imports.validator;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -6,7 +6,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static com.example.techgicus_ebilling.techgicus_ebilling.imports.utill.ExcelUtil.getCellString;
@@ -19,8 +18,14 @@ public abstract class BaseExcelValidatior {
     protected abstract String sheetNameKeyword();
     protected abstract Map<Integer, String> requiredHeaders();
     protected abstract int headerRowNumber();
+    protected abstract int transactionTypeColumnIndex();
+
     public int getHeaderRowNumber(){
         return headerRowNumber();
+    }
+
+    public int getTransactionTypeColumnIndex() {
+        return transactionTypeColumnIndex();
     }
 
 
@@ -66,18 +71,18 @@ public abstract class BaseExcelValidatior {
         log.info("{} Excel format validated successfully.", sheetNameKeyword());
     }
 
-    public int getColumnIndex(String headerKeyword) {
-
-        return requiredHeaders().entrySet().stream()
-                .filter(e -> e.getValue().equalsIgnoreCase(headerKeyword))
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Header '" + headerKeyword + "' not defined in requiredHeaders"
-                        )
-                );
-    }
+//    public int getColumnIndex(String headerKeyword) {
+//
+//        return requiredHeaders().entrySet().stream()
+//                .filter(e -> e.getValue().equalsIgnoreCase(headerKeyword))
+//                .map(Map.Entry::getKey)
+//                .findFirst()
+//                .orElseThrow(() ->
+//                        new IllegalArgumentException(
+//                                "Header '" + headerKeyword + "' not defined in requiredHeaders"
+//                        )
+//                );
+//    }
 
 
 

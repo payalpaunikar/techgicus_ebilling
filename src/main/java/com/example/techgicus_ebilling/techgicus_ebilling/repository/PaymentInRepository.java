@@ -2,6 +2,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.repository;
 
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.DeliveryChallan;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.PaymentIn;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +16,8 @@ import java.util.List;
 public interface PaymentInRepository extends JpaRepository<PaymentIn,Long> {
 
     long countByCompany(Company company);
+     PaymentIn findTopByCompanyOrderByPaymentInIdDesc(Company company);
+
 
 
     @Query("""

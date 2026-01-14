@@ -1,4 +1,4 @@
-package com.example.techgicus_ebilling.techgicus_ebilling.imports.strategy;
+package com.example.techgicus_ebilling.techgicus_ebilling.imports.handler;
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.enumeration.ImportReportType;

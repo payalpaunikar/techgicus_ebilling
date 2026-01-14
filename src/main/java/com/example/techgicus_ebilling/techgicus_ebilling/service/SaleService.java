@@ -6,6 +6,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.I
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PartyTransactionType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PaymentType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.StockTransactionType;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.ItemTaxSummaryResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleDto.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.BadRequestException;
@@ -21,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,25 +45,27 @@ public class SaleService {
        private PartyLedgerService partyLedgerService;
        private PartyActivityService partyActivityService;
        private StockTransactionService stockTransactionService;
+       private final TaxCalculationService taxCalculationService;
 
        private static final Logger log = LoggerFactory.getLogger(SaleService.class);
 
-    @Autowired
-    public SaleService(SaleRepository saleRepository, SaleItemRepository saleItemRepository, SaleMapper saleMapper, CompanyRepository companyRepository, PartyRepository partyRepository, SaleItemMapper saleItemMapper, PartyMapper partyMapper, SalePaymentRepository salePaymentRepository, SalePaymentMapper salePaymentMapper, ItemRepository itemRepository, StockTransactionRepository stockTransactionRepository, PartyLedgerService partyLedgerService, PartyActivityService partyActivityService, StockTransactionService stockTransactionService) {
-        this.saleRepository = saleRepository;
-        this.saleItemRepository = saleItemRepository;
-        this.saleMapper = saleMapper;
-        this.companyRepository = companyRepository;
-        this.partyRepository = partyRepository;
-        this.saleItemMapper = saleItemMapper;
-        this.partyMapper = partyMapper;
-        this.salePaymentRepository = salePaymentRepository;
-        this.salePaymentMapper = salePaymentMapper;
-        this.itemRepository = itemRepository;
-        this.stockTransactionRepository = stockTransactionRepository;
-        this.partyLedgerService = partyLedgerService;
-        this.partyActivityService = partyActivityService;
+     @Autowired
+    public SaleService(TaxCalculationService taxCalculationService, StockTransactionService stockTransactionService, PartyActivityService partyActivityService, PartyLedgerService partyLedgerService, StockTransactionRepository stockTransactionRepository, ItemRepository itemRepository, SalePaymentMapper salePaymentMapper, SalePaymentRepository salePaymentRepository, PartyMapper partyMapper, SaleItemMapper saleItemMapper, PartyRepository partyRepository, CompanyRepository companyRepository, SaleMapper saleMapper, SaleItemRepository saleItemRepository, SaleRepository saleRepository) {
+        this.taxCalculationService = taxCalculationService;
         this.stockTransactionService = stockTransactionService;
+        this.partyActivityService = partyActivityService;
+        this.partyLedgerService = partyLedgerService;
+        this.stockTransactionRepository = stockTransactionRepository;
+        this.itemRepository = itemRepository;
+        this.salePaymentMapper = salePaymentMapper;
+        this.salePaymentRepository = salePaymentRepository;
+        this.partyMapper = partyMapper;
+        this.saleItemMapper = saleItemMapper;
+        this.partyRepository = partyRepository;
+        this.companyRepository = companyRepository;
+        this.saleMapper = saleMapper;
+        this.saleItemRepository = saleItemRepository;
+        this.saleRepository = saleRepository;
     }
 
     @Transactional
@@ -194,8 +196,11 @@ public class SaleService {
         List<SalePaymentResponse> salePaymentResponseList = new ArrayList<>();
         salePaymentResponseList = convertSalePaymentListIntoSalePaymentResponseList(sale.getSalePayments());
 
+        List<ItemTaxSummaryResponse> taxSummaryResponses = taxCalculationService.calculateTaxSummary(saleItemResponses);
+
         SaleResponse saleResponse = new SaleResponse();
         saleResponse = setSaleResponseField(sale,partyResponseDto,saleItemResponses,sale.getInvoceDate(),sale.getDueDate(),salePaymentResponseList,totalTaxRate);
+        saleResponse.setTaxSummary(taxSummaryResponses);
 
         return saleResponse;
     }
@@ -220,10 +225,15 @@ public class SaleService {
                     //convert sale payment list into response list
                     List<SalePaymentResponse> salePaymentResponses = salePaymentMapper.convertSalePaymentListIntoSalePaymentResponseList(sale.getSalePayments());
                     double totalTaxRate = calculateTotalTaxRate(sale);
+
+                    List<ItemTaxSummaryResponse> taxSummaryResponses = taxCalculationService.calculateTaxSummary(saleItemResponses);
+
+
                     // set sale response field
                     SaleResponse saleResponse = new SaleResponse();
                     saleResponse = setSaleResponseField(sale,partyResponseDto,saleItemResponses,sale.getInvoceDate(),sale.getDueDate(),salePaymentResponses,
                             totalTaxRate);
+                    saleResponse.setTaxSummary(taxSummaryResponses);
 
                     return saleResponse;
                 }).toList();
@@ -247,9 +257,13 @@ public class SaleService {
 
         double totalTaxRate = calculateTotalTaxRate(sale);
 
+        List<ItemTaxSummaryResponse> taxSummaryResponses = taxCalculationService.calculateTaxSummary(saleItemResponses);
+
         SaleResponse saleResponse = new SaleResponse();
         saleResponse = setSaleResponseField(sale,partyResponseDto,saleItemResponses,sale.getInvoceDate(),sale.getDueDate(),salePaymentResponses,
                 totalTaxRate);
+
+        saleResponse.setTaxSummary(taxSummaryResponses);
 
         return saleResponse;
     }
@@ -372,9 +386,15 @@ public class SaleService {
         salePaymentResponses = convertSalePaymentListIntoSalePaymentResponseList(sale.getSalePayments());
 
         double totalTaxRate = calculateTotalTaxRate(sale);
+
+        List<ItemTaxSummaryResponse> taxSummaryResponses = taxCalculationService.calculateTaxSummary(saleItemResponses);
+
+
         SaleResponse saleResponse = new SaleResponse();
         saleResponse = setSaleResponseField(sale,partyResponseDto,saleItemResponses,sale.getInvoceDate(),sale.getDueDate(),salePaymentResponses,
                 totalTaxRate);
+
+        saleResponse.setTaxSummary(taxSummaryResponses);
 
         return saleResponse;
     }

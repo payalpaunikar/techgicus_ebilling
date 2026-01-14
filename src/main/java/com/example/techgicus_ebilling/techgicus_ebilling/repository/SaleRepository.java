@@ -26,6 +26,8 @@ public interface SaleRepository extends JpaRepository<Sale,Long> {
 
     long countByCompany(Company company);
 
+    Sale findTopByCompanyOrderBySaleIdDesc(Company company);
+
 
     @Query("""
             SELECT s FROM Sale s WHERE

@@ -1,15 +1,8 @@
 package com.example.techgicus_ebilling.techgicus_ebilling.imports.service;
 
 
-import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Category;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
-import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Item;
-import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.DiscountType;
-import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.ItemType;
-import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.TaxRate;
-import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.Unit;
-import com.example.techgicus_ebilling.techgicus_ebilling.imports.excel.ItemExcelValidator;
-import com.example.techgicus_ebilling.techgicus_ebilling.imports.excel.SaleReportExcelValidator;
+import com.example.techgicus_ebilling.techgicus_ebilling.imports.validator.ItemExcelValidator;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.strategy.ItemImportHandler;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.strategy.SaleReportImportHandler;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.CategoryRepository;
@@ -23,7 +16,6 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
 
 
 @Service

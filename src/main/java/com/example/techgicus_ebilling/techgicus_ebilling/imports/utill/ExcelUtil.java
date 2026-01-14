@@ -1,6 +1,7 @@
 package com.example.techgicus_ebilling.techgicus_ebilling.imports.utill;
 
 
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PaymentType;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -62,5 +63,13 @@ public final class ExcelUtil {
         String cellStr = cell.getStringCellValue().trim();
         LocalDate date = cellStr.isEmpty() ? null : LocalDate.parse(cellStr, DATE_FORMATTER);
         return date;
+    }
+
+    public static PaymentType parsePaymentType(Cell cell) {
+        try {
+            return PaymentType.valueOf(getCellString(cell).trim().toUpperCase());
+        } catch (Exception e) {
+            return PaymentType.CASH; // default or handle as needed
+        }
     }
 }

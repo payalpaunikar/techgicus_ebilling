@@ -12,11 +12,11 @@ import static com.example.techgicus_ebilling.techgicus_ebilling.imports.utill.Ex
 import static com.example.techgicus_ebilling.techgicus_ebilling.imports.utill.ExcelUtil.isRowEmpty;
 
 @Service
-public class TransactionSheetProcessor {
+public class TransactionSheetProcessors {
 
-    private final List<TransactionProcessor> processors;
+    private final List<TransactionProcessors> processors;
 
-    public TransactionSheetProcessor(List<TransactionProcessor> processors) {
+    public TransactionSheetProcessors(List<TransactionProcessors> processors) {
         this.processors = processors;
     }
 
@@ -32,7 +32,7 @@ public class TransactionSheetProcessor {
                     .toLowerCase()
                     .trim();
 
-            TransactionProcessor processor = processors.stream()
+            TransactionProcessors processor = processors.stream()
                     .filter(p -> p.supports(type))
                     .findFirst()
                     .orElse(null);

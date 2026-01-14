@@ -1,7 +1,7 @@
 package com.example.techgicus_ebilling.techgicus_ebilling.service;
 
 
-import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.DocumentType;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,16 +47,156 @@ public class DocumentNumberService {
     private long getNextNumber(DocumentType type,Company company) {
         // Decide which table to count based on type
         return switch (type) {
-            case SALE -> saleRepository.countByCompany(company)+1;
-            case SALE_ORDER -> saleOrderRepository.countByCompany(company) + 1;
-            case SALE_RETURN -> saleReturnRepository.countByCompany(company)+1;
-            case PURCHASE -> purchaseRepository.countByCompany(company) + 1;
-            case PURCHASE_ORDER -> purchaseOrderRepository.countByCompany(company)+1;
-            case PURCHASE_RETURN -> purchaseReturnRepository.countByCompany(company)+1;
-            case DELIVERY -> deliveryChallanRepository.countByCompany(company)+1;
-            case PAYMENT_IN -> paymentInRepository.countByCompany(company)+1;
-            case PAYMENT_OUT -> paymentOutRepository.countByCompany(company)+1;
-            case QUOTATION -> quotationRepository.countByCompany(company) + 1;
+            case SALE -> {
+                Sale latest =
+                        saleRepository.findTopByCompanyOrderBySaleIdDesc(company);
+
+                if (latest == null) {
+                    yield 1L; // first invoice for this company
+                }
+
+                String invoice = latest.getInvoiceNumber(); // KE/2026/3
+                long lastNumber = Long.parseLong(
+                        invoice.substring(invoice.lastIndexOf("/") + 1)
+                );
+
+                yield lastNumber + 1;
+            }
+            case SALE_ORDER -> {
+                SaleOrder latest =
+                        saleOrderRepository.findTopByCompanyOrderBySaleOrderIdDesc(company);
+
+                if (latest == null) {
+                    yield 1L; // first invoice for this company
+                }
+
+                String invoice = latest.getOrderNo(); 
+                long lastNumber = Long.parseLong(
+                        invoice.substring(invoice.lastIndexOf("/") + 1)
+                );
+
+                yield lastNumber + 1;
+            }
+            
+            case SALE_RETURN -> {
+                SaleReturn latest =
+                        saleReturnRepository.findTopByCompanyOrderBySaleReturnIdDesc(company);
+
+                if (latest == null) {
+                    yield 1L; // first invoice for this company
+                }
+
+                String invoice = latest.getReturnNo();
+                long lastNumber = Long.parseLong(
+                        invoice.substring(invoice.lastIndexOf("/") + 1)
+                );
+
+                yield lastNumber + 1;
+            }
+            case PURCHASE ->{
+                Purchase latest =
+                        purchaseRepository.findTopByCompanyOrderByPurchaseIdDesc(company);
+
+                if (latest == null) {
+                    yield 1L; // first invoice for this company
+                }
+
+                String invoice = latest.getBillNumber();
+                long lastNumber = Long.parseLong(
+                        invoice.substring(invoice.lastIndexOf("/") + 1)
+                );
+
+                yield lastNumber + 1;
+            }
+            case PURCHASE_ORDER -> {
+                PurchaseOrder latest =
+                        purchaseOrderRepository.findTopByCompanyOrderByPurchaseOrderIdDesc(company);
+
+                if (latest == null) {
+                    yield 1L; // first invoice for this company
+                }
+
+                String invoice = latest.getOrderNo();
+                long lastNumber = Long.parseLong(
+                        invoice.substring(invoice.lastIndexOf("/") + 1)
+                );
+
+                yield lastNumber + 1;
+            }
+            case PURCHASE_RETURN -> {
+                PurchaseReturn latest =
+                        purchaseReturnRepository.findTopByCompanyOrderByPurchaseReturnIdDesc(company);
+
+                if (latest == null) {
+                    yield 1L; // first invoice for this company
+                }
+
+                String invoice = latest.getReturnNo();
+                long lastNumber = Long.parseLong(
+                        invoice.substring(invoice.lastIndexOf("/") + 1)
+                );
+
+                yield lastNumber + 1;
+            }
+            case DELIVERY ->{
+                DeliveryChallan latest =
+                        deliveryChallanRepository.findTopByCompanyOrderByDeliveryChallanIdDesc(company);
+
+                if (latest == null) {
+                    yield 1L; // first invoice for this company
+                }
+
+                String invoice = latest.getChallanNo();
+                long lastNumber = Long.parseLong(
+                        invoice.substring(invoice.lastIndexOf("/") + 1)
+                );
+
+                yield lastNumber + 1;
+            }
+            case PAYMENT_IN -> {
+                PaymentIn latest =
+                        paymentInRepository.findTopByCompanyOrderByPaymentInIdDesc(company);
+
+                if (latest == null) {
+                    yield 1L; // first invoice for this company
+                }
+
+                String invoice = latest.getReceiptNo();
+                long lastNumber = Long.parseLong(
+                        invoice.substring(invoice.lastIndexOf("/") + 1)
+                );
+
+                yield lastNumber + 1;
+            }
+            case PAYMENT_OUT ->{
+                PaymentOut latest = paymentOutRepository.findTopByCompanyOrderByPaymentOutIdDesc(company);
+
+                if (latest == null) {
+                    yield 1L; // first invoice for this company
+                }
+
+                String invoice = latest.getReceiptNo();
+                long lastNumber = Long.parseLong(
+                        invoice.substring(invoice.lastIndexOf("/") + 1)
+                );
+
+                yield lastNumber + 1;
+            }
+            case QUOTATION -> {
+                Quotation latest =
+                        quotationRepository.findTopByCompanyOrderByQuotationIdDesc(company);
+
+                if (latest == null) {
+                    yield 1L; // first invoice for this company
+                }
+
+                String invoice = latest.getReferenceNo();
+                long lastNumber = Long.parseLong(
+                        invoice.substring(invoice.lastIndexOf("/") + 1)
+                );
+
+                yield lastNumber + 1;
+            }
         };
     }
 }

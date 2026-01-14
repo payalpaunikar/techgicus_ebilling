@@ -3,8 +3,8 @@ package com.example.techgicus_ebilling.techgicus_ebilling.imports.strategy;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.dto.SaleRowData;
-import com.example.techgicus_ebilling.techgicus_ebilling.imports.excel.SaleItemDetailsExcelValidator;
-import com.example.techgicus_ebilling.techgicus_ebilling.imports.excel.SaleReportExcelValidator;
+import com.example.techgicus_ebilling.techgicus_ebilling.imports.validator.SaleItemDetailsExcelValidator;
+import com.example.techgicus_ebilling.techgicus_ebilling.imports.validator.SaleReportExcelValidator;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.utill.ModelUtill;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.SaleRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.SaleReturnRepository;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

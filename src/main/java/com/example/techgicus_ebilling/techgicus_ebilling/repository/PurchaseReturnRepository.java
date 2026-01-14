@@ -2,6 +2,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.repository;
 
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Purchase;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.PurchaseReturn;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.reportDto.PurchaseReportDto;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +17,9 @@ import java.util.List;
 public interface PurchaseReturnRepository extends JpaRepository<PurchaseReturn,Long> {
 
     long countByCompany(Company company);
+
+    PurchaseReturn findTopByCompanyOrderByPurchaseReturnIdDesc(Company company);
+
 
     List<PurchaseReturn> findAllByCompanyAndReturnDateBetween(Company company, LocalDate startDate, LocalDate endDate);
 

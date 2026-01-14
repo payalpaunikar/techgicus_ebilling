@@ -2,6 +2,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.repository;
 
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.SaleOrder;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.SaleReturn;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.reportDto.SaleReportDto;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,6 +18,9 @@ import java.util.Optional;
 public interface SaleReturnRepository extends JpaRepository<SaleReturn,Long> {
 
     long countByCompany(Company company);
+
+    SaleReturn findTopByCompanyOrderBySaleReturnIdDesc(Company company);
+
 
     List<SaleReturn> findAllByCompanyAndReturnDateBetweenOrderByReturnDateDesc(Company company, LocalDate startDate, LocalDate endDate);
 

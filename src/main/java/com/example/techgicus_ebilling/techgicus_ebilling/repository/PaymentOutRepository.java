@@ -17,6 +17,8 @@ public interface PaymentOutRepository extends JpaRepository<PaymentOut,Long> {
 
     long countByCompany(Company company);
 
+    PaymentOut findTopByCompanyOrderByPaymentOutIdDesc(Company company);
+
     @Query("""
         SELECT p FROM PaymentOut p 
         WHERE p.company.companyId = :companyId

@@ -1,19 +1,15 @@
-package com.example.techgicus_ebilling.techgicus_ebilling.imports.excel;
+package com.example.techgicus_ebilling.techgicus_ebilling.imports.validator;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import static com.example.techgicus_ebilling.techgicus_ebilling.imports.utill.ExcelUtil.*;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 
 @Component
-public class ItemExcelValidator extends BaseExcelValidatior{
+public class ItemExcelValidator extends BaseExcelValidatior {
 
     private Logger log = LoggerFactory.getLogger(ItemExcelValidator.class);
 
@@ -52,5 +48,8 @@ public class ItemExcelValidator extends BaseExcelValidatior{
         return 0;
     }
 
-
+    @Override
+    protected int transactionTypeColumnIndex() {
+        return 0;
+    }
 }

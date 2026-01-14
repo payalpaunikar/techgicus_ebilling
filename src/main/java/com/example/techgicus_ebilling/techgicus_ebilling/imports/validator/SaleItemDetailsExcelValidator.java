@@ -1,4 +1,4 @@
-package com.example.techgicus_ebilling.techgicus_ebilling.imports.excel;
+package com.example.techgicus_ebilling.techgicus_ebilling.imports.validator;
 
 import org.springframework.stereotype.Component;
 
@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Component
-public class SaleItemDetailsExcelValidator extends BaseExcelValidatior{
+public class SaleItemDetailsExcelValidator extends BaseExcelValidatior {
     @Override
     protected String sheetNameKeyword() {
         return "ItemDetails";
@@ -39,5 +39,10 @@ public class SaleItemDetailsExcelValidator extends BaseExcelValidatior{
     @Override
     protected int headerRowNumber() {
         return 2;
+    }
+
+    @Override
+    protected int transactionTypeColumnIndex() {
+        return 14;
     }
 }

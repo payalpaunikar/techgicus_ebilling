@@ -2,6 +2,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.repository;
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.PurchaseOrder;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.PurchaseReturn;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.SaleOrder;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.OrderType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +16,8 @@ import java.util.List;
 public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder,Long> {
 
     long countByCompany(Company company);
+
+    PurchaseOrder findTopByCompanyOrderByPurchaseOrderIdDesc(Company company);
 
     @Query("""
             SELECT p FROM PurchaseOrder p
