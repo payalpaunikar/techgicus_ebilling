@@ -24,18 +24,21 @@ public class TaxCalculationService {
         }
 
         // 🔹 Group by HSN + Tax Rate
-        Map<String, List<TaxableItem>> groupedItems =
+        Map<Double, List<TaxableItem>> groupedItems =
                 items.stream()
                         .collect(Collectors.groupingBy(
-                                item -> item.getItemHsnCode() + "_" + item.getTaxRate().getRate()
+                                item ->  item.getTaxRate().getRate()
                         ));
+
+
+
 
         // 🔹 Process each group separately
         for (List<TaxableItem> group : groupedItems.values()) {
 
             TaxableItem firstItem = group.get(0);
 
-            String hsnCode = firstItem.getItemHsnCode();
+            // String hsnCode = firstItem.getItemHsnCode();
             double taxRate = firstItem.getTaxRate().getRate();
 
             double totalTaxAmount = group.stream()
@@ -49,7 +52,7 @@ public class TaxCalculationService {
             double taxableAmount = totalAmount - totalTaxAmount;
 
             ItemTaxSummaryResponse summary = new ItemTaxSummaryResponse();
-            summary.setHsnCode(hsnCode);
+            //summary.setHsnCode(hsnCode);
             summary.setTaxableAmount(round2(taxableAmount));
 
             double halfTaxRate = taxRate / 2.0;

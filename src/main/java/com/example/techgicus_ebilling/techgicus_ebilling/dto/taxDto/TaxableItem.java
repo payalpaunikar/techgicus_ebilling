@@ -4,7 +4,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.T
 
 public interface TaxableItem {
    // String getItemName();
-    String getItemHsnCode();
+   // String getItemHsnCode();
     Double getTotalAmount();
     Double getTaxAmount();
     TaxRate getTaxRate();

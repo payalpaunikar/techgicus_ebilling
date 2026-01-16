@@ -2,7 +2,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto;
 
 public class ItemTaxSummaryResponse {
    // private String itemName;
-    private String hsnCode;
+ //   private String hsnCode;
 
     private Double taxableAmount;
 
@@ -20,13 +20,13 @@ public class ItemTaxSummaryResponse {
 //        this.itemName = itemName;
 //    }
 
-    public String getHsnCode() {
-        return hsnCode;
-    }
-
-    public void setHsnCode(String hsnCode) {
-        this.hsnCode = hsnCode;
-    }
+//    public String getHsnCode() {
+//        return hsnCode;
+//    }
+//
+//    public void setHsnCode(String hsnCode) {
+//        this.hsnCode = hsnCode;
+//    }
 
     public Double getTaxableAmount() {
         return taxableAmount;
