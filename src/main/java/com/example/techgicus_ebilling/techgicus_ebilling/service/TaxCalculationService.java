@@ -17,46 +17,46 @@ public class TaxCalculationService {
     public List<ItemTaxSummaryResponse> calculateTaxSummary(
             List<? extends TaxableItem> items) {
 
-        List<ItemTaxSummaryResponse> taxSummaryList = new ArrayList<>();
+        List<ItemTaxSummaryResponse> summaries = new ArrayList<>();
 
         if (items == null || items.isEmpty()) {
-            return taxSummaryList;
+            return summaries;
         }
 
-        // 🔹 Group by HSN + Tax Rate
-        Map<Double, List<TaxableItem>> groupedItems =
+        // 🔹 Group items by GST percentage
+        Map<Double, List<TaxableItem>> groupedByTaxRate =
                 items.stream()
                         .collect(Collectors.groupingBy(
-                                item ->  item.getTaxRate().getRate()
+                                item -> item.getTaxRate().getRate()
                         ));
 
+        // 🔹 Process each GST group separately
+        for (Map.Entry<Double, List<TaxableItem>> entry : groupedByTaxRate.entrySet()) {
 
+            double gstRate = entry.getKey();                // e.g. 18
+            List<TaxableItem> groupItems = entry.getValue();
 
-
-        // 🔹 Process each group separately
-        for (List<TaxableItem> group : groupedItems.values()) {
-
-            TaxableItem firstItem = group.get(0);
-
-            // String hsnCode = firstItem.getItemHsnCode();
-            double taxRate = firstItem.getTaxRate().getRate();
-
-            double totalTaxAmount = group.stream()
-                    .mapToDouble(TaxableItem::getTaxAmount)
-                    .sum();
-
-            double totalAmount = group.stream()
+            // ✅ Total amount INCLUDING GST
+            double totalAmountInclusive = groupItems.stream()
                     .mapToDouble(TaxableItem::getTotalAmount)
                     .sum();
 
-            double taxableAmount = totalAmount - totalTaxAmount;
+            // ✅ Correct taxable amount calculation (GST inclusive formula)
+            double taxableAmount =
+                    totalAmountInclusive / (1 + gstRate / 100.0);
+
+            // ✅ Total GST amount
+            double totalTaxAmount =
+                    totalAmountInclusive - taxableAmount;
+
+            // CGST & SGST
+            double halfTaxRate = gstRate / 2.0;
+            double halfTaxAmount = totalTaxAmount / 2.0;
 
             ItemTaxSummaryResponse summary = new ItemTaxSummaryResponse();
-            //summary.setHsnCode(hsnCode);
+            //summary.setHsnCode(null); // HSN intentionally removed
             summary.setTaxableAmount(round2(taxableAmount));
-
-            double halfTaxRate = taxRate / 2.0;
-            double halfTaxAmount = totalTaxAmount / 2.0;
+            summary.setTotalTaxAmount(round2(totalTaxAmount));
 
             // CGST
             TaxComponentResponse cgst = new TaxComponentResponse();
@@ -70,20 +70,19 @@ public class TaxCalculationService {
             sgst.setAmount(round2(halfTaxAmount));
             summary.setSgst(sgst);
 
-            summary.setTotalTaxAmount(round2(totalTaxAmount));
-
-            taxSummaryList.add(summary);
+            summaries.add(summary);
         }
 
-        return taxSummaryList;
+        return summaries;
     }
 
-    // 🔹 Proper rounding to 2 decimal places
+    // 🔹 Correct rounding for tax calculations
     private double round2(double value) {
         return BigDecimal.valueOf(value)
                 .setScale(2, RoundingMode.HALF_UP)
                 .doubleValue();
     }
 }
+
 
 
