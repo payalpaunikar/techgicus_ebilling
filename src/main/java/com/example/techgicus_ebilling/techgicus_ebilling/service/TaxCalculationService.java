@@ -41,22 +41,28 @@ public class TaxCalculationService {
                     .mapToDouble(TaxableItem::getTotalAmount)
                     .sum();
 
-            // ✅ Correct taxable amount calculation (GST inclusive formula)
-            double taxableAmount =
-                    totalAmountInclusive / (1 + gstRate / 100.0);
+            double taxAmount = groupItems.stream()
+                    .mapToDouble(TaxableItem::getTaxAmount)
+                    .sum();
 
-            // ✅ Total GST amount
-            double totalTaxAmount =
-                    totalAmountInclusive - taxableAmount;
+//            // ✅ Correct taxable amount calculation (GST inclusive formula)
+//            double taxableAmount =
+//                    totalAmountInclusive / (1 + gstRate / 100.0);
+
+            double taxableAmount = totalAmountInclusive - taxAmount;
+
+//            // ✅ Total GST amount
+//            double totalTaxAmount =
+//                    totalAmountInclusive - taxableAmount;
 
             // CGST & SGST
             double halfTaxRate = gstRate / 2.0;
-            double halfTaxAmount = totalTaxAmount / 2.0;
+            double halfTaxAmount = taxAmount / 2.0;
 
             ItemTaxSummaryResponse summary = new ItemTaxSummaryResponse();
             //summary.setHsnCode(null); // HSN intentionally removed
             summary.setTaxableAmount(round2(taxableAmount));
-            summary.setTotalTaxAmount(round2(totalTaxAmount));
+            summary.setTotalTaxAmount(round2(taxAmount));
 
             // CGST
             TaxComponentResponse cgst = new TaxComponentResponse();
