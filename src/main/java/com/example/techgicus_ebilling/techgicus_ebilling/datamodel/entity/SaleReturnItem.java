@@ -15,7 +15,7 @@ public class SaleReturnItem {
 
     private String name;
 
-    private Integer quantity;
+    private Double quantity;
 
     @Enumerated(EnumType.STRING)
     private Unit unit;
@@ -67,11 +67,11 @@ public class SaleReturnItem {
         this.name = name;
     }
 
-    public Integer getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
     }
 

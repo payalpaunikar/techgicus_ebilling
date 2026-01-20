@@ -1,4 +1,4 @@
-package com.example.techgicus_ebilling.techgicus_ebilling.imports.dto;
+package com.example.techgicus_ebilling.techgicus_ebilling.imports.context;
 
 public class ImportError {
 

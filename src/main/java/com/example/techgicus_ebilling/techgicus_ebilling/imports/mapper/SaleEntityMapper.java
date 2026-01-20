@@ -12,9 +12,11 @@ import java.time.LocalDateTime;
 @Component
 public class SaleEntityMapper {
 
-    public Sale toEntity(SaleRowData data, Company company, Party party) {
+    public Sale toEntity(Sale existingSale,SaleRowData data, Company company, Party party) {
 
-        Sale sale = new Sale();
+        Sale sale = (existingSale != null) ? existingSale : new Sale();
+
+
         sale.setInvoceDate(data.getInvoiceDate());
         sale.setInvoiceNumber(data.getInvoiceNo());
         sale.setTotalAmount(data.getTotalAmount());
@@ -27,7 +29,9 @@ public class SaleEntityMapper {
         sale.setPaymentDescription(data.getDescription());
         sale.setCompany(company);
         sale.setParty(party);
-        sale.setCreatedAt(LocalDateTime.now());
+        if (existingSale == null) {
+            sale.setCreatedAt(LocalDateTime.now());
+        }
         sale.setUpdatedAt(LocalDateTime.now());
 
         return sale;

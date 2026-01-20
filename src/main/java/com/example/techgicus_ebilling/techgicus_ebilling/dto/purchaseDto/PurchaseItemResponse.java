@@ -147,4 +147,6 @@ public class PurchaseItemResponse implements TaxableItem {
     public Double getTaxAmount() {
         return getTotalTaxAmount();
     }
+
+
 }

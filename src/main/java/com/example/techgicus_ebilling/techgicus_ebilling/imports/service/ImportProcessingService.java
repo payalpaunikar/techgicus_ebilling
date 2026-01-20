@@ -2,9 +2,9 @@ package com.example.techgicus_ebilling.techgicus_ebilling.imports.service;
 
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
+import com.example.techgicus_ebilling.techgicus_ebilling.imports.handler.SaleReportImportHandler;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.validator.ItemExcelValidator;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.strategy.ItemImportHandler;
-import com.example.techgicus_ebilling.techgicus_ebilling.imports.strategy.SaleReportImportHandler;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.CategoryRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.CompanyRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.ItemRepository;
@@ -112,7 +112,7 @@ public class ImportProcessingService {
                         itemExcelValidator.validateExcelFormat(sheet);
                         return itemImportHandler.importItems(sheet, company);
                     case "SALE":
-                        return saleReportImportHandler.importSaleReport(workbook, company);
+                        return saleReportImportHandler.importReport(workbook, company);
 //                    case "PURCHASE":
 //                        return importPurchases(sheet, company);
 //                    case "PARTY":

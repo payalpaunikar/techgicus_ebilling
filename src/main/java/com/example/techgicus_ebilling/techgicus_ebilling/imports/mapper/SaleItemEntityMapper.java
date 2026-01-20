@@ -1,14 +1,13 @@
 package com.example.techgicus_ebilling.techgicus_ebilling.imports.mapper;
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.*;
-import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.TaxType;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.dto.SaleItemRow;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Component
-public class SaleItemMapper {
+public class SaleItemEntityMapper {
 
     public SaleItem toEntity(Sale sale, SaleItemRow data,
                              Item item,SaleItem existingSaleItem){

@@ -60,7 +60,7 @@ public abstract class BaseExcelValidatior {
             if (actual == null || !actual.toLowerCase().contains(expected.toLowerCase())) {
                 char columnLetter = (char) ('A' + colIndex);
                 throw new IllegalArgumentException(
-                        "Wrong format: Column " + columnLetter +
+                        "Wrong format in sheet :"+sheet.getSheetName()+": Column " + columnLetter +
                                 " should contain '" + expected +
                                 "', but found: '" + actual + "'"
                 );

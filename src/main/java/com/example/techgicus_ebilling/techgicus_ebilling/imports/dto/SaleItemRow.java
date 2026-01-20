@@ -2,26 +2,28 @@ package com.example.techgicus_ebilling.techgicus_ebilling.imports.dto;
 
 
 
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.TaxRate;
+
 import java.time.LocalDate;
 
 public class SaleItemRow {
     private LocalDate invoiceDate;
-    private Long invoiceNo;
+    private String invoiceNo;
     private String partyName;
     private String itemName;
     private String itemCode;
     private String hsn;
     private String category;
-    private Long orderNo;
-    private Integer quantity;
+    private String orderNo;
+    private Double quantity;
     private String unit;
-    private Long unitPrice;
+    private Double unitPrice;
     private Integer discountPercentage;
-    private  Long discountPrice;
-    private Integer taxPercentage;
-    private Long taxPrice;
+    private  Double discountPrice;
+    private TaxRate taxPercentage;
+    private Double taxPrice;
     private String transactionType;
-    private Long amount;
+    private Double amount;
 
     public LocalDate getInvoiceDate() {
         return invoiceDate;
@@ -31,11 +33,11 @@ public class SaleItemRow {
         this.invoiceDate = invoiceDate;
     }
 
-    public Long getInvoiceNo() {
+    public String getInvoiceNo() {
         return invoiceNo;
     }
 
-    public void setInvoiceNo(Long invoiceNo) {
+    public void setInvoiceNo(String invoiceNo) {
         this.invoiceNo = invoiceNo;
     }
 
@@ -79,19 +81,19 @@ public class SaleItemRow {
         this.category = category;
     }
 
-    public Long getOrderNo() {
+    public String getOrderNo() {
         return orderNo;
     }
 
-    public void setOrderNo(Long orderNo) {
+    public void setOrderNo(String orderNo) {
         this.orderNo = orderNo;
     }
 
-    public Integer getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
     }
 
@@ -103,11 +105,11 @@ public class SaleItemRow {
         this.unit = unit;
     }
 
-    public Long getUnitPrice() {
+    public Double getUnitPrice() {
         return unitPrice;
     }
 
-    public void setUnitPrice(Long unitPrice) {
+    public void setUnitPrice(Double unitPrice) {
         this.unitPrice = unitPrice;
     }
 
@@ -119,27 +121,27 @@ public class SaleItemRow {
         this.discountPercentage = discountPercentage;
     }
 
-    public Long getDiscountPrice() {
+    public Double getDiscountPrice() {
         return discountPrice;
     }
 
-    public void setDiscountPrice(Long discountPrice) {
+    public void setDiscountPrice(Double discountPrice) {
         this.discountPrice = discountPrice;
     }
 
-    public Integer getTaxPercentage() {
+    public TaxRate getTaxPercentage() {
         return taxPercentage;
     }
 
-    public void setTaxPercentage(Integer taxPercentage) {
+    public void setTaxPercentage(TaxRate taxPercentage) {
         this.taxPercentage = taxPercentage;
     }
 
-    public Long getTaxPrice() {
+    public Double getTaxPrice() {
         return taxPrice;
     }
 
-    public void setTaxPrice(Long taxPrice) {
+    public void setTaxPrice(Double taxPrice) {
         this.taxPrice = taxPrice;
     }
 
@@ -151,11 +153,11 @@ public class SaleItemRow {
         this.transactionType = transactionType;
     }
 
-    public Long getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(Long amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 }

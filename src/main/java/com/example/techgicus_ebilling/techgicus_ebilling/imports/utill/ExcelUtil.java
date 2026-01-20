@@ -2,6 +2,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.imports.utill;
 
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PaymentType;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.TaxRate;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -33,6 +34,33 @@ public final class ExcelUtil {
             default -> "";
         };
     }
+
+    public static Integer getCellInteger(Cell cell) {
+
+        if (cell == null) return 0;
+
+        try {
+            switch (cell.getCellType()) {
+
+                case NUMERIC:
+                    return (int) cell.getNumericCellValue();
+
+                case STRING:
+                    String value = cell.getStringCellValue().trim();
+                    if (value.isEmpty()) return 0;
+                    return (int) Double.parseDouble(value);
+
+                case FORMULA:
+                    return (int) cell.getNumericCellValue();
+
+                default:
+                    return 0;
+            }
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
 
     public static Double getCellDouble(Cell cell) {
         if (cell == null) return 0.0;
@@ -72,4 +100,14 @@ public final class ExcelUtil {
             return PaymentType.CASH; // default or handle as needed
         }
     }
+
+    public static TaxRate parseTaxRate(Cell cell) {
+        try {
+            return TaxRate.valueOf(getCellString(cell).trim().toUpperCase());
+        } catch (Exception e) {
+            return TaxRate.NONE;
+        }
+    }
+
+
 }

@@ -6,6 +6,7 @@ public interface TaxableItem {
    // String getItemName();
    // String getItemHsnCode();
     Double getTotalAmount();
+   // Double getTotalAmountWithoutTax();
     Double getTaxAmount();
     TaxRate getTaxRate();
 }

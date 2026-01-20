@@ -23,15 +23,16 @@ public class SaleItemDetailsExcelValidator extends BaseExcelValidatior {
         headers.put(4, "Item Code");
         headers.put(5, "HSN/SAC");
         headers.put(6, "Category");
-        headers.put(7, "Quantity");
-        headers.put(8, "Unit");
-        headers.put(9, "UnitPrice");
-        headers.put(10, "Discount Percent");
-        headers.put(11, "Discount");
-        headers.put(12,"Tax Percent");
-        headers.put(13, "Tax");
-        headers.put(14,"Transaction Type");
-        headers.put(15,"Amount");
+        headers.put(7,"Challan/Order No.");
+        headers.put(8, "Quantity");
+        headers.put(9, "Unit");
+        headers.put(10, "UnitPrice");
+        headers.put(11, "Discount Percent");
+        headers.put(12, "Discount");
+        headers.put(13,"Tax Percent");
+        headers.put(14, "Tax");
+        headers.put(15,"Transaction Type");
+        headers.put(16,"Amount");
 
         return headers;
     }
@@ -43,6 +44,6 @@ public class SaleItemDetailsExcelValidator extends BaseExcelValidatior {
 
     @Override
     protected int transactionTypeColumnIndex() {
-        return 14;
+        return 15;
     }
 }
