@@ -26,7 +26,7 @@ public class SaleReturnResponse {
 
     private Double totalTaxAmount;
 
-    private Integer totalQuantity;
+    private Double totalQuantity;
 
     private Double totalAmount;
 
@@ -108,11 +108,11 @@ public class SaleReturnResponse {
         this.totalTaxAmount = totalTaxAmount;
     }
 
-    public Integer getTotalQuantity() {
+    public Double getTotalQuantity() {
         return totalQuantity;
     }
 
-    public void setTotalQuantity(Integer totalQuantity) {
+    public void setTotalQuantity(Double totalQuantity) {
         this.totalQuantity = totalQuantity;
     }
 

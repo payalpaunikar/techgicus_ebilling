@@ -153,4 +153,21 @@ public class SaleItem {
     }
 
 
+    @Override
+    public String toString() {
+        return "SaleItem{" +
+                "saleItemId=" + saleItemId +
+                ", item=" + item +
+                ", itemDescription='" + itemDescription + '\'' +
+                ", quantity=" + quantity +
+                ", pricePerUnit=" + pricePerUnit +
+                ", pricePerUnitTaxType=" + pricePerUnitTaxType +
+                ", taxRate=" + taxRate +
+                ", taxAmount=" + taxAmount +
+                ", totalAmount=" + totalAmount +
+                ", sale=" + sale +
+                ", createdAt=" + createdAt +
+                ", updateAt=" + updateAt +
+                '}';
+    }
 }

@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -28,5 +29,7 @@ public interface StockTransactionRepository extends JpaRepository<StockTransacti
     Double sumClosingStock(@Param("companyId")Long companyId,
                            @Param("startDate") LocalDate startDate,
                            @Param("endDate")LocalDate endDate);
+
+    List<StockTransaction> findByItem(Item item);
 
 }

@@ -6,16 +6,18 @@ import com.example.techgicus_ebilling.techgicus_ebilling.imports.context.ImportC
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.dto.SaleItemRow;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.extractor.SaleItemRowExtractor;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.mapper.SaleReturnItemEntityMapper;
+import com.example.techgicus_ebilling.techgicus_ebilling.imports.service.SaleCalculationService;
+import com.example.techgicus_ebilling.techgicus_ebilling.imports.utill.ModelUtill;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.*;
 import org.apache.poi.ss.usermodel.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
+
+@Service
 public class SaleReturnItemTransactionProcessor implements TransactionProcessor{
 
     private final SaleItemRowExtractor saleItemRowExtractor;
@@ -24,23 +26,25 @@ public class SaleReturnItemTransactionProcessor implements TransactionProcessor{
     private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
     private final SaleReturnItemEntityMapper saleReturnItemEntityMapper;
+    private final SaleCalculationService saleCalculationService;
 
-    public SaleReturnItemTransactionProcessor(SaleItemRowExtractor saleItemRowExtractor, SaleReturnRepository saleReturnRepository, SaleReturnItemRepository saleReturnItemRepository, ItemRepository itemRepository, CategoryRepository categoryRepository, SaleReturnItemEntityMapper saleReturnItemEntityMapper) {
+    public SaleReturnItemTransactionProcessor(SaleItemRowExtractor saleItemRowExtractor, SaleReturnRepository saleReturnRepository, SaleReturnItemRepository saleReturnItemRepository, ItemRepository itemRepository, CategoryRepository categoryRepository, SaleReturnItemEntityMapper saleReturnItemEntityMapper, SaleCalculationService saleCalculationService) {
         this.saleItemRowExtractor = saleItemRowExtractor;
         this.saleReturnRepository = saleReturnRepository;
         this.saleReturnItemRepository = saleReturnItemRepository;
         this.itemRepository = itemRepository;
         this.categoryRepository = categoryRepository;
         this.saleReturnItemEntityMapper = saleReturnItemEntityMapper;
+        this.saleCalculationService = saleCalculationService;
     }
 
-    private final static Logger log = LoggerFactory.getLogger(SaleTransactionProcessor.class);
+    private final static Logger log = LoggerFactory.getLogger(SaleReturnItemTransactionProcessor.class);
 
 
     @Override
     public boolean supports(String transactionType) {
         log.info("transaction type is : "+transactionType);
-        if (transactionType.toLowerCase().trim().equals("credit note"))return true;
+        if (transactionType.toLowerCase().trim().equals("credit-note-item"))return true;
         return false;
     }
 
@@ -51,6 +55,8 @@ public class SaleReturnItemTransactionProcessor implements TransactionProcessor{
 
         SaleItemRow saleItemRow = saleItemRowExtractor.extract(row);
 
+        log.info("Excel quantity = {}", saleItemRow.getQuantity());
+
         Optional<SaleReturn> saleReturn = saleReturnRepository.findByReturnNoAndCompany(saleItemRow.getInvoiceNo(),company);
 
         if (saleReturn.isEmpty()){
@@ -58,40 +64,22 @@ public class SaleReturnItemTransactionProcessor implements TransactionProcessor{
             return;
         }
 
-        Item item = itemRepository.findByItemNameAndCompany(
-                saleItemRow.getItemName(),
-                company
-        ).orElseGet(()->{
-            Item newItem = new Item();
-            newItem.setItemName(saleItemRow.getItemName());
-            newItem.setItemCode(saleItemRow.getItemCode());
-            newItem.setItemHsn(saleItemRow.getHsn());
-            newItem.setCompany(company);
-            newItem.setCreatedAt(LocalDateTime.now());
-            newItem.setUpdatedAt(LocalDateTime.now());
+        Item item = ModelUtill.findOrCreateItem(saleItemRow,
+                company,
+                itemRepository,
+                categoryRepository);
 
+        // 🔥 CLEAR ONLY ONCE PER SALE
+        if (!context.isInitialized(saleReturn.get())) {
 
-            if (saleItemRow.getCategory() !=null) {
-                Category newCategory = categoryRepository.findByCategoryNameAndCompany(
-                        saleItemRow.getCategory(), company);
+            log.info("First time processing sale {}, clearing old items & payments",
+                    saleReturn.get().getReturnNo());
 
-                if (newCategory == null){
-                    newCategory.setCategoryName(saleItemRow.getCategory());
-                    newCategory.setCompany(company);
-                    newCategory.setCraetedAt(LocalDateTime.now());
-                    newCategory.setUpdatedAt(LocalDateTime.now());
+            saleReturn.get().getSaleReturnItems().clear();
+           // saleReturn.get().getSalePayments().clear();
 
-                    newCategory = categoryRepository.save(newCategory);
-                    Set categorySet = new HashSet<>();
-                    categorySet.add(newCategory);
-                    newItem.setCategories(categorySet);
-                }
-
-            }
-
-            return newItem;
-
-        });
+            context.markInitialized(saleReturn.get());
+        }
 
 
         SaleReturnItem newSaleReturnItem = new SaleReturnItem();
@@ -103,9 +91,17 @@ public class SaleReturnItemTransactionProcessor implements TransactionProcessor{
                 newSaleReturnItem
         );
 
-        saleReturnItemRepository.save(newSaleReturnItem);
+        log.info("Entity quantity = {}", newSaleReturnItem.getQuantity());
 
 
+        // saleReturnItemRepository.save(newSaleReturnItem);
+
+        SaleReturn existingSaleReturn = saleReturn.get();
+        existingSaleReturn.getSaleReturnItems().add(newSaleReturnItem);
+
+      //  existingSaleReturn = saleCalculationService.recalculateSaleTotals(existingSaleReturn);
+
+        saleReturnRepository.save(existingSaleReturn);
 
     }
 }

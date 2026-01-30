@@ -14,11 +14,14 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PurchaseRepository extends JpaRepository<Purchase,Long> {
 
     long countByCompany(Company company);
+
+    Optional<Purchase> findByBillNumberAndCompany(String billNo,Company company);
 
     Purchase findTopByCompanyOrderByPurchaseIdDesc(Company company);
 
@@ -87,4 +90,20 @@ public interface PurchaseRepository extends JpaRepository<Purchase,Long> {
     Double sumTaxAmountByDate(@Param("companyId")Long companyId,
                               @Param("startDate")LocalDate startDate,
                               @Param("endDate")LocalDate endDate);
+
+    @Query("""
+        SELECT DISTINCT pu
+        FROM Purchase pu
+        LEFT JOIN FETCH pu.party p
+        LEFT JOIN FETCH pu.purchaseItems pi
+        LEFT JOIN FETCH pi.item i
+        WHERE pu.company.id = :companyId
+          AND pu.billDate BETWEEN :startDate AND :endDate
+        ORDER BY pu.billDate, pu.billNumber
+    """)
+    List<Purchase> findForGstr2(
+            @Param("companyId") Long companyId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
 }

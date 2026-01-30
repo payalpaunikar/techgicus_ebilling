@@ -1,7 +1,9 @@
 package com.example.techgicus_ebilling.techgicus_ebilling.controller;
 
 
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.gstrDto.GstrDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.reportDto.*;
+import com.example.techgicus_ebilling.techgicus_ebilling.service.GstReportService;
 import com.example.techgicus_ebilling.techgicus_ebilling.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,13 +20,14 @@ import java.util.List;
 @RestController
 public class ReportController {
 
-     public ReportService reportService;
+     private final ReportService reportService;
 
-    @Autowired
-    public ReportController(ReportService reportService) {
+     private final GstReportService gstReportService;
+
+    public ReportController(ReportService reportService, GstReportService gstReportService) {
         this.reportService = reportService;
+        this.gstReportService = gstReportService;
     }
-
 
     @GetMapping("/company/{companyId}/sale/report")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -109,6 +112,23 @@ public class ReportController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public BillWiseProfitAndLossDetail getBillWiseProfitAndLossDetailsBySaleId(@PathVariable Long saleId){
         return reportService.getBillWiseProfitAndLossDetailBySaleId(saleId);
+    }
+
+    @GetMapping("/company/{companyId}/gstr1/report")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<GstrDto> generatedGSTR1Report(@PathVariable Long companyId,
+                                    @RequestParam String startMonthYear,
+                                    @RequestParam String endMonthYear){
+        return ResponseEntity.ok(gstReportService.generateGSTR1Report(companyId,startMonthYear,endMonthYear));
+    }
+
+
+    @GetMapping("/company/{companyId}/gstr2/report")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<GstrDto> generatedGSTR2Report(@PathVariable Long companyId,
+                                                        @RequestParam String startMonthYear,
+                                                        @RequestParam String endMonthYear){
+        return ResponseEntity.ok(gstReportService.generateGSTR2Report(companyId,startMonthYear,endMonthYear));
     }
 
 }

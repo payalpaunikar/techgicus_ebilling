@@ -22,7 +22,7 @@ public class SaleItemRowExtractor implements RowExtractor<SaleItemRow>{
         data.setCategory(getCellString(row.getCell(6)));
         data.setOrderNo(getCellString(row.getCell(7)));
         data.setQuantity(getCellDouble(row.getCell(8)));
-        data.setUnit(getCellString(row.getCell(9)));
+        data.setUnit(parseUnit(row.getCell(9)));
         data.setUnitPrice(getCellDouble(row.getCell(10)));
         data.setDiscountPercentage(getCellInteger(row.getCell(11)));
         data.setDiscountPrice(getCellDouble(row.getCell(12)));

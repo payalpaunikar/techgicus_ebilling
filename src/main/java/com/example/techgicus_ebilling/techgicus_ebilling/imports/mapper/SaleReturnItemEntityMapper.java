@@ -6,6 +6,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.SaleRe
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.dto.SaleItemRow;
 import org.springframework.stereotype.Component;
 
+
 @Component
 public class SaleReturnItemEntityMapper {
 

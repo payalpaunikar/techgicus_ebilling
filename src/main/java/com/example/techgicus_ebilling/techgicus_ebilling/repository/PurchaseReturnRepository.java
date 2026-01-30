@@ -12,11 +12,14 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PurchaseReturnRepository extends JpaRepository<PurchaseReturn,Long> {
 
     long countByCompany(Company company);
+
+    Optional<PurchaseReturn> findByReturnNoAndCompany(String returnNo,Company company);
 
     PurchaseReturn findTopByCompanyOrderByPurchaseReturnIdDesc(Company company);
 

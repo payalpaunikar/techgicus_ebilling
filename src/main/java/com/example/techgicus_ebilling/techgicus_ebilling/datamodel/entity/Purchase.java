@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -56,10 +57,10 @@ public class Purchase {
 
 
     @OneToMany(mappedBy = "purchase",cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<PurchaseItem> purchaseItems;
+    private List<PurchaseItem> purchaseItems = new ArrayList<>();
 
     @OneToMany(mappedBy = "purchase",cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<PurchasePayment> purchasePayments;
+    private List<PurchasePayment> purchasePayments = new ArrayList<>();
 
     private LocalDateTime createdAt;
     private LocalDateTime updateAt;

@@ -114,4 +114,11 @@ public class ItemController {
     }
 
 
+    @GetMapping("/item/{itemId}/stock-transaction")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<StockTransactionDto> getItemStockTransactionList(@PathVariable Long itemId){
+      return itemService.getStockTrasactioList(itemId);
+    }
+
+
 }

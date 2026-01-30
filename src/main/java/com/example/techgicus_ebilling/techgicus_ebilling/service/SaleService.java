@@ -309,7 +309,7 @@ public class SaleService {
 
             if(item.getItemType().equals(ItemType.PRODUCT)) {
                 // management of item stock after sale happend
-                item = updateStockAfterSale(item, saleItem);
+                 reverseSaleEffect(item,saleItem);
                 itemRepository.save(item);
             }
 
@@ -405,16 +405,13 @@ public class SaleService {
         Sale sale = saleRepository.findById(saleId)
                 .orElseThrow(()-> new ResourceNotFoundException("Sale not found with id : "+saleId));
 
-
-
         sale.getSaleItem().stream()
                         .forEach(saleItem -> {
                             Item item = saleItem.getItem();
 
                             if(item.getItemType().equals(ItemType.PRODUCT)) {
-                                item.setTotalStockIn(item.getTotalStockIn() + saleItem.getQuantity());
-                                item.setStockValue(item.getStockValue() + item.getPurchasePrice());
-                                item.setAvailableStock(item.getTotalStockIn());
+                                reverseSaleEffect(item,saleItem);
+                                itemRepository.save(item);
                             }
 
                                 StockTransaction stockTransaction = stockTransactionRepository.findByReferenceNumberAndItemAndTransactionType(
@@ -638,32 +635,49 @@ public class SaleService {
    }
 
 
-    // management of item stock after sale happend
-   private Item updateStockAfterSale(Item item,SaleItem saleItem){
-       double oldQty = item.getTotalStockIn();
-       double oldValue = item.getStockValue();
+    public Item updateStockAfterSale(Item item, SaleItem saleItem) {
+        double qty = saleItem.getQuantity();
 
-       log.info("old qty : "+oldQty);
+        // Use safe defaults
+        double currentQty = item.getTotalStockIn() != null ? item.getAvailableStock() : 0.0;
+        double currentValue = item.getStockValue() != null ? item.getStockValue() : 0.0;
 
-       log.info("Old value : "+oldValue);
+        double costRemoved;
 
+        if (currentQty >= qty) {
+            // Normal case: enough stock
+            double averageCost = (currentQty > 0) ? currentValue / currentQty : 0.0;
+            costRemoved = qty * averageCost;
 
-       //double avgCost = oldValue / oldQty ;
+            double newQty = currentQty - qty;
+            double newValue = currentValue - costRemoved;
 
-       double avgCost = (oldQty>0) ? oldValue/oldQty :0.0;
+            item.setTotalStockIn(newQty);
+            item.setStockValue(newValue);
+        } else {
+            // Oversold case: qty > currentQty
+            // Deduct all remaining value → stock value becomes 0
+            costRemoved = currentValue;  // sell everything that exists
 
-       log.info("Avg  : "+avgCost);
+            double oversoldQty = qty - currentQty;
 
-       double reducedValue = (avgCost>0) ? saleItem.getQuantity() * avgCost:0.0;
+            // Stock quantity goes negative
+            double newQty = currentQty - qty;  // negative value
 
-       log.info("reduced value : "+reducedValue);
+            // Stock value forced to 0
+            double newValue = 0.0;
 
-       item.setTotalStockIn(oldQty-saleItem.getQuantity());
-       item.setStockValue(oldValue-reducedValue);
-       item.setAvailableStock(item.getTotalStockIn());
+            item.setTotalStockIn(newQty);
+            item.setStockValue(newValue);
 
-       return item;
-   }
+            // Optional: log or throw warning (but not exception, since you want to allow overselling)
+            // You can add logging here if needed:
+            // log.warn("Oversold item {}: sold {} but only {} available. Stock now negative: {}",
+            //          item.getItemName(), qty, currentQty, newQty);
+        }
+
+        return item;
+    }
 
    private SaleResponse setSaleResponseField(Sale sale,PartyResponseDto partyResponseDto,List<SaleItemResponse> saleItemResponses,LocalDate inovoiceDate,LocalDate dueDate,
                                              List<SalePaymentResponse> salePaymentResponses,double totalTaxRate){
@@ -704,5 +718,16 @@ public class SaleService {
                 .sum();
     }
 
+    private void reverseSaleEffect(Item item, SaleItem saleItem) {
+        double qty = saleItem.getQuantity();
+        double currentQty = item.getTotalStockIn() != null ? item.getAvailableStock() : 0.0;
+        double currentValue = item.getStockValue() != null ? item.getStockValue() : 0.0;
+
+        double averageCost = (currentQty > 0) ? currentValue / currentQty : 0.0;
+        double costToAddBack = qty * averageCost;
+
+        item.setTotalStockIn(currentQty + qty);
+        item.setStockValue(currentValue + costToAddBack);
+    }
 
 }

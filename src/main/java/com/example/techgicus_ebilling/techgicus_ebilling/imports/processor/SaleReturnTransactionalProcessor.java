@@ -15,9 +15,12 @@ import com.example.techgicus_ebilling.techgicus_ebilling.service.PartyLedgerServ
 import org.apache.poi.ss.usermodel.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+
+@Service
 public class SaleReturnTransactionalProcessor implements TransactionProcessor{
 
     private final SaleRowExtractor saleRowExtractor;
@@ -37,7 +40,7 @@ public class SaleReturnTransactionalProcessor implements TransactionProcessor{
         this.partyLedgerService = partyLedgerService;
     }
 
-    private final static Logger log = LoggerFactory.getLogger(SaleTransactionProcessor.class);
+    private final static Logger log = LoggerFactory.getLogger(SaleReturnTransactionalProcessor.class);
 
 
     @Override
@@ -49,6 +52,7 @@ public class SaleReturnTransactionalProcessor implements TransactionProcessor{
 
     @Override
     public void process(Row row, Company company, ImportContext context) {
+
         log.info("row number : "+row.getRowNum());
 
         SaleRowData rowData = saleRowExtractor.extract(row);
@@ -71,6 +75,8 @@ public class SaleReturnTransactionalProcessor implements TransactionProcessor{
         boolean isNew = (existingSaleReturn == null);
 
         saleReturn = saleReturnRepository.save(saleReturn);
+
+        context.registerSaleReturn(saleReturn);
 
         if (isNew) {
             partyLedgerService.addLedgerEntry(

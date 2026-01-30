@@ -111,6 +111,7 @@ public class PurchaseService {
             Item item = itemRepository.findById(purchaseItemRequest.getItemId())
                     .orElseThrow(()-> new ResourceNotFoundException("Item not found with id : "+purchaseItemRequest.getItemId()));
 
+
             PurchaseItem purchaseItem = new PurchaseItem();
             purchaseItem = setPurchaseItemFields(purchaseItemRequest,purchase,LocalDateTime.now(),LocalDateTime.now(),item);
 
@@ -119,6 +120,7 @@ public class PurchaseService {
             if(item.getItemType().equals(ItemType.PRODUCT)) {
                 // management of item stock after sale happend
                  item = updateStockAfterPurchase(item,purchaseItem);
+                item.setPurchasePrice(purchaseRequest.getSendAmount());
 
                 itemRepository.save(item);
 
@@ -311,9 +313,8 @@ public class PurchaseService {
             purchaseItems.add(purchaseItem);
 
             if (item.getItemType().equals(ItemType.PRODUCT)) {
-                // management of item stock after sale happend
-                item.setTotalStockIn(item.getTotalStockIn() + purchaseItem.getQuantity());
-                item.setStockValue(item.getStockValue() + item.getPurchasePrice());
+
+                reversePurchaseEffect(item,purchaseItem);
 
                 itemRepository.save(item);
             }
@@ -402,8 +403,8 @@ public class PurchaseService {
                     Item item = purchaseItem.getItem();
 
                     if(item.getItemType().equals(ItemType.PRODUCT)) {
-                        item.setTotalStockIn(item.getTotalStockIn() - purchaseItem.getQuantity());
-                        item.setStockValue(item.getStockValue() - item.getPurchasePrice());
+                        reversePurchaseEffect(item,purchaseItem);
+                        itemRepository.save(item);
                     }
 
                     StockTransaction stockTransaction = stockTransactionRepository.findByReferenceNumberAndItemAndTransactionType(
@@ -540,18 +541,28 @@ public class PurchaseService {
     }
 
 
-    // management of item stock after Purchase happend
-    private Item updateStockAfterPurchase(Item item,PurchaseItem purchaseItem){
-        double oldQty = item.getTotalStockIn();
-        double oldValue = item.getStockValue();
+    public Item updateStockAfterPurchase(Item item, PurchaseItem purchaseItem) {
+        double qty = purchaseItem.getQuantity();                    // quantity purchased
+        double cost = purchaseItem.getTotalAmount() - purchaseItem.getTotalTaxAmount();
 
-        double addedValue = purchaseItem.getQuantity() * purchaseItem.getPricePerUnit();
+        // Current state
+        double currentQty = item.getTotalStockIn() != null ? item.getAvailableStock() : 0.0;
+        double currentValue = item.getStockValue() != null ? item.getStockValue() : 0.0;
 
-        item.setTotalStockIn(oldQty+purchaseItem.getQuantity());
-        item.setStockValue(oldValue+addedValue);
-        item.setAvailableStock(item.getTotalStockIn());
+        // New totals
+        double newQty = currentQty + qty;
+        double newValue = currentValue + cost;
 
-        itemRepository.save(item);
+        // Update average cost (for information / reporting)
+        double newAverage = (newQty > 0) ? newValue / newQty : 0.0;
+
+        // Update item
+        item.setTotalStockIn(newQty);
+        item.setStockValue(newValue);
+       // item.setTotalStockIn((item.getTotalStockIn() != null ? item.getTotalStockIn() : 0.0) + qty);
+
+        // Optional: you can store the new average if you want
+        // item.setAverageCost(newAverage);  // add field if needed
 
         return item;
     }
@@ -617,6 +628,17 @@ public class PurchaseService {
                 }).toList();
 
         return purchaseItemResponses;
+    }
+
+    private void reversePurchaseEffect(Item item, PurchaseItem purchaseItem) {
+        double qty = purchaseItem.getQuantity();
+        double costToRemove = purchaseItem.getTotalAmount();
+
+        double currentQty = item.getTotalStockIn() != null ? item.getAvailableStock() : 0.0;
+        double currentValue = item.getStockValue() != null ? item.getStockValue() : 0.0;
+
+        item.setTotalStockIn(currentQty - qty);
+        item.setStockValue(currentValue - costToRemove);
     }
 
 }

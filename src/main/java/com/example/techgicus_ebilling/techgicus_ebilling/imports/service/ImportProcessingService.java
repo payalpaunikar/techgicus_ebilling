@@ -2,6 +2,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.imports.service;
 
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
+import com.example.techgicus_ebilling.techgicus_ebilling.imports.handler.PurchaseReportImportHandler;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.handler.SaleReportImportHandler;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.validator.ItemExcelValidator;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.strategy.ItemImportHandler;
@@ -40,9 +41,10 @@ public class ImportProcessingService {
     private final ItemExcelValidator itemExcelValidator;
     private final ItemImportHandler itemImportHandler;
     private final SaleReportImportHandler saleReportImportHandler;
+    private final PurchaseReportImportHandler purchaseReportImportHandler;
 
 
-    public ImportProcessingService(JobLauncher jobLauncher, Job importExcelDataJob, CompanyRepository companyRepository, ItemRepository itemRepository, CategoryRepository categoryRepository, ItemExcelValidator itemExcelValidator, ItemImportHandler itemImportHandler, SaleReportImportHandler saleReportImportHandler) {
+    public ImportProcessingService(JobLauncher jobLauncher, Job importExcelDataJob, CompanyRepository companyRepository, ItemRepository itemRepository, CategoryRepository categoryRepository, ItemExcelValidator itemExcelValidator, ItemImportHandler itemImportHandler, SaleReportImportHandler saleReportImportHandler, PurchaseReportImportHandler purchaseReportImportHandler) {
         this.jobLauncher = jobLauncher;
         this.importExcelDataJob = importExcelDataJob;
         this.companyRepository = companyRepository;
@@ -51,6 +53,7 @@ public class ImportProcessingService {
         this.itemExcelValidator = itemExcelValidator;
         this.itemImportHandler = itemImportHandler;
         this.saleReportImportHandler = saleReportImportHandler;
+        this.purchaseReportImportHandler = purchaseReportImportHandler;
     }
 
     @Value("${app.upload.dir}")
@@ -113,8 +116,8 @@ public class ImportProcessingService {
                         return itemImportHandler.importItems(sheet, company);
                     case "SALE":
                         return saleReportImportHandler.importReport(workbook, company);
-//                    case "PURCHASE":
-//                        return importPurchases(sheet, company);
+                    case "PURCHASE":
+                        return purchaseReportImportHandler.importReport(workbook,company);
 //                    case "PARTY":
 //                        return importPartyStatements(sheet, company);
                     default:

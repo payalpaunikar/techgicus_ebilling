@@ -5,22 +5,18 @@ import com.example.techgicus_ebilling.techgicus_ebilling.imports.context.ImportC
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.dto.SaleItemRow;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.extractor.SaleItemRowExtractor;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.mapper.SaleItemEntityMapper;
+import com.example.techgicus_ebilling.techgicus_ebilling.imports.mapper.SalePaymentEntityMapper;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.service.SaleCalculationService;
-import com.example.techgicus_ebilling.techgicus_ebilling.mapper.SaleItemMapper;
-import com.example.techgicus_ebilling.techgicus_ebilling.repository.CategoryRepository;
-import com.example.techgicus_ebilling.techgicus_ebilling.repository.ItemRepository;
-import com.example.techgicus_ebilling.techgicus_ebilling.repository.SaleItemRepository;
-import com.example.techgicus_ebilling.techgicus_ebilling.repository.SaleRepository;
+import com.example.techgicus_ebilling.techgicus_ebilling.imports.utill.ModelUtill;
+import com.example.techgicus_ebilling.techgicus_ebilling.repository.*;
 import org.apache.poi.ss.usermodel.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
+@Service
 public class SaleItemTransactionProcessor implements TransactionProcessor{
 
     private final SaleItemRowExtractor saleItemRowExtractor;
@@ -30,10 +26,12 @@ public class SaleItemTransactionProcessor implements TransactionProcessor{
     private final CategoryRepository categoryRepository;
     private final SaleItemEntityMapper saleItemEntityMapper;
     private final SaleCalculationService saleCalculationService;
+    private final SalePaymentEntityMapper salePaymentEntityMapper;
+    private final SalePaymentRepository salePaymentRepository;
 
-    private final static Logger log = LoggerFactory.getLogger(SaleTransactionProcessor.class);
+    private final static Logger log = LoggerFactory.getLogger(SaleItemTransactionProcessor.class);
 
-    public SaleItemTransactionProcessor(SaleItemRowExtractor saleItemRowExtractor, SaleRepository saleRepository, SaleItemRepository saleItemRepository, ItemRepository itemRepository, CategoryRepository categoryRepository, SaleItemEntityMapper saleItemEntityMapper, SaleCalculationService saleCalculationService) {
+    public SaleItemTransactionProcessor(SaleItemRowExtractor saleItemRowExtractor, SaleRepository saleRepository, SaleItemRepository saleItemRepository, ItemRepository itemRepository, CategoryRepository categoryRepository, SaleItemEntityMapper saleItemEntityMapper, SaleCalculationService saleCalculationService, SalePaymentEntityMapper salePaymentEntityMapper, SalePaymentRepository salePaymentRepository) {
         this.saleItemRowExtractor = saleItemRowExtractor;
         this.saleRepository = saleRepository;
         this.saleItemRepository = saleItemRepository;
@@ -41,6 +39,8 @@ public class SaleItemTransactionProcessor implements TransactionProcessor{
         this.categoryRepository = categoryRepository;
         this.saleItemEntityMapper = saleItemEntityMapper;
         this.saleCalculationService = saleCalculationService;
+        this.salePaymentEntityMapper = salePaymentEntityMapper;
+        this.salePaymentRepository = salePaymentRepository;
     }
 
     @Override
@@ -65,43 +65,27 @@ public class SaleItemTransactionProcessor implements TransactionProcessor{
         }
 
 
-        Item item = itemRepository.findByItemNameAndCompany(
-                saleItemRow.getItemName(),
-                company
-        ).orElseGet(()->{
-            Item newItem = new Item();
-            newItem.setItemName(saleItemRow.getItemName());
-            newItem.setItemCode(saleItemRow.getItemCode());
-            newItem.setItemHsn(saleItemRow.getHsn());
-            newItem.setCompany(company);
-            newItem.setCreatedAt(LocalDateTime.now());
-            newItem.setUpdatedAt(LocalDateTime.now());
+       Item item = ModelUtill.findOrCreateItem(saleItemRow,
+               company,
+               itemRepository,
+               categoryRepository);
 
 
-            if (saleItemRow.getCategory() !=null) {
-                Category  newCategory = categoryRepository.findByCategoryNameAndCompany(
-                        saleItemRow.getCategory(), company);
 
-                 if (newCategory == null){
-                     newCategory.setCategoryName(saleItemRow.getCategory());
-                     newCategory.setCompany(company);
-                     newCategory.setCraetedAt(LocalDateTime.now());
-                     newCategory.setUpdatedAt(LocalDateTime.now());
+        // 🔥 CLEAR ONLY ONCE PER SALE
+        if (!context.isInitialized(sale.get())) {
 
-                     newCategory = categoryRepository.save(newCategory);
-                     Set categorySet = new HashSet<>();
-                     categorySet.add(newCategory);
-                     newItem.setCategories(categorySet);
-                 }
+            log.info("First time processing sale {}, clearing old items & payments",
+                    sale.get().getInvoiceNumber());
 
-            }
+            sale.get().getSaleItem().clear();
+            sale.get().getSalePayments().clear();
 
-            return newItem;
-
-        });
+            context.markInitialized(sale.get());
+        }
 
 
-       SaleItem newSaleItem = new SaleItem();
+        SaleItem newSaleItem = new SaleItem();
 
        newSaleItem = saleItemEntityMapper.toEntity(
                sale.get(),
@@ -111,9 +95,19 @@ public class SaleItemTransactionProcessor implements TransactionProcessor{
        );
 
 
-        saleItemRepository.save(newSaleItem);
+      //  saleItemRepository.save(newSaleItem);
 
-        saleCalculationService.recalculateSaleTotals(sale.get());
-        saleRepository.save(sale.get());
+        Sale existingSale = sale.get();
+        existingSale.getSaleItem().add(newSaleItem);
+
+
+     //  existingSale =  saleCalculationService.recalculateSaleTotals(existingSale);
+        saleRepository.save(existingSale);
+
+
+//        SalePayment salePayment = new SalePayment();
+//        salePayment = salePaymentEntityMapper.toEntity(existingSale,salePayment);
+//
+//        salePaymentRepository.save(salePayment);
     }
 }

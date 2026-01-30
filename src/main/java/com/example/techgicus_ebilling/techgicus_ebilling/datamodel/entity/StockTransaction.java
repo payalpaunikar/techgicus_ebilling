@@ -32,6 +32,9 @@ public class StockTransaction {
 
     private Double pricePerUnit;
 
+    private Double openingStock;      // stock before transaction
+    private Double closingStock;      // stock after transaction
+
     @ManyToOne
     @JoinColumn(name = "item_id")
     private Item item;

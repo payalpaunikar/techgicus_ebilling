@@ -283,9 +283,12 @@ public class ReportService {
     }
 
 
+
+
+
     private BillWiseProfitAndLossDetail convertSaleIntoBillWiseProfitAndLossDetail(Sale sale){
         BillWiseProfitAndLossDetail  billWiseProfitAndLossDetail = new BillWiseProfitAndLossDetail();
-        billWiseProfitAndLossDetail.setSaleAmount(sale.getTotalAmountWithoutTax());
+        billWiseProfitAndLossDetail.setSaleAmount(sale.getTotalAmount());
         billWiseProfitAndLossDetail.setTaxPayable(sale.getTotalTaxAmount());
         billWiseProfitAndLossDetail.setTdsPayable(0.0);
 
@@ -301,8 +304,8 @@ public class ReportService {
         billWiseProfitAndLossDetail.setItems(items);
         billWiseProfitAndLossDetail.setTotalCost(totalCost);
 
-        Double total = billWiseProfitAndLossDetail.getSaleAmount()+ billWiseProfitAndLossDetail.getTotalCost()
-                + billWiseProfitAndLossDetail.getTaxPayable() - billWiseProfitAndLossDetail.getTdsPayable();
+        Double total = billWiseProfitAndLossDetail.getSaleAmount()- billWiseProfitAndLossDetail.getTotalCost()
+                - billWiseProfitAndLossDetail.getTaxPayable() + billWiseProfitAndLossDetail.getTdsPayable();
 
         billWiseProfitAndLossDetail.setTotal(total);
 
@@ -314,7 +317,7 @@ public class ReportService {
 
     private BillWiseProfitAndLossSummary convertSaleIntoBillWiseProfitAndLoss(Sale sale){
 
-        Double saleAmount = sale.getTotalAmountWithoutTax();
+        Double saleAmount = sale.getTotalAmount();
 
         List<SaleItem> saleItemList = sale.getSaleItem();
 

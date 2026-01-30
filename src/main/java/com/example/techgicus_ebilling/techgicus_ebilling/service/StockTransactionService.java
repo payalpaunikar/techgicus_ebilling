@@ -2,6 +2,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.service;
 
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Item;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.PurchaseItem;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.StockTransaction;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.StockTransactionType;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.StockTransactionRepository;
@@ -31,4 +32,6 @@ public class StockTransactionService {
 
         return stockTransaction;
     }
+
+
 }

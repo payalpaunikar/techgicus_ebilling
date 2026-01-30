@@ -5,11 +5,13 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Catego
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Item;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.StockTransaction;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.ItemType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.StockTransactionType;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.itemDto.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.ItemAlreadyExitException;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.ResourceNotFoundException;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.ItemMapper;
+import com.example.techgicus_ebilling.techgicus_ebilling.mapper.StockTransactionMapper;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.CategoryRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.CompanyRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.ItemRepository;
@@ -33,14 +35,15 @@ public class ItemService {
          private CategoryRepository categoryRepository;
          private ItemMapper itemMapper;
          private StockTransactionRepository stockTransactionRepository;
+         private StockTransactionMapper stockTransactionMapper;
 
-    @Autowired
-    public ItemService(ItemRepository itemRepository, CompanyRepository companyRepository, CategoryRepository categoryRepository, ItemMapper itemMapper, StockTransactionRepository stockTransactionRepository) {
+    public ItemService(ItemRepository itemRepository, CompanyRepository companyRepository, CategoryRepository categoryRepository, ItemMapper itemMapper, StockTransactionRepository stockTransactionRepository, StockTransactionMapper stockTransactionMapper) {
         this.itemRepository = itemRepository;
         this.companyRepository = companyRepository;
         this.categoryRepository = categoryRepository;
         this.itemMapper = itemMapper;
         this.stockTransactionRepository = stockTransactionRepository;
+        this.stockTransactionMapper = stockTransactionMapper;
     }
 
     @Transactional
@@ -65,14 +68,14 @@ public class ItemService {
         item.setAvailableStock(item.getTotalStockIn());
         item.setStockValue(item.getStockPricePerQty() * item.getStockOpeningQty());
 
+        Item saveItem = itemRepository.save(item);
+
         StockTransaction stockTransaction = new StockTransaction();
         stockTransaction.setItem(item);
         stockTransaction.setTransactionDate(item.getStockOpeningDate());
-        stockTransaction.setQuantity(item.getStockOpeningQty());
+        stockTransaction.setQuantity(item.getStockOpeningQty() == null ? 0.0:item.getStockOpeningQty());
         stockTransaction.setTransactionType(StockTransactionType.OPENING_STOCK);
         stockTransaction.setTotalAmount(item.getStockPricePerQty() * item.getStockOpeningQty());
-
-        Item saveItem = itemRepository.save(item);
 
         stockTransactionRepository.save(stockTransaction);
 
@@ -253,6 +256,26 @@ public class ItemService {
 
 
     
+        public List<StockTransactionDto> getStockTrasactioList(Long itemId){
+
+             Item item = itemRepository.findById(itemId)
+                     .orElseThrow(()-> new ResourceNotFoundException("Item not found with id : "+itemId));
+
+             if (item.getItemType().equals(ItemType.PRODUCT)) {
+                 List<StockTransaction> stockTransactionList = stockTransactionRepository.findByItem(item);
+
+                 List<StockTransactionDto> stockTransactionDtos = stockTransactionList.stream()
+                         .map(stockTransaction -> stockTransactionMapper.toDto(stockTransaction))
+                         .toList();
+
+                 return stockTransactionDtos;
+             }
+
+             else{
+                 return new ArrayList<>();
+             }
+        }
+
 
 
 

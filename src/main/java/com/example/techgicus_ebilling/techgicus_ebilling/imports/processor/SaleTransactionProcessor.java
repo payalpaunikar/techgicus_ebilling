@@ -12,7 +12,6 @@ import com.example.techgicus_ebilling.techgicus_ebilling.imports.utill.ModelUtil
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.SaleRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.service.PartyActivityService;
 import com.example.techgicus_ebilling.techgicus_ebilling.service.PartyLedgerService;
-import com.example.techgicus_ebilling.techgicus_ebilling.service.PartyService;
 import org.apache.poi.ss.usermodel.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +77,8 @@ public class SaleTransactionProcessor implements TransactionProcessor {
         boolean isNew = (existingSale == null);
 
        sale = saleRepository.save(sale);
+
+       context.registerSale(sale);
 
         if (isNew) {
             partyLedgerService.addLedgerEntry(

@@ -1,5 +1,7 @@
 package com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration;
 
+import java.math.BigDecimal;
+
 public enum TaxRate {
     NONE(0.0),
     EXEMPTED(0.0),
@@ -20,10 +22,35 @@ public enum TaxRate {
 
     private final double rate;
 
+
     // Constructor
     TaxRate(double rate) {
         this.rate = rate;
     }
+
+   public static BigDecimal getRateFromTaxRate(TaxRate taxRate){
+        if (taxRate == null){
+            return BigDecimal.ZERO;
+        }
+        return switch (taxRate){
+            case NONE ->  BigDecimal.ZERO;
+            case EXEMPTED -> BigDecimal.ZERO;
+            case GST0 -> BigDecimal.ZERO;
+            case IGST0 -> BigDecimal.ZERO;
+            case GST0POINT25 -> BigDecimal.valueOf(0.25);
+            case IGST0POINT25 -> BigDecimal.valueOf(0.25);
+            case GST3 -> BigDecimal.valueOf(3);
+            case IGST3 -> BigDecimal.valueOf(3);
+            case GST5 -> BigDecimal.valueOf(5);
+            case IGST5 -> BigDecimal.valueOf(5);
+            case GST12 -> BigDecimal.valueOf(12);
+            case IGST12 -> BigDecimal.valueOf(12);
+            case GST18 -> BigDecimal.valueOf(18);
+            case IGST18 -> BigDecimal.valueOf(18);
+            case GST28 -> BigDecimal.valueOf(28);
+            case IGST28 -> BigDecimal.valueOf(28);
+        };
+   }
 
     // Getter if you need it later
     public double getRate() {

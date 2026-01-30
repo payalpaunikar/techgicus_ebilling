@@ -3,6 +3,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.imports.dto;
 
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.TaxRate;
+import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.Unit;
 
 import java.time.LocalDate;
 
@@ -16,7 +17,7 @@ public class SaleItemRow {
     private String category;
     private String orderNo;
     private Double quantity;
-    private String unit;
+    private Unit unit;
     private Double unitPrice;
     private Integer discountPercentage;
     private  Double discountPrice;
@@ -97,11 +98,11 @@ public class SaleItemRow {
         this.quantity = quantity;
     }
 
-    public String getUnit() {
+    public Unit getUnit() {
         return unit;
     }
 
-    public void setUnit(String unit) {
+    public void setUnit(Unit unit) {
         this.unit = unit;
     }
 

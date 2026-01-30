@@ -78,10 +78,10 @@ public class Item {
      private String openingStockLocation;
 
 
-    private Double totalStockIn;
-    private Double reservedStock;  // items allocated but not yet sold (like pending orders)
-    private Double availableStock;
-    private Double stockValue;
+    private Double totalStockIn = 0.0;
+    private Double reservedStock =0.0;  // items allocated but not yet sold (like pending orders)
+    private Double availableStock = 0.0;
+    private Double stockValue = 0.0;
 
 
      @ManyToMany

@@ -145,6 +145,21 @@ public interface SaleRepository extends JpaRepository<Sale,Long> {
     );
 
 
+    @Query("""
+        SELECT DISTINCT s 
+        FROM Sale s
+        LEFT JOIN FETCH s.party p
+        LEFT JOIN FETCH s.saleItem si
+        LEFT JOIN FETCH si.item i
+        WHERE s.company.id = :companyId
+          AND s.invoceDate BETWEEN :startDate AND :endDate
+        ORDER BY s.invoceDate, s.invoiceNumber
+    """)
+    List<Sale> findForGstr1(
+            @Param("companyId") Long companyId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
 
     @Query("""
     SELECT COALESCE(SUM(s.totalTaxAmount), 0)

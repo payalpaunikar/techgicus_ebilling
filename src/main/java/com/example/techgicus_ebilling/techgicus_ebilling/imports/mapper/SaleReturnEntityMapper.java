@@ -4,7 +4,9 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Compan
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Party;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.SaleReturn;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.dto.SaleRowData;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SaleReturnEntityMapper {
 
     public SaleReturn toEntity(SaleReturn existingSaleReturn, SaleRowData data, Company company, Party party){
