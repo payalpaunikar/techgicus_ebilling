@@ -12,8 +12,8 @@ public class GstrDto {
     private String gstin;                   // e.g., "27BJIPD7892R1Z7"
     private String legalName;               // e.g., "Karuna Enterprises"
    // private String tradeName;               // Can be empty
-    private BigDecimal aggregateTurnoverPrevFy;  // Aggregate turnover of preceding FY
-    private BigDecimal aggregateTurnoverAprJun2017;  // Aggregate turnover April to June 2017
+//    private BigDecimal aggregateTurnoverPrevFy;  // Aggregate turnover of preceding FY
+//    private BigDecimal aggregateTurnoverAprJun2017;  // Aggregate turnover April to June 2017
 
     // List of invoices (from main sheet row 11+)
     private List<InvoiceDetailDto> invoices = new ArrayList<>();
@@ -94,21 +94,21 @@ public class GstrDto {
 //        this.tradeName = tradeName;
 //    }
 
-    public BigDecimal getAggregateTurnoverPrevFy() {
-        return aggregateTurnoverPrevFy;
-    }
-
-    public void setAggregateTurnoverPrevFy(BigDecimal aggregateTurnoverPrevFy) {
-        this.aggregateTurnoverPrevFy = aggregateTurnoverPrevFy;
-    }
-
-    public BigDecimal getAggregateTurnoverAprJun2017() {
-        return aggregateTurnoverAprJun2017;
-    }
-
-    public void setAggregateTurnoverAprJun2017(BigDecimal aggregateTurnoverAprJun2017) {
-        this.aggregateTurnoverAprJun2017 = aggregateTurnoverAprJun2017;
-    }
+//    public BigDecimal getAggregateTurnoverPrevFy() {
+//        return aggregateTurnoverPrevFy;
+//    }
+//
+//    public void setAggregateTurnoverPrevFy(BigDecimal aggregateTurnoverPrevFy) {
+//        this.aggregateTurnoverPrevFy = aggregateTurnoverPrevFy;
+//    }
+//
+//    public BigDecimal getAggregateTurnoverAprJun2017() {
+//        return aggregateTurnoverAprJun2017;
+//    }
+//
+//    public void setAggregateTurnoverAprJun2017(BigDecimal aggregateTurnoverAprJun2017) {
+//        this.aggregateTurnoverAprJun2017 = aggregateTurnoverAprJun2017;
+//    }
 
     public List<InvoiceDetailDto> getInvoices() {
         return invoices;
