@@ -19,6 +19,8 @@ public class ImportContext {
 
     private final Map<String, Purchase> purchases = new HashMap<>();
     private final Map<String, PurchaseReturn> purchaseReturns = new HashMap<>();
+    private final Map<Long, Map<Long, Double>> purchaseOldQtyMap = new HashMap<>();
+
 
     private final Set<Long> initializedPurchases = new HashSet<>();
     private final Set<Long> initializedPurchaseReturns = new HashSet<>();
@@ -39,8 +41,8 @@ public class ImportContext {
         initializedSaleReturns.add(saleReturn.getSaleReturnId());
     }
 
-    public void addError(int row, String message) {
-        errors.add(new ImportError(row, message));
+    public void addError(String sheetName,int row, String message) {
+        errors.add(new ImportError(sheetName,row, message));
     }
 
     public void registerSale(Sale sale) {
@@ -86,6 +88,14 @@ public class ImportContext {
     }
 
     public void registerPurchaseReturn(PurchaseReturn purchaseReturn) {
+//        if (purchaseReturn.getPurchaseReturnId() == null) {
+//            errors.add(new ImportError(
+//                    -1,
+//                    "Internal Error: Purchase Return was not saved correctly (ID is null)"
+//            ));
+//            return;
+//        }
+
         purchaseReturns.put(purchaseReturn.getPurchaseReturnId().toString(), purchaseReturn);
     }
 
@@ -99,6 +109,18 @@ public class ImportContext {
 
     public List<ImportError> getErrors() {
         return errors;
+    }
+
+    public void storePurchaseOldQty(Long purchaseId, Map<Long, Double> qtyMap) {
+        purchaseOldQtyMap.put(purchaseId, qtyMap);
+    }
+
+    public Map<Long, Double> getOldQtyForPurchase(Long purchaseId) {
+        return purchaseOldQtyMap.getOrDefault(purchaseId, new HashMap<>());
+    }
+
+    public Set<Long> getInitializedPurchases() {
+        return initializedPurchases;
     }
 
 

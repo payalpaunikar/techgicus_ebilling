@@ -3,8 +3,9 @@ package com.example.techgicus_ebilling.techgicus_ebilling.dto.quotationDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.TaxRate;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.TaxType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.Unit;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.TaxableItem;
 
-public class QuotationItemResponse {
+public class QuotationItemResponse implements TaxableItem {
 
     private Long quotationItemId;
 
@@ -130,6 +131,11 @@ public class QuotationItemResponse {
 
     public Double getTotalAmount() {
         return totalAmount;
+    }
+
+    @Override
+    public Double getTaxAmount() {
+        return totalTaxAmount;
     }
 
     public void setTotalAmount(Double totalAmount) {

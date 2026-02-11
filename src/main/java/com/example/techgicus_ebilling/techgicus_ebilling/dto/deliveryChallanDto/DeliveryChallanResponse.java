@@ -3,6 +3,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.dto.deliveryChallanDto
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.ChallanType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.State;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.ItemTaxSummaryResponse;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -33,6 +34,9 @@ public class DeliveryChallanResponse {
     private ChallanType challanType;
 
     private PartyResponseDto partyResponseDto;
+
+    private List<ItemTaxSummaryResponse> taxSummary;
+
 
     private List<DeliveryChallanItemResponse> deliveryChallanItemResponses = new ArrayList<>();
 
@@ -134,6 +138,14 @@ public class DeliveryChallanResponse {
 
     public ChallanType getChallanType() {
         return challanType;
+    }
+
+    public List<ItemTaxSummaryResponse> getTaxSummary() {
+        return taxSummary;
+    }
+
+    public void setTaxSummary(List<ItemTaxSummaryResponse> taxSummary) {
+        this.taxSummary = taxSummary;
     }
 
     public void setChallanType(ChallanType challanType) {

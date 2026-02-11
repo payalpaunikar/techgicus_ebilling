@@ -14,6 +14,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleDto.SaleItemRes
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleDto.SalePaymentResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleDto.SaleRequest;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleDto.SaleResponse;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.ItemTaxSummaryResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.QuotationAlreadyClosedException;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.ResourceNotFoundException;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.*;
@@ -43,22 +44,26 @@ public class QuotationService {
      private PartyLedgerService partyLedgerService;
      private PartyActivityService partyActivityService;
      private ItemRepository itemRepository;
+     private SaleService saleService;
+    private final TaxCalculationService taxCalculationService;
 
-    @Autowired
-    public QuotationService(QuotationRepository quotationRepository, QuotationItemRepository quotationItemRepository, QuotationMapper quotationMapper, QuotationItemMapper quotationItemMapper, CompanyRepository companyRepository, PartyRepository partyRepository, PartyMapper partyMapper, SaleMapper saleMapper, SaleRepository saleRepository, SaleItemMapper saleItemMapper, PartyLedgerService partyLedgerService, PartyActivityService partyActivityService, ItemRepository itemRepository) {
-        this.quotationRepository = quotationRepository;
-        this.quotationItemRepository = quotationItemRepository;
-        this.quotationMapper = quotationMapper;
-        this.quotationItemMapper = quotationItemMapper;
-        this.companyRepository = companyRepository;
-        this.partyRepository = partyRepository;
-        this.partyMapper = partyMapper;
-        this.saleMapper = saleMapper;
-        this.saleRepository = saleRepository;
-        this.saleItemMapper = saleItemMapper;
-        this.partyLedgerService = partyLedgerService;
-        this.partyActivityService = partyActivityService;
+
+    public QuotationService(TaxCalculationService taxCalculationService, SaleService saleService, ItemRepository itemRepository, PartyActivityService partyActivityService, PartyLedgerService partyLedgerService, SaleItemMapper saleItemMapper, SaleRepository saleRepository, SaleMapper saleMapper, PartyMapper partyMapper, PartyRepository partyRepository, CompanyRepository companyRepository, QuotationItemMapper quotationItemMapper, QuotationMapper quotationMapper, QuotationItemRepository quotationItemRepository, QuotationRepository quotationRepository) {
+        this.taxCalculationService = taxCalculationService;
+        this.saleService = saleService;
         this.itemRepository = itemRepository;
+        this.partyActivityService = partyActivityService;
+        this.partyLedgerService = partyLedgerService;
+        this.saleItemMapper = saleItemMapper;
+        this.saleRepository = saleRepository;
+        this.saleMapper = saleMapper;
+        this.partyMapper = partyMapper;
+        this.partyRepository = partyRepository;
+        this.companyRepository = companyRepository;
+        this.quotationItemMapper = quotationItemMapper;
+        this.quotationMapper = quotationMapper;
+        this.quotationItemRepository = quotationItemRepository;
+        this.quotationRepository = quotationRepository;
     }
 
     @Transactional
@@ -128,10 +133,12 @@ public class QuotationService {
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(quotation.getParty());
         List<QuotationItemResponse> quotationItemResponses = setQuotationItemResponseListFields(quotation.getQuotationItems());
        // List<QuotationItemResponse> quotationItemResponses = quotationItemMapper.convertQuotationItemListIntoQuotationItemResponseList(quotation.getQuotationItems());
-
+        List<ItemTaxSummaryResponse> taxSummaryResponses =
+                taxCalculationService.calculateTaxSummary(quotationItemResponses);
         QuotationResponse quotationResponse = quotationMapper.convertQuotationIntoQuotationResponse(quotation);
         quotationResponse.setQuotationItemResponses(quotationItemResponses);
         quotationResponse.setPartyResponseDto(partyResponseDto);
+        quotationResponse.setTaxSummary(taxSummaryResponses);
         return quotationResponse;
     }
 
@@ -147,10 +154,12 @@ public class QuotationService {
                     PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(quotation.getParty());
                     List<QuotationItemResponse> quotationItemResponses = setQuotationItemResponseListFields(quotation.getQuotationItems());
                     //List<QuotationItemResponse> quotationItemResponses = quotationItemMapper.convertQuotationItemListIntoQuotationItemResponseList(quotation.getQuotationItems());
+                    List<ItemTaxSummaryResponse> taxSummaryResponses =
+                            taxCalculationService.calculateTaxSummary(quotationItemResponses);
                     QuotationResponse quotationResponse = quotationMapper.convertQuotationIntoQuotationResponse(quotation);
                     quotationResponse.setPartyResponseDto(partyResponseDto);
                     quotationResponse.setQuotationItemResponses(quotationItemResponses);
-
+                    quotationResponse.setTaxSummary(taxSummaryResponses);
                     return quotationResponse;
                 }).toList();
 
@@ -241,111 +250,117 @@ public class QuotationService {
 
         quotationRepository.save(quotation);
 
-        Party party = partyRepository.findById(saleRequest.getPartyId())
-                .orElseThrow(()-> new ResourceNotFoundException("Party not found with id : "+saleRequest.getPartyId()));
-
-       Sale sale = saleMapper.convertSaleRequestIntoSale(saleRequest);
-        sale.setCompany(quotation.getCompany());
-        sale.setParty(party);
-        sale.setInvoceDate(saleRequest.getInvoceDate());
-        sale.setDueDate(saleRequest.getDueDate());
-        sale.setCreatedAt(LocalDateTime.now());
-        sale.setUpdatedAt(LocalDateTime.now());
-
-        // 4️⃣ Handle null-safe numeric fields
-        double receivedAmount = sale.getReceivedAmount() != null ? sale.getReceivedAmount() : 0.0;
-        double totalAmount = sale.getTotalAmount() != null ? sale.getTotalAmount() : 0.0;
-
-        // calculate balance
-        Double balance = totalAmount - receivedAmount;
-        sale.setBalance(balance);
-
-        // set isPaid
-        sale.setPaid(balance <= 0);
-
-        // set isOverdue
-        if (sale.getDueDate() != null && sale.getDueDate().isBefore(LocalDate.now()) && balance > 0) {
-            sale.setOverdue(true);
-        } else {
-            sale.setOverdue(false);
-        }
-
-        List<SaleItem> saleItems = saleRequest.getSaleItems()
-                .stream()
-                .map(saleItemRequest -> {
-                    Item item = itemRepository.findById(saleItemRequest.getItemId())
-                            .orElseThrow(()-> new ResourceNotFoundException("Item not found with id : "+saleItemRequest.getItemId()));
-
-                    SaleItem saleItem = saleItemMapper.convertSaleItemRequestIntoSaleItem(saleItemRequest);
-                    saleItem.setItem(item);
-                    saleItem.setSale(sale);
-                    saleItem.setCreatedAt(LocalDateTime.now());
-                    saleItem.setUpdateAt(LocalDateTime.now());
-
-                    return saleItem;
-                }).toList();
-
-        sale.setSaleItem(saleItems);
-
-        SalePayment salePayment = new SalePayment();
-        salePayment.setPaymentDescription("Received During Sale");
-        salePayment.setPaymentType(saleRequest.getPaymentType());
-        salePayment.setPaymentDate(saleRequest.getInvoceDate());
-        salePayment.setSale(sale);
-        salePayment.setCreatedAt(LocalDateTime.now());
-        salePayment.setUpdateAt(LocalDateTime.now());
-        salePayment.setAmountPaid(sale.getReceivedAmount());
-
-        sale.setSalePayments(List.of(salePayment));
-
-
-        Sale saveSale = saleRepository.save(sale);
-
-        // delete party activity of quotation
         partyActivityService.deletePartyActivity(PartyTransactionType.QUOTATION,quotation.getQuotationId());
 
-
-        // add party ledger entry in the database
-        partyLedgerService.addLedgerEntry(
-                sale.getParty(),
-                sale.getCompany(),
-                sale.getInvoceDate(),
-                PartyTransactionType.SALE,
-                sale.getSaleId(),
-                sale.getInvoiceNumber(),
-                sale.getTotalAmount(),
-                0.0,
-                sale.getBalance(),
-                sale.getPaymentDescription()
-        );
-
-        PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(sale.getParty());
-        List<SaleItemResponse> saleItemResponses = saleItemMapper.convertSaleItemListIntoSaleItmResponseList(sale.getSaleItem());
-
-        List<SalePayment> salePayments = saveSale.getSalePayments();
-
-        List<SalePaymentResponse> salePaymentResponses = salePayments.stream()
-                .map(salePayment1 -> {
-                    SalePaymentResponse salePaymentResponse = new SalePaymentResponse();
-                    salePaymentResponse.setPaymentId(salePayment1.getPaymentId());
-                    salePaymentResponse.setPaymentDate(salePayment1.getPaymentDate());
-                    salePaymentResponse.setPaymentType(salePayment1.getPaymentType());
-                    salePaymentResponse.setPaymentDescription(salePayment1.getPaymentDescription());
-                    salePaymentResponse.setAmountPaid(salePayment1.getAmountPaid());
-                    salePaymentResponse.setReceiptNo(salePayment1.getReceiptNo());
-                    salePaymentResponse.setReferenceNumber(salePayment1.getReferenceNumber());
-
-                    return salePaymentResponse;
-                }).toList();
-
-        SaleResponse saleResponse = saleMapper.convertSaleIntoSaleResponse(saveSale);
-        saleResponse.setPartyResponseDto(partyResponseDto);
-        saleResponse.setSaleItemResponses(saleItemResponses);
-        saleResponse.setInvoceDate(saveSale.getInvoceDate());
-        saleResponse.setDueDate(saveSale.getDueDate());
-        saleResponse.setSalePaymentResponses(salePaymentResponses);
+        SaleResponse saleResponse = saleService.createdSale(saleRequest,quotation.getCompany().getCompanyId());
 
         return saleResponse;
+
+//        Party party = partyRepository.findById(saleRequest.getPartyId())
+//                .orElseThrow(()-> new ResourceNotFoundException("Party not found with id : "+saleRequest.getPartyId()));
+//
+//       Sale sale = saleMapper.convertSaleRequestIntoSale(saleRequest);
+//        sale.setCompany(quotation.getCompany());
+//        sale.setParty(party);
+//        sale.setInvoceDate(saleRequest.getInvoceDate());
+//        sale.setDueDate(saleRequest.getDueDate());
+//        sale.setCreatedAt(LocalDateTime.now());
+//        sale.setUpdatedAt(LocalDateTime.now());
+//
+//        // 4️⃣ Handle null-safe numeric fields
+//        double receivedAmount = sale.getReceivedAmount() != null ? sale.getReceivedAmount() : 0.0;
+//        double totalAmount = sale.getTotalAmount() != null ? sale.getTotalAmount() : 0.0;
+//
+//        // calculate balance
+//        Double balance = totalAmount - receivedAmount;
+//        sale.setBalance(balance);
+//
+//        // set isPaid
+//        sale.setPaid(balance <= 0);
+//
+//        // set isOverdue
+//        if (sale.getDueDate() != null && sale.getDueDate().isBefore(LocalDate.now()) && balance > 0) {
+//            sale.setOverdue(true);
+//        } else {
+//            sale.setOverdue(false);
+//        }
+//
+//        List<SaleItem> saleItems = saleRequest.getSaleItems()
+//                .stream()
+//                .map(saleItemRequest -> {
+//                    Item item = itemRepository.findById(saleItemRequest.getItemId())
+//                            .orElseThrow(()-> new ResourceNotFoundException("Item not found with id : "+saleItemRequest.getItemId()));
+//
+//                    SaleItem saleItem = saleItemMapper.convertSaleItemRequestIntoSaleItem(saleItemRequest);
+//                    saleItem.setItem(item);
+//                    saleItem.setSale(sale);
+//                    saleItem.setCreatedAt(LocalDateTime.now());
+//                    saleItem.setUpdateAt(LocalDateTime.now());
+//
+//                    return saleItem;
+//                }).toList();
+//
+//        sale.setSaleItem(saleItems);
+//
+//        SalePayment salePayment = new SalePayment();
+//        salePayment.setPaymentDescription("Received During Sale");
+//        salePayment.setPaymentType(saleRequest.getPaymentType());
+//        salePayment.setPaymentDate(saleRequest.getInvoceDate());
+//        salePayment.setSale(sale);
+//        salePayment.setCreatedAt(LocalDateTime.now());
+//        salePayment.setUpdateAt(LocalDateTime.now());
+//        salePayment.setAmountPaid(sale.getReceivedAmount());
+//
+//        sale.setSalePayments(List.of(salePayment));
+//
+//
+//        Sale saveSale = saleRepository.save(sale);
+//
+//        // delete party activity of quotation
+//        partyActivityService.deletePartyActivity(PartyTransactionType.QUOTATION,quotation.getQuotationId());
+//
+//
+//        // add party ledger entry in the database
+//        partyLedgerService.addLedgerEntry(
+//                sale.getParty(),
+//                sale.getCompany(),
+//                sale.getInvoceDate(),
+//                PartyTransactionType.SALE,
+//                sale.getSaleId(),
+//                sale.getInvoiceNumber(),
+//                sale.getTotalAmount(),
+//                0.0,
+//                sale.getBalance(),
+//                sale.getPaymentDescription()
+//        );
+//
+//        PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(sale.getParty());
+//        List<SaleItemResponse> saleItemResponses = saleItemMapper.convertSaleItemListIntoSaleItmResponseList(sale.getSaleItem());
+//
+//        List<SalePayment> salePayments = saveSale.getSalePayments();
+//
+//        List<SalePaymentResponse> salePaymentResponses = salePayments.stream()
+//                .map(salePayment1 -> {
+//                    SalePaymentResponse salePaymentResponse = new SalePaymentResponse();
+//                    salePaymentResponse.setPaymentId(salePayment1.getPaymentId());
+//                    salePaymentResponse.setPaymentDate(salePayment1.getPaymentDate());
+//                    salePaymentResponse.setPaymentType(salePayment1.getPaymentType());
+//                    salePaymentResponse.setPaymentDescription(salePayment1.getPaymentDescription());
+//                    salePaymentResponse.setAmountPaid(salePayment1.getAmountPaid());
+//                    salePaymentResponse.setReceiptNo(salePayment1.getReceiptNo());
+//                    salePaymentResponse.setReferenceNumber(salePayment1.getReferenceNumber());
+//
+//                    return salePaymentResponse;
+//                }).toList();
+//
+//        SaleResponse saleResponse = saleMapper.convertSaleIntoSaleResponse(saveSale);
+//        saleResponse.setPartyResponseDto(partyResponseDto);
+//        saleResponse.setSaleItemResponses(saleItemResponses);
+//        saleResponse.setInvoceDate(saveSale.getInvoceDate());
+//        saleResponse.setDueDate(saveSale.getDueDate());
+//        saleResponse.setSalePaymentResponses(salePaymentResponses);
+//
+//        return saleResponse;
     }
 
 

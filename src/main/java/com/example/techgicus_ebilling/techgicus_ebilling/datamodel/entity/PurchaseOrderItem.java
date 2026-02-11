@@ -42,6 +42,8 @@ public class PurchaseOrderItem {
     @JoinColumn(name = "item_id")
     private Item item;
 
+    private String itemDescription;
+
     public Long getPurchaseOrderItemId() {
         return purchaseOrderItemId;
     }
@@ -136,5 +138,13 @@ public class PurchaseOrderItem {
 
     public void setItem(Item item) {
         this.item = item;
+    }
+
+    public String getItemDescription() {
+        return itemDescription;
+    }
+
+    public void setItemDescription(String itemDescription) {
+        this.itemDescription = itemDescription;
     }
 }

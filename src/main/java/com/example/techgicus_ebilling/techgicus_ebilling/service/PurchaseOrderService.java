@@ -17,6 +17,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleDto.SaleRespons
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleOrderDto.SaleOrderItemResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleOrderDto.SaleOrderRequest;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleOrderDto.SaleOrderResponse;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.ItemTaxSummaryResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.PurchaseOrderAlreadyClosedException;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.ResourceNotFoundException;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.SaleOrderAlreadyClosedException;
@@ -48,23 +49,27 @@ public class PurchaseOrderService {
        private PartyLedgerService partyLedgerService;
        private PartyActivityService partyActivityService;
        private ItemRepository itemRepository;
+       private PurchaseService purchaseService;
+    private final TaxCalculationService taxCalculationService;
 
-    @Autowired
-    public PurchaseOrderService(PurchaseOrderRepository purchaseOrderRepository, CompanyRepository companyRepository, PartyRepository partyRepository, PartyMapper partyMapper, PurchaseOrderItemMapper purchaseOrderItemMapper, PurchaseOrderMapper purchaseOrderMapper, PurchaseMapper purchaseMapper, PurchaseRepository purchaseRepository, PurchasePaymentRepository purchasePaymentRepository, PurchasePaymentMapper purchasePaymentMapper, PurchaseItemMapper purchaseItemMapper, PartyLedgerService partyLedgerService, PartyActivityService partyActivityService, ItemRepository itemRepository) {
-        this.purchaseOrderRepository = purchaseOrderRepository;
-        this.companyRepository = companyRepository;
-        this.partyRepository = partyRepository;
-        this.partyMapper = partyMapper;
-        this.purchaseOrderItemMapper = purchaseOrderItemMapper;
-        this.purchaseOrderMapper = purchaseOrderMapper;
-        this.purchaseMapper = purchaseMapper;
-        this.purchaseRepository = purchaseRepository;
-        this.purchasePaymentRepository = purchasePaymentRepository;
-        this.purchasePaymentMapper = purchasePaymentMapper;
-        this.purchaseItemMapper = purchaseItemMapper;
-        this.partyLedgerService = partyLedgerService;
-        this.partyActivityService = partyActivityService;
+
+    public PurchaseOrderService(TaxCalculationService taxCalculationService, PurchaseService purchaseService, ItemRepository itemRepository, PartyActivityService partyActivityService, PartyLedgerService partyLedgerService, PurchaseItemMapper purchaseItemMapper, PurchasePaymentMapper purchasePaymentMapper, PurchasePaymentRepository purchasePaymentRepository, PurchaseRepository purchaseRepository, PurchaseMapper purchaseMapper, PurchaseOrderMapper purchaseOrderMapper, PurchaseOrderItemMapper purchaseOrderItemMapper, PartyMapper partyMapper, PartyRepository partyRepository, CompanyRepository companyRepository, PurchaseOrderRepository purchaseOrderRepository) {
+        this.taxCalculationService = taxCalculationService;
+        this.purchaseService = purchaseService;
         this.itemRepository = itemRepository;
+        this.partyActivityService = partyActivityService;
+        this.partyLedgerService = partyLedgerService;
+        this.purchaseItemMapper = purchaseItemMapper;
+        this.purchasePaymentMapper = purchasePaymentMapper;
+        this.purchasePaymentRepository = purchasePaymentRepository;
+        this.purchaseRepository = purchaseRepository;
+        this.purchaseMapper = purchaseMapper;
+        this.purchaseOrderMapper = purchaseOrderMapper;
+        this.purchaseOrderItemMapper = purchaseOrderItemMapper;
+        this.partyMapper = partyMapper;
+        this.partyRepository = partyRepository;
+        this.companyRepository = companyRepository;
+        this.purchaseOrderRepository = purchaseOrderRepository;
     }
 
     @Transactional
@@ -132,9 +137,12 @@ public class PurchaseOrderService {
                     PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(purchaseOrder.getParty());
                     List<PurchaseOrderItemResponse> purchaseOrderItemResponseList = setPurchaseOrderItemResponseList(purchaseOrder.getPurchaseOrderItems());
                    // List<PurchaseOrderItemResponse> purchaseOrderItemResponseList = purchaseOrderItemMapper.convertEntityListToResponseList(purchaseOrder.getPurchaseOrderItems());
+                    List<ItemTaxSummaryResponse> taxSummaryResponses =
+                            taxCalculationService.calculateTaxSummary(purchaseOrderItemResponseList);
                     PurchaseOrderResponse purchaseOrderResponse = purchaseOrderMapper.convertEntityToResponse(purchaseOrder);
                     purchaseOrderResponse.setPartyResponseDto(partyResponseDto);
                     purchaseOrderResponse.setPurchaseOrderItemResponseList(purchaseOrderItemResponseList);
+                    purchaseOrderResponse.setTaxSummary(taxSummaryResponses);
                     return purchaseOrderResponse;
                 }).toList();
 
@@ -148,11 +156,14 @@ public class PurchaseOrderService {
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(purchaseOrder.getParty());
         List<PurchaseOrderItemResponse> purchaseOrderItemResponseList = setPurchaseOrderItemResponseList(purchaseOrder.getPurchaseOrderItems());
 
+        List<ItemTaxSummaryResponse> taxSummaryResponses =
+                taxCalculationService.calculateTaxSummary(purchaseOrderItemResponseList);
+
         //  List<PurchaseOrderItemResponse> purchaseOrderItemResponseList = purchaseOrderItemMapper.convertEntityListToResponseList(purchaseOrder.getPurchaseOrderItems());
         PurchaseOrderResponse purchaseOrderResponse = purchaseOrderMapper.convertEntityToResponse(purchaseOrder);
         purchaseOrderResponse.setPartyResponseDto(partyResponseDto);
         purchaseOrderResponse.setPurchaseOrderItemResponseList(purchaseOrderItemResponseList);
-
+        purchaseOrderResponse.setTaxSummary(taxSummaryResponses);
         return purchaseOrderResponse;
     }
 
@@ -241,89 +252,94 @@ public class PurchaseOrderService {
         purchaseOrder.setOrderType(OrderType.CLOSE);
         purchaseOrderRepository.save(purchaseOrder);
 
+        partyActivityService.deletePartyActivity(PartyTransactionType.PURCHASE_ORDER,purchaseOrder.getPurchaseOrderId());
 
-        Party party = partyRepository.findById(purchaseRequest.getPartyId())
-                .orElseThrow(()-> new ResourceNotFoundException("Party not found with id : "+purchaseRequest.getPartyId()));
+        PurchaseResponse purchaseResponse = purchaseService.createdPurchase(purchaseOrder.getCompany().getCompanyId(),purchaseRequest);
 
-        Purchase purchase = purchaseMapper.convertPurchaseRequestIntoPurchase(purchaseRequest);
-        purchase.setCompany(purchaseOrder.getCompany());
-        purchase.setParty(party);
-        purchase.setCreatedAt(LocalDateTime.now());
-        purchase.setUpdateAt(LocalDateTime.now());
-        purchase.setIsPaid(purchaseRequest.getIsPaid());
-        purchase.setOverdue(purchaseRequest.getIsOverdue());
+        return purchaseResponse;
 
-        List<PurchaseItem> purchaseItems = new ArrayList<>();
-
-        for (PurchaseItemRequest purchaseItemRequest : purchaseRequest.getPurchaseItemRequests()){
-         PurchaseItem purchaseItem = purchaseItemMapper.convertPurchaseItemRequestIntoPurchaseItem(purchaseItemRequest);
-            Item item = itemRepository.findById(purchaseItemRequest.getItemId())
-                    .orElseThrow(()-> new ResourceNotFoundException("Item not found with id : "+purchaseItemRequest.getItemId()));
-
-            purchaseItem.setPurchase(purchase);
-            purchaseItem.setItem(item);
-            purchaseItem.setCreatedAt(LocalDateTime.now());
-            purchaseItem.setUpdateAt(LocalDateTime.now());
-            purchaseItems.add(purchaseItem);
-        }
-
-//        List<PurchaseItem> purchaseItems = purchaseItemMapper.convertPurchaseItemRequestListIntoPurchaseItemList(purchaseRequest.getPurchaseItemRequests());
-//        for(PurchaseItem purchaseItem : purchaseItems){
-//            Item item = itemRepository.findById(purchaseItem.getItemId())
-//                    .orElseThrow(()-> new ResourceNotFoundException("Item not found with id : "+purchaseItems.getItemId()));
+//        Party party = partyRepository.findById(purchaseRequest.getPartyId())
+//                .orElseThrow(()-> new ResourceNotFoundException("Party not found with id : "+purchaseRequest.getPartyId()));
+//
+//        Purchase purchase = purchaseMapper.convertPurchaseRequestIntoPurchase(purchaseRequest);
+//        purchase.setCompany(purchaseOrder.getCompany());
+//        purchase.setParty(party);
+//        purchase.setCreatedAt(LocalDateTime.now());
+//        purchase.setUpdateAt(LocalDateTime.now());
+//        purchase.setIsPaid(purchaseRequest.getIsPaid());
+//        purchase.setOverdue(purchaseRequest.getIsOverdue());
+//
+//        List<PurchaseItem> purchaseItems = new ArrayList<>();
+//
+//        for (PurchaseItemRequest purchaseItemRequest : purchaseRequest.getPurchaseItemRequests()){
+//         PurchaseItem purchaseItem = purchaseItemMapper.convertPurchaseItemRequestIntoPurchaseItem(purchaseItemRequest);
+//            Item item = itemRepository.findById(purchaseItemRequest.getItemId())
+//                    .orElseThrow(()-> new ResourceNotFoundException("Item not found with id : "+purchaseItemRequest.getItemId()));
 //
 //            purchaseItem.setPurchase(purchase);
 //            purchaseItem.setItem(item);
 //            purchaseItem.setCreatedAt(LocalDateTime.now());
 //            purchaseItem.setUpdateAt(LocalDateTime.now());
+//            purchaseItems.add(purchaseItem);
 //        }
-
-        purchase.setPurchaseItems(purchaseItems);
-
-
-        PurchasePayment purchasePayment = new PurchasePayment();
-        purchasePayment.setPaymentDate(purchaseRequest.getBillDate());
-        purchasePayment.setPaymentDescription("Paid During Purchase");
-        purchasePayment.setAmountPaid(purchaseRequest.getSendAmount());
-        purchasePayment.setPaymentType(purchaseRequest.getPaymentType());
-        purchasePayment.setPurchase(purchase);
-        purchasePayment.setCreatedAt(LocalDateTime.now());
-        purchasePayment.setUpdateAt(LocalDateTime.now());
-
-        purchasePaymentRepository.save(purchasePayment);
-
-        Purchase savePurchase =  purchaseRepository.save(purchase);
-
-        partyActivityService.deletePartyActivity(PartyTransactionType.PURCHASE_ORDER,purchaseOrder.getPurchaseOrderId());
-
-        // add party ledger entry in the database
-        partyLedgerService.addLedgerEntry(
-                purchase.getParty(),
-                purchase.getCompany(),
-                purchase.getBillDate(),
-                PartyTransactionType.PURCHASE,
-                purchase.getPurchaseId(),
-                purchase.getBillNumber(),
-                0.0,
-                purchase.getTotalAmount(),
-                purchase.getBalance(),
-                purchase.getPaymentDescription()
-        );
-
-        PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(party);
-        List<PurchaseItemResponse> purchaseItemResponses = purchaseItemMapper.convertPurchaseItemsIntoResponseList(savePurchase.getPurchaseItems());
-
-        PurchasePaymentResponse purchasePaymentResponse = purchasePaymentMapper.convertPurchasePaymentIntoPurchasePaymentResponse(purchasePayment);
-
-        PurchaseResponse purchaseResponse = purchaseMapper.convertPurchaseIntoPurchaseResponse(savePurchase);
-        purchaseResponse.setPartyResponseDto(partyResponseDto);
-        purchaseResponse.setPurchaseItemResponses(purchaseItemResponses);
-        purchaseResponse.setIsPaid(savePurchase.getIsPaid());
-        purchaseResponse.setOverdue(savePurchase.getIsOverdue());
-        purchaseResponse.setPurchasePaymentResponses(List.of(purchasePaymentResponse));
-        purchaseResponse.setPurchaseId(savePurchase.getPurchaseId());
-
-        return purchaseResponse;
+//
+////        List<PurchaseItem> purchaseItems = purchaseItemMapper.convertPurchaseItemRequestListIntoPurchaseItemList(purchaseRequest.getPurchaseItemRequests());
+////        for(PurchaseItem purchaseItem : purchaseItems){
+////            Item item = itemRepository.findById(purchaseItem.getItemId())
+////                    .orElseThrow(()-> new ResourceNotFoundException("Item not found with id : "+purchaseItems.getItemId()));
+////
+////            purchaseItem.setPurchase(purchase);
+////            purchaseItem.setItem(item);
+////            purchaseItem.setCreatedAt(LocalDateTime.now());
+////            purchaseItem.setUpdateAt(LocalDateTime.now());
+////        }
+//
+//        purchase.setPurchaseItems(purchaseItems);
+//
+//
+//        PurchasePayment purchasePayment = new PurchasePayment();
+//        purchasePayment.setPaymentDate(purchaseRequest.getBillDate());
+//        purchasePayment.setPaymentDescription("Paid During Purchase");
+//        purchasePayment.setAmountPaid(purchaseRequest.getSendAmount());
+//        purchasePayment.setPaymentType(purchaseRequest.getPaymentType());
+//        purchasePayment.setPurchase(purchase);
+//        purchasePayment.setCreatedAt(LocalDateTime.now());
+//        purchasePayment.setUpdateAt(LocalDateTime.now());
+//
+//        purchasePaymentRepository.save(purchasePayment);
+//
+//        Purchase savePurchase =  purchaseRepository.save(purchase);
+//
+//        partyActivityService.deletePartyActivity(PartyTransactionType.PURCHASE_ORDER,purchaseOrder.getPurchaseOrderId());
+//
+//        // add party ledger entry in the database
+//        partyLedgerService.addLedgerEntry(
+//                purchase.getParty(),
+//                purchase.getCompany(),
+//                purchase.getBillDate(),
+//                PartyTransactionType.PURCHASE,
+//                purchase.getPurchaseId(),
+//                purchase.getBillNumber(),
+//                0.0,
+//                purchase.getTotalAmount(),
+//                purchase.getBalance(),
+//                purchase.getPaymentDescription()
+//        );
+//
+//        PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(party);
+//        List<PurchaseItemResponse> purchaseItemResponses = purchaseItemMapper.convertPurchaseItemsIntoResponseList(savePurchase.getPurchaseItems());
+//
+//        PurchasePaymentResponse purchasePaymentResponse = purchasePaymentMapper.convertPurchasePaymentIntoPurchasePaymentResponse(purchasePayment);
+//
+//        PurchaseResponse purchaseResponse = purchaseMapper.convertPurchaseIntoPurchaseResponse(savePurchase);
+//        purchaseResponse.setPartyResponseDto(partyResponseDto);
+//        purchaseResponse.setPurchaseItemResponses(purchaseItemResponses);
+//        purchaseResponse.setIsPaid(savePurchase.getIsPaid());
+//        purchaseResponse.setOverdue(savePurchase.getIsOverdue());
+//        purchaseResponse.setPurchasePaymentResponses(List.of(purchasePaymentResponse));
+//        purchaseResponse.setPurchaseId(savePurchase.getPurchaseId());
+//
+//        return purchaseResponse;
 
     }
 

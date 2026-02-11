@@ -4,6 +4,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.O
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PaymentType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.State;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.ItemTaxSummaryResponse;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -42,6 +43,8 @@ public class PurchaseOrderResponse {
     private PartyResponseDto partyResponseDto;
 
     private List<PurchaseOrderItemResponse> purchaseOrderItemResponseList = new ArrayList<>();
+
+    private List<ItemTaxSummaryResponse> taxSummary;
 
     public Long getPurchaseOrderId() {
         return purchaseOrderId;
@@ -170,4 +173,13 @@ public class PurchaseOrderResponse {
     public void setPartyResponseDto(PartyResponseDto partyResponseDto) {
         this.partyResponseDto = partyResponseDto;
     }
+
+    public List<ItemTaxSummaryResponse> getTaxSummary() {
+        return taxSummary;
+    }
+
+    public void setTaxSummary(List<ItemTaxSummaryResponse> taxSummary) {
+        this.taxSummary = taxSummary;
+    }
 }
+

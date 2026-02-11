@@ -3,6 +3,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.dto.itemDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 public class UpdateItemRequest {
@@ -22,7 +23,7 @@ public class UpdateItemRequest {
 
     private Double baseUnitToSecondaryUnit;
 
-    private Set<Long> categoryIds;
+    private List<Long> categoryIds;
 
     private Double salePrice;
 
@@ -36,7 +37,7 @@ public class UpdateItemRequest {
 
     private Double stockOpeningQty;
 
-    private Double stockPrice;
+    private Double stockPricePerQty;
 
     private LocalDate stockOpeningDate;
 
@@ -51,29 +52,6 @@ public class UpdateItemRequest {
     public UpdateItemRequest() {
     }
 
-    public UpdateItemRequest(String itemName, String itemHsn, String itemCode, String description, ItemType itemType, Unit baseUnit, Unit secondaryUnit, Double baseUnitToSecondaryUnit, Set<Long> categoryIds, Double salePrice, TaxType saleTaxType, Double purchasePrice, TaxType purchaseTaxType, TaxRate taxRate, Double stockOpeningQty, Double stockPrice, LocalDate stockOpeningDate, Double minimumStockToMaintain, String openingStockLocation, Double saleDiscountPrice, DiscountType saleDiscountType) {
-        this.itemName = itemName;
-        this.itemHsn = itemHsn;
-        this.itemCode = itemCode;
-        this.description = description;
-        this.itemType = itemType;
-        this.baseUnit = baseUnit;
-        this.secondaryUnit = secondaryUnit;
-        this.baseUnitToSecondaryUnit = baseUnitToSecondaryUnit;
-        this.categoryIds = categoryIds;
-        this.salePrice = salePrice;
-        this.saleTaxType = saleTaxType;
-        this.purchasePrice = purchasePrice;
-        this.purchaseTaxType = purchaseTaxType;
-        this.taxRate = taxRate;
-        this.stockOpeningQty = stockOpeningQty;
-        this.stockPrice = stockPrice;
-        this.stockOpeningDate = stockOpeningDate;
-        this.minimumStockToMaintain = minimumStockToMaintain;
-        this.openingStockLocation = openingStockLocation;
-        this.saleDiscountPrice = saleDiscountPrice;
-        this.saleDiscountType = saleDiscountType;
-    }
 
     public String getItemName() {
         return itemName;
@@ -139,11 +117,11 @@ public class UpdateItemRequest {
         this.baseUnitToSecondaryUnit = baseUnitToSecondaryUnit;
     }
 
-    public Set<Long> getCategoryIds() {
+    public List<Long> getCategoryIds() {
         return categoryIds;
     }
 
-    public void setCategoryIds(Set<Long> categoryIds) {
+    public void setCategoryIds(List<Long> categoryIds) {
         this.categoryIds = categoryIds;
     }
 
@@ -195,12 +173,12 @@ public class UpdateItemRequest {
         this.stockOpeningQty = stockOpeningQty;
     }
 
-    public Double getStockPrice() {
-        return stockPrice;
+    public Double getStockPricePerQty() {
+        return stockPricePerQty;
     }
 
-    public void setStockPrice(Double stockPrice) {
-        this.stockPrice = stockPrice;
+    public void setStockPricePerQty(Double stockPricePerQty) {
+        this.stockPricePerQty = stockPricePerQty;
     }
 
     public LocalDate getStockOpeningDate() {

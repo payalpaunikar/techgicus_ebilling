@@ -8,6 +8,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleReturnDto.SaleR
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleReturnDto.SaleReturnItemResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleReturnDto.SaleReturnRequest;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleReturnDto.SaleReturnResponse;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.ItemTaxSummaryResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.ResourceNotFoundException;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.PartyMapper;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.SaleReturnItemMapper;
@@ -33,19 +34,21 @@ public class SaleReturnService {
           private PartyLedgerService partyLedgerService;
           private PartyActivityService partyActivityService;
           private ItemRepository itemRepository;
+    private final TaxCalculationService taxCalculationService;
 
-    @Autowired
-    public SaleReturnService(SaleReturnRepository saleReturnRepository, CompanyRepository companyRepository, PartyRepository partyRepository, SaleReturnItemRepository saleReturnItemRepository, SaleReturnMapper saleReturnMapper, SaleReturnItemMapper saleReturnItemMapper, PartyMapper partyMapper, PartyLedgerService partyLedgerService, PartyActivityService partyActivityService, ItemRepository itemRepository) {
-        this.saleReturnRepository = saleReturnRepository;
-        this.companyRepository = companyRepository;
-        this.partyRepository = partyRepository;
-        this.saleReturnItemRepository = saleReturnItemRepository;
-        this.saleReturnMapper = saleReturnMapper;
-        this.saleReturnItemMapper = saleReturnItemMapper;
-        this.partyMapper = partyMapper;
-        this.partyLedgerService = partyLedgerService;
-        this.partyActivityService = partyActivityService;
+
+    public SaleReturnService(TaxCalculationService taxCalculationService, ItemRepository itemRepository, PartyActivityService partyActivityService, PartyLedgerService partyLedgerService, PartyMapper partyMapper, SaleReturnItemMapper saleReturnItemMapper, SaleReturnMapper saleReturnMapper, SaleReturnItemRepository saleReturnItemRepository, PartyRepository partyRepository, CompanyRepository companyRepository, SaleReturnRepository saleReturnRepository) {
+        this.taxCalculationService = taxCalculationService;
         this.itemRepository = itemRepository;
+        this.partyActivityService = partyActivityService;
+        this.partyLedgerService = partyLedgerService;
+        this.partyMapper = partyMapper;
+        this.saleReturnItemMapper = saleReturnItemMapper;
+        this.saleReturnMapper = saleReturnMapper;
+        this.saleReturnItemRepository = saleReturnItemRepository;
+        this.partyRepository = partyRepository;
+        this.companyRepository = companyRepository;
+        this.saleReturnRepository = saleReturnRepository;
     }
 
     @Transactional
@@ -105,11 +108,16 @@ public class SaleReturnService {
                 saleReturn.getDescription());
 
         List<SaleReturnItemResponse> saleReturnItemResponses = setSaleReturnItemResponseListFields(saleReturn.getSaleReturnItems());
+
        // List<SaleReturnItemResponse> saleReturnItemResponses = saleReturnItemMapper.convertEntityListToResponseList(saleReturn.getSaleReturnItems());
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(saleReturn.getParty());
+
+        List<ItemTaxSummaryResponse> taxSummaryResponses =
+                taxCalculationService.calculateTaxSummary(saleReturnItemResponses);
         SaleReturnResponse saleReturnResponse = saleReturnMapper.convertEntityToResponse(saleReturn);
        saleReturnResponse.setPartyResponseDto(partyResponseDto);
        saleReturnResponse.setSaleReturnItemResponses(saleReturnItemResponses);
+       saleReturnResponse.setTaxSummary(taxSummaryResponses);
 
        return saleReturnResponse;
     }
@@ -125,11 +133,13 @@ public class SaleReturnService {
                 .map(saleReturn -> {
                     PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(saleReturn.getParty());
                     List<SaleReturnItemResponse> saleReturnItemResponses = setSaleReturnItemResponseListFields(saleReturn.getSaleReturnItems());
-
                     //List<SaleReturnItemResponse> saleReturnItemResponses = saleReturnItemMapper.convertEntityListToResponseList(saleReturn.getSaleReturnItems());
+                    List<ItemTaxSummaryResponse> taxSummaryResponses =
+                            taxCalculationService.calculateTaxSummary(saleReturnItemResponses);
                     SaleReturnResponse saleReturnResponse = saleReturnMapper.convertEntityToResponse(saleReturn);
                     saleReturnResponse.setPartyResponseDto(partyResponseDto);
                     saleReturnResponse.setSaleReturnItemResponses(saleReturnItemResponses);
+                    saleReturnResponse.setTaxSummary(taxSummaryResponses);
                     return saleReturnResponse;
                 }).toList();
 
@@ -143,10 +153,13 @@ public class SaleReturnService {
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(saleReturn.getParty());
         List<SaleReturnItemResponse> saleReturnItemResponses = setSaleReturnItemResponseListFields(saleReturn.getSaleReturnItems());
 
+        List<ItemTaxSummaryResponse> taxSummaryResponses =
+                taxCalculationService.calculateTaxSummary(saleReturnItemResponses);
         // List<SaleReturnItemResponse> saleReturnItemResponses = saleReturnItemMapper.convertEntityListToResponseList(saleReturn.getSaleReturnItems());
         SaleReturnResponse saleReturnResponse = saleReturnMapper.convertEntityToResponse(saleReturn);
         saleReturnResponse.setPartyResponseDto(partyResponseDto);
         saleReturnResponse.setSaleReturnItemResponses(saleReturnItemResponses);
+        saleReturnResponse.setTaxSummary(taxSummaryResponses);
 
         return saleReturnResponse;
     }
@@ -209,10 +222,13 @@ public class SaleReturnService {
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(saleReturn.getParty());
         List<SaleReturnItemResponse> saleReturnItemResponses = setSaleReturnItemResponseListFields(saleReturn.getSaleReturnItems());
 
+        List<ItemTaxSummaryResponse> taxSummaryResponses =
+                taxCalculationService.calculateTaxSummary(saleReturnItemResponses);
         //  List<SaleReturnItemResponse> saleReturnItemResponses = saleReturnItemMapper.convertEntityListToResponseList(saleReturn.getSaleReturnItems());
         SaleReturnResponse saleReturnResponse = saleReturnMapper.convertEntityToResponse(saleReturn);
         saleReturnResponse.setPartyResponseDto(partyResponseDto);
         saleReturnResponse.setSaleReturnItemResponses(saleReturnItemResponses);
+        saleReturnResponse.setTaxSummary(taxSummaryResponses);
 
         return saleReturnResponse;
     }

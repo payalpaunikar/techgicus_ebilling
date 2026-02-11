@@ -14,7 +14,7 @@ public class PurchaseItemRequest {
 
     private String itemDescription;
 
-    private Integer quantity;
+    private Double quantity;
   //  private Unit unit;
 
     private Double pricePerUnit;
@@ -53,11 +53,11 @@ public class PurchaseItemRequest {
         this.itemDescription = itemDescription;
     }
 
-    public Integer getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
     }
 

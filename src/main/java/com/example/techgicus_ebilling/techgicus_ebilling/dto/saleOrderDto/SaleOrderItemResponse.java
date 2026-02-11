@@ -3,14 +3,17 @@ package com.example.techgicus_ebilling.techgicus_ebilling.dto.saleOrderDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.TaxRate;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.TaxType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.Unit;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.TaxableItem;
 
-public class SaleOrderItemResponse {
+public class SaleOrderItemResponse implements TaxableItem {
 
     private Long saleOrderItemId;
 
     private Long itemId;
 
     private String name;
+
+    private String itemHsnCode;
 
     private Double quantity;
     private Unit unit;
@@ -26,6 +29,8 @@ public class SaleOrderItemResponse {
     private Double totalTaxAmount;
 
     private Double totalAmount;
+
+    private String itemDescription;
 
     public Long getSaleOrderItemId() {
         return saleOrderItemId;
@@ -103,6 +108,11 @@ public class SaleOrderItemResponse {
         return totalAmount;
     }
 
+    @Override
+    public Double getTaxAmount() {
+        return getTotalTaxAmount();
+    }
+
     public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
     }
@@ -113,5 +123,21 @@ public class SaleOrderItemResponse {
 
     public void setItemId(Long itemId) {
         this.itemId = itemId;
+    }
+
+    public String getItemDescription() {
+        return itemDescription;
+    }
+
+    public void setItemDescription(String itemDescription) {
+        this.itemDescription = itemDescription;
+    }
+
+    public String getItemHsnCode() {
+        return itemHsnCode;
+    }
+
+    public void setItemHsnCode(String itemHsnCode) {
+        this.itemHsnCode = itemHsnCode;
     }
 }

@@ -3,6 +3,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.dto.quotationDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.QuotationType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.State;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.ItemTaxSummaryResponse;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -30,6 +31,8 @@ public class QuotationResponse {
     private QuotationType quotationType;
 
     private PartyResponseDto partyResponseDto;
+    private List<ItemTaxSummaryResponse> taxSummary;
+
 
     private List<QuotationItemResponse> quotationItemResponses = new ArrayList<>();
 
@@ -129,6 +132,14 @@ public class QuotationResponse {
 
     public void setQuotationItemResponses(List<QuotationItemResponse> quotationItemResponses) {
         this.quotationItemResponses = quotationItemResponses;
+    }
+
+    public List<ItemTaxSummaryResponse> getTaxSummary() {
+        return taxSummary;
+    }
+
+    public void setTaxSummary(List<ItemTaxSummaryResponse> taxSummary) {
+        this.taxSummary = taxSummary;
     }
 
     public Long getQuotationId() {

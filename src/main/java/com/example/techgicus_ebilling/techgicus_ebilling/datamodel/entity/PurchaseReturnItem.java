@@ -43,6 +43,8 @@ public class PurchaseReturnItem {
     @JoinColumn(name = "item_id")
     private Item item;
 
+    private String itemDescription;
+
     public Item getItem() {
         return item;
     }
@@ -139,5 +141,11 @@ public class PurchaseReturnItem {
         this.purchaseReturn = purchaseReturn;
     }
 
+    public String getItemDescription() {
+        return itemDescription;
+    }
 
+    public void setItemDescription(String itemDescription) {
+        this.itemDescription = itemDescription;
+    }
 }

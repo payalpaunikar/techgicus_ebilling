@@ -53,6 +53,11 @@ public class PurchaseTransactionProcessor implements TransactionProcessor{
                 company
         );
 
+        if (rowData.getBillNo() == null || rowData.getBillNo().isEmpty()){
+            context.addError(row.getSheet().getSheetName(),row.getRowNum()+1,"Invoice number is missing. Purchase require an existing Purchase Invoice.");
+            return;
+        }
+
         Optional<Purchase> purchaseOpt = purchaseRepository.findByBillNumberAndCompany(rowData.getBillNo(),company);
 
         Purchase existingPurchase = purchaseOpt.orElse(null);

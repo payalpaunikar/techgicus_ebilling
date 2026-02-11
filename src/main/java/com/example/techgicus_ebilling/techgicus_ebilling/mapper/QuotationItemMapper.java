@@ -5,6 +5,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Quotat
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.quotationDto.QuotationItemRequest;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.quotationDto.QuotationItemResponse;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -15,7 +16,10 @@ public interface QuotationItemMapper {
 
     List<QuotationItem> convertQuotationItemRequestListIntoQuotationItemList(List<QuotationItemRequest> quotationItemRequests);
 
-
+    @Mapping(
+            target = "itemHsnCode",
+            source = "item.itemHsn"   // 🔥 THIS LINE
+    )
     QuotationItemResponse convertQuotationItemIntoQuotationItemResponse(QuotationItem quotationItem);
 
     List<QuotationItemResponse> convertQuotationItemListIntoQuotationItemResponseList(List<QuotationItem> quotationItems);

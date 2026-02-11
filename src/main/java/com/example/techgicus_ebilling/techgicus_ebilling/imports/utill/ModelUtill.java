@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -105,7 +106,11 @@ public class ModelUtill {
                 category = categoryRepository.save(category);
             }
 
-            newItem.setCategories(Set.of(category));
+            // ✅ FIX: Use MUTABLE Set
+            Set<Category> categories = new HashSet<>();
+            categories.add(category);
+
+            newItem.setCategories(categories);
         }
 
         return itemRepository.save(newItem);
@@ -149,7 +154,11 @@ public class ModelUtill {
                 category = categoryRepository.save(category);
             }
 
-            newItem.setCategories(Set.of(category));
+            // ✅ FIX: Use MUTABLE Set
+            Set<Category> categories = new HashSet<>();
+            categories.add(category);
+
+            newItem.setCategories(categories);
         }
 
         return itemRepository.save(newItem);

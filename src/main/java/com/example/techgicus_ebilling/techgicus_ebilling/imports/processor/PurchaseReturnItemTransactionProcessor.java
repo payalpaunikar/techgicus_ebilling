@@ -50,7 +50,11 @@ public class PurchaseReturnItemTransactionProcessor implements TransactionProces
         Optional<PurchaseReturn> purchaseReturn = purchaseReturnRepository.findByReturnNoAndCompany(purchaseItemRow.getBillNo(),company);
 
         if (purchaseReturn.isEmpty()){
-            context.addError(row.getRowNum()+1,"Purchase Return not found for invoice : "+purchaseItemRow.getBillNo());
+            if (purchaseItemRow.getBillNo() == null || purchaseItemRow.getBillNo().isEmpty()){
+                context.addError(row.getSheet().getSheetName(),row.getRowNum()+1,"Invoice number is missing. Purchase items require an existing Purchase Invoice.");
+                return;
+            }
+            context.addError(row.getSheet().getSheetName(),row.getRowNum()+1,"Purchase Return not found for invoice : "+purchaseItemRow.getBillNo());
             return;
         }
 

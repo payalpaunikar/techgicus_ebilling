@@ -4,6 +4,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.imports.handler;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.context.ImportContext;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.context.ImportError;
+import com.example.techgicus_ebilling.techgicus_ebilling.imports.dto.ImportSummaryResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.enumeration.ImportReportType;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.sheet.TransactionSheetProcessor;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.validator.PurchaseItemDetailsExcelValidator;
@@ -14,6 +15,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class PurchaseReportImportHandler implements ImportHandler{
@@ -38,7 +41,7 @@ public class PurchaseReportImportHandler implements ImportHandler{
     }
 
     @Override
-    public String importReport(Workbook workbook, Company company) {
+    public ImportSummaryResponse importReport(Workbook workbook, Company company) {
 
         Sheet purchaseSheet = workbook.getSheetAt(0);
         Sheet purchaseItemSheet = workbook.getSheetAt(1);
@@ -66,40 +69,45 @@ public class PurchaseReportImportHandler implements ImportHandler{
 
         finalizePurchases(context);
 
-        return buildImportSummary(purchaseCount,itemCount,context);
+       // return buildImportSummary(purchaseCount,itemCount,context);
+
+        return buildImportSummary("PURCHASE",purchaseCount,itemCount,context);
     }
 
 
-    private String buildImportSummary(
-            int purchaseCount,
-            int itemCount,
-            ImportContext context
-    ) {
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("Import completed\n");
-        sb.append("• Purchase processed: ").append(purchaseCount).append("\n");
-        sb.append("• Purchase items processed: ").append(itemCount).append("\n");
-
-        if (context.hasErrors()) {
-            sb.append("\n⚠ Errors (")
-                    .append(context.getErrors().size())
-                    .append("):\n");
-
-            for (ImportError error : context.getErrors()) {
-                sb.append("Row ")
-                        .append(error.getRowNumber())
-                        .append(": ")
-                        .append(error.getMessage())
-                        .append("\n");
-            }
-        } else {
-            sb.append("\n✔ No errors found");
-        }
-
-        return sb.toString();
-    }
+//    private String buildImportSummary(
+//            int purchaseCount,
+//            int itemCount,
+//            ImportContext context
+//    ) {
+//
+//        StringBuilder sb = new StringBuilder();
+//
+//        sb.append("Import completed\n");
+//        sb.append("• Purchase processed: ").append(purchaseCount).append("\n");
+//        sb.append("• Purchase items processed: ").append(itemCount).append("\n");
+//
+//        if (context.hasErrors()) {
+//            sb.append("\n⚠ Errors (")
+//                    .append(context.getErrors().size())
+//                    .append("):\n");
+//
+//            for (ImportError error : context.getErrors()) {
+//                sb.append("Sheet Name ")
+//                        .append(error.getSheetName())
+//                        .append(": ")
+//                        .append("Row ")
+//                        .append(error.getRowNumber())
+//                        .append(": ")
+//                        .append(error.getMessage())
+//                        .append("\n");
+//            }
+//        } else {
+//            sb.append("\n✔ No errors found");
+//        }
+//
+//        return sb.toString();
+//    }
 
     @Transactional
     public void finalizePurchases(ImportContext context) {

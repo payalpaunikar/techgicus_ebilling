@@ -49,8 +49,8 @@ public class ItemResponse {
 
     private String openingStockLocation;
 
-    private Double totalStockIn;
-    private Double reservedStock;  // items allocated but not yet sold (like pending orders)
+  //  private Double totalStockIn;
+ //   private Double reservedStock;  // items allocated but not yet sold (like pending orders)
     private Double availableStock;
     private Double stockValue;
 
@@ -59,21 +59,21 @@ public class ItemResponse {
     public ItemResponse() {
     }
 
-    public Double getTotalStockIn() {
-        return totalStockIn;
-    }
-
-    public void setTotalStockIn(Double totalStockIn) {
-        this.totalStockIn = totalStockIn;
-    }
-
-    public Double getReservedStock() {
-        return reservedStock;
-    }
-
-    public void setReservedStock(Double reservedStock) {
-        this.reservedStock = reservedStock;
-    }
+//    public Double getTotalStockIn() {
+//        return totalStockIn;
+//    }
+//
+//    public void setTotalStockIn(Double totalStockIn) {
+//        this.totalStockIn = totalStockIn;
+//    }
+//
+//    public Double getReservedStock() {
+//        return reservedStock;
+//    }
+//
+//    public void setReservedStock(Double reservedStock) {
+//        this.reservedStock = reservedStock;
+//    }
 
     public Double getAvailableStock() {
         return availableStock;

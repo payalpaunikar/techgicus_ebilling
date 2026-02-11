@@ -10,6 +10,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.ItemTaxSumma
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.saleDto.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.BadRequestException;
+import com.example.techgicus_ebilling.techgicus_ebilling.exception.DataIntegrityViolationException;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.InvalidPaymentAmountException;
 import com.example.techgicus_ebilling.techgicus_ebilling.exception.ResourceNotFoundException;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.PartyMapper;
@@ -19,14 +20,17 @@ import com.example.techgicus_ebilling.techgicus_ebilling.mapper.SalePaymentMappe
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SaleService {
@@ -44,15 +48,14 @@ public class SaleService {
        private StockTransactionRepository stockTransactionRepository;
        private PartyLedgerService partyLedgerService;
        private PartyActivityService partyActivityService;
-       private StockTransactionService stockTransactionService;
        private final TaxCalculationService taxCalculationService;
+       private final PurchaseBatchRepository purchaseBatchRepository;
 
        private static final Logger log = LoggerFactory.getLogger(SaleService.class);
 
-     @Autowired
-    public SaleService(TaxCalculationService taxCalculationService, StockTransactionService stockTransactionService, PartyActivityService partyActivityService, PartyLedgerService partyLedgerService, StockTransactionRepository stockTransactionRepository, ItemRepository itemRepository, SalePaymentMapper salePaymentMapper, SalePaymentRepository salePaymentRepository, PartyMapper partyMapper, SaleItemMapper saleItemMapper, PartyRepository partyRepository, CompanyRepository companyRepository, SaleMapper saleMapper, SaleItemRepository saleItemRepository, SaleRepository saleRepository) {
+    public SaleService(TaxCalculationService taxCalculationService, PurchaseBatchRepository purchaseBatchRepository, PartyActivityService partyActivityService, PartyLedgerService partyLedgerService, StockTransactionRepository stockTransactionRepository, ItemRepository itemRepository, SalePaymentMapper salePaymentMapper, SalePaymentRepository salePaymentRepository, PartyMapper partyMapper, SaleItemMapper saleItemMapper, PartyRepository partyRepository, CompanyRepository companyRepository, SaleMapper saleMapper, SaleItemRepository saleItemRepository, SaleRepository saleRepository) {
         this.taxCalculationService = taxCalculationService;
-        this.stockTransactionService = stockTransactionService;
+        this.purchaseBatchRepository = purchaseBatchRepository;
         this.partyActivityService = partyActivityService;
         this.partyLedgerService = partyLedgerService;
         this.stockTransactionRepository = stockTransactionRepository;
@@ -121,28 +124,85 @@ public class SaleService {
            // add sale item in the lsit
             saleItemList.add(saleItem);
 
-            if(item.getItemType().equals(ItemType.PRODUCT)) {
-                 item = updateStockAfterSale(item,saleItem);
-                 // save item
-                itemRepository.save(item);
-            }
+//            if(item.getItemType().equals(ItemType.PRODUCT)) {
+//                 item = updateStockAfterSale(item,saleItem);
+//                 // save item
+//                itemRepository.save(item);
+//            }
 
 
-            // set stock transaction values
-            StockTransaction stockTransaction = new StockTransaction();
-            stockTransaction =  stockTransactionService.addStockTransaction(item,StockTransactionType.SALE,saleItem.getTotalAmount(),sale.getInvoceDate(),sale.getSaleId().toString());
-
-            // if the item is product then stock transaction quantity add it.
             if (item.getItemType().equals(ItemType.PRODUCT)) {
-                stockTransaction.setQuantity(saleItem.getQuantity());
+
+                double qtyToSell = saleItem.getQuantity();
+
+                List<PurchaseBatch> batches =
+                        purchaseBatchRepository.findAvailableBatchesFIFO(item);
+
+                for (PurchaseBatch batch : batches) {
+
+                    if (qtyToSell <= 0) break;
+
+                    double used = Math.min(batch.getQtyRemaining(), qtyToSell);
+
+                    batch.setQtyRemaining(batch.getQtyRemaining() - used);
+
+                    // 🔴 deactivate batch if empty
+                    if (batch.getQtyRemaining() == 0) {
+                        batch.setActive(false);
+                    }
+                    purchaseBatchRepository.save(batch);
+
+                    // STOCK TRANSACTION
+                    StockTransaction tx = new StockTransaction();
+                    tx.setItem(item);
+                    tx.setType(StockTransactionType.SALE);
+                    tx.setQuantity(-used);
+                    tx.setRate(batch.getPricePerQty());
+                    tx.setAmount(BigDecimal.valueOf(used).multiply(batch.getPricePerQty()));
+                    tx.setTransactionDate(sale.getInvoceDate());
+                    tx.setReference("SALE-" + sale.getSaleId());
+
+                    stockTransactionRepository.save(tx);
+
+                    qtyToSell -= used;
+                }
+
+                if (qtyToSell > 0) {
+//                    throw new RuntimeException("Insufficient stock for item: " + item.getItemName());
+
+                    // Oversold quantity → negative stock
+                    StockTransaction negativeTx = new StockTransaction();
+                    negativeTx.setItem(item);
+                    negativeTx.setType(StockTransactionType.SALE);
+                    negativeTx.setQuantity(-qtyToSell);
+                    negativeTx.setRate(BigDecimal.ZERO); // no cost
+                    negativeTx.setAmount(BigDecimal.ZERO);
+                    negativeTx.setTransactionDate(sale.getInvoceDate());
+                    //negativeTx.setReference("SALE-" + sale.getSaleId() + "-NEGATIVE");
+                    negativeTx.setReference("SALE-" + sale.getSaleId());
+
+
+                    stockTransactionRepository.save(negativeTx);
+                }
+
+                // 🔹 Update Item snapshot after sale
+                double availableStock =
+                        stockTransactionRepository.totalStock(item.getItemId());
+               // Double availableStock = purchaseBatchRepository.sumRemainingQty(item.getItemId());
+                Double stockValue = availableStock==0 || availableStock<0 ? 0.0 : purchaseBatchRepository.sumRemainingValue(item.getItemId());
+
+                item.setAvailableStock(availableStock);
+                item.setStockValue(Math.max(stockValue, 0));
+
+                itemRepository.save(item);
+
             }
-                // add stock transcation in list
-                stockTransactionList.add(stockTransaction);
 
         }
 
-        sale.setSaleItem(saleItemList);
-        stockTransactionRepository.saveAll(stockTransactionList);
+        sale.getSaleItem().addAll(saleItemList);
+      //  stockTransactionRepository.saveAll(stockTransactionList);
+
 
         // ---------------------- Payment Details ----------------------
         SalePayment salePayment = new SalePayment();
@@ -151,10 +211,13 @@ public class SaleService {
         //set Sale payment
         salePayment = setSalePaymentFields(paymentDescription,saleRequest.getPaymentType(),
                 sale.getInvoceDate(),sale,sale.getReceivedAmount(),LocalDateTime.now(),LocalDateTime.now(),null,null);
+
+
         // add payment
         payments.add(salePayment);
 
-        sale.setSalePayments(payments);
+        sale.getSalePayments().addAll(payments);
+
 
         // add party ledger entry in the database
         partyLedgerService.addLedgerEntry(
@@ -253,11 +316,13 @@ public class SaleService {
         List<SaleItemResponse> saleItemResponses = new ArrayList<>();
         saleItemResponses = convertSaleItemListIntoResponseList(sale);
 
-        List<SalePaymentResponse> salePaymentResponses = salePaymentMapper.convertSalePaymentListIntoSalePaymentResponseList(sale.getSalePayments());
+        List<SalePaymentResponse> salePaymentResponses =
+                salePaymentMapper.convertSalePaymentListIntoSalePaymentResponseList(sale.getSalePayments());
 
         double totalTaxRate = calculateTotalTaxRate(sale);
 
-        List<ItemTaxSummaryResponse> taxSummaryResponses = taxCalculationService.calculateTaxSummary(saleItemResponses);
+        List<ItemTaxSummaryResponse> taxSummaryResponses =
+                taxCalculationService.calculateTaxSummary(saleItemResponses);
 
         SaleResponse saleResponse = new SaleResponse();
         saleResponse = setSaleResponseField(sale,partyResponseDto,saleItemResponses,sale.getInvoceDate(),sale.getDueDate(),salePaymentResponses,
@@ -275,7 +340,7 @@ public class SaleService {
                 .orElseThrow(()-> new ResourceNotFoundException("Sale not found with id : "+saleId));
 
         Party party = partyRepository.findById(saleRequest.getPartyId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Party not found with id : "+saleRequest.getPartyId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Party not found with id : "+saleRequest.getPartyId()));
 
 
         if(saleRequest.getTotalAmount()<saleRequest.getReceivedAmount()){
@@ -297,6 +362,50 @@ public class SaleService {
 
         sale.getSaleItem().clear();
 
+        // ===============================
+        // 1️⃣ ROLLBACK OLD SALE STOCK
+        // ===============================
+        List<StockTransaction> oldTxs =
+                stockTransactionRepository.findByReference("SALE-" + sale.getSaleId());
+
+        for (StockTransaction tx : oldTxs) {
+
+            if (tx.getQuantity() >= 0) continue;
+
+            Item item = tx.getItem();
+            double qtyToRestore = -tx.getQuantity();
+
+            // ❌ negative stock tx → no batch restore
+            if (tx.getRate().compareTo(BigDecimal.ZERO) == 0) {
+                continue;
+            }
+
+            // restore FIFO batches in reverse (LIFO restore)
+            List<PurchaseBatch> batches =
+                    purchaseBatchRepository.findByItemOrderByPurchaseDateDesc(item);
+
+            for (PurchaseBatch batch : batches) {
+
+                if (qtyToRestore <= 0) break;
+
+                double consumed =
+                        batch.getQtyPurchased() - batch.getQtyRemaining();
+
+                if (consumed <= 0) continue;
+
+                double restore = Math.min(consumed, qtyToRestore);
+
+                batch.setQtyRemaining(batch.getQtyRemaining() + restore);
+                batch.setActive(true);
+                purchaseBatchRepository.save(batch);
+
+                qtyToRestore -= restore;
+            }
+        }
+
+        // delete old sale stock tx
+        stockTransactionRepository.deleteByReference("SALE-" + sale.getSaleId());
+
         List<SaleItem> saleItems = new ArrayList<>();
         List<StockTransaction> stockTransactionList = new ArrayList<>();
 
@@ -307,21 +416,21 @@ public class SaleService {
             SaleItem saleItem = new SaleItem();
             saleItem = setSaleItemFields(saleItemRequest,sale,sale.getCreatedAt(),LocalDateTime.now(),item);
 
-            if(item.getItemType().equals(ItemType.PRODUCT)) {
-                // management of item stock after sale happend
-                 reverseSaleEffect(item,saleItem);
-                itemRepository.save(item);
-            }
-
-                StockTransaction stockTransaction = new StockTransaction();
-                stockTransactionService.addStockTransaction(item,StockTransactionType.SALE,saleItem.getTotalAmount(),sale.getInvoceDate(),sale.getSaleId().toString());
-
-                // if the item is product then stock transaction quantity add it.
-                if (item.getItemType().equals(ItemType.PRODUCT)) {
-                    stockTransaction.setQuantity(saleItem.getQuantity());
-                }
-
-                stockTransactionList.add(stockTransaction);
+//            if(item.getItemType().equals(ItemType.PRODUCT)) {
+//                // management of item stock after sale happend
+//                reverseSaleEffect(item,saleItem);
+//                itemRepository.save(item);
+//            }
+//
+//            StockTransaction stockTransaction = new StockTransaction();
+//            stockTransactionService.addStockTransaction(item,StockTransactionType.SALE,saleItem.getTotalAmount(),sale.getInvoceDate(),sale.getSaleId().toString());
+//
+//            // if the item is product then stock transaction quantity add it.
+//            if (item.getItemType().equals(ItemType.PRODUCT)) {
+//                stockTransaction.setQuantity(saleItem.getQuantity());
+//            }
+//
+//            stockTransactionList.add(stockTransaction);
 
             saleItems.add(saleItem);
         }
@@ -329,12 +438,12 @@ public class SaleService {
 
 
         if (paymentList.isEmpty()) {
-            throw new RuntimeException("First payment is missing. Sale data is corrupted.");
+            throw new DataIntegrityViolationException("First payment is missing. Sale data is corrupted.");
         }
 
         SalePayment firstPayment = paymentList.get(0); // Only update this
         String paymentDescription = "Received During Sale";
-         updateSalePayment(firstPayment,paymentDescription,saleRequest.getPaymentType(),sale.getInvoceDate(),
+        updateSalePayment(firstPayment,paymentDescription,saleRequest.getPaymentType(),sale.getInvoceDate(),
                 sale.getReceivedAmount(),LocalDateTime.now(),
                 null,null);
 
@@ -343,7 +452,7 @@ public class SaleService {
         sale.getSaleItem().addAll(saleItems);
         sale.setSalePayments(paymentList);
 
-        stockTransactionRepository.saveAll(stockTransactionList);
+       // stockTransactionRepository.saveAll(stockTransactionList);
 
 
 
@@ -377,6 +486,78 @@ public class SaleService {
         saleRepository.save(sale);
 
 
+        for (SaleItem saleItem : saleItems) {
+
+            Item item = saleItem.getItem();
+
+            if (!item.getItemType().equals(ItemType.PRODUCT)) continue;
+
+            double qtyToSell = saleItem.getQuantity();
+
+            List<PurchaseBatch> batches =
+                    purchaseBatchRepository.findAvailableBatchesFIFO(item);
+
+            for (PurchaseBatch batch : batches) {
+
+                if (qtyToSell <= 0) break;
+
+                double used = Math.min(batch.getQtyRemaining(), qtyToSell);
+
+                batch.setQtyRemaining(batch.getQtyRemaining() - used);
+
+                if (batch.getQtyRemaining() == 0) {
+                    batch.setActive(false);
+                }
+
+                purchaseBatchRepository.save(batch);
+
+                StockTransaction tx = new StockTransaction();
+                tx.setItem(item);
+                tx.setType(StockTransactionType.SALE);
+                tx.setQuantity(-used);
+                tx.setRate(batch.getPricePerQty());
+                tx.setAmount(
+                        BigDecimal.valueOf(used).multiply(batch.getPricePerQty())
+                );
+                tx.setTransactionDate(sale.getInvoceDate());
+                tx.setReference("SALE-" + sale.getSaleId());
+
+                stockTransactionRepository.save(tx);
+
+                qtyToSell -= used;
+            }
+
+            // 🔴 oversell → negative stock
+            if (qtyToSell > 0) {
+                StockTransaction negativeTx = new StockTransaction();
+                negativeTx.setItem(item);
+                negativeTx.setType(StockTransactionType.SALE);
+                negativeTx.setQuantity(-qtyToSell);
+                negativeTx.setRate(BigDecimal.ZERO);
+                negativeTx.setAmount(BigDecimal.ZERO);
+                negativeTx.setTransactionDate(sale.getInvoceDate());
+                negativeTx.setReference("SALE-" + sale.getSaleId());
+
+                stockTransactionRepository.save(negativeTx);
+            }
+
+            // ===============================
+            // 3️⃣ UPDATE ITEM SNAPSHOT
+            // ===============================
+            double availableStock =
+                    stockTransactionRepository.totalStock(item.getItemId());
+
+            double stockValue =
+                    availableStock <= 0
+                            ? 0.0
+                            : purchaseBatchRepository.sumRemainingValue(item.getItemId());
+
+            item.setAvailableStock(availableStock);
+            item.setStockValue(Math.max(stockValue, 0));
+            itemRepository.save(item);
+        }
+
+
         PartyResponseDto partyResponseDto = partyMapper.convertEntityIntoResponse(party);
         List<SaleItemResponse> saleItemResponses = new ArrayList<>();
         saleItemResponses = convertSaleItemListIntoResponseList(sale);
@@ -400,35 +581,86 @@ public class SaleService {
     }
 
 
+
     @Transactional
     public String deleteSaleById(Long saleId){
         Sale sale = saleRepository.findById(saleId)
                 .orElseThrow(()-> new ResourceNotFoundException("Sale not found with id : "+saleId));
 
-        sale.getSaleItem().stream()
-                        .forEach(saleItem -> {
-                            Item item = saleItem.getItem();
 
-                            if(item.getItemType().equals(ItemType.PRODUCT)) {
-                                reverseSaleEffect(item,saleItem);
-                                itemRepository.save(item);
-                            }
+        for (SaleItem saleItem : sale.getSaleItem()) {
 
-                                StockTransaction stockTransaction = stockTransactionRepository.findByReferenceNumberAndItemAndTransactionType(
-                                        sale.getSaleId().toString(), item, StockTransactionType.SALE
-                                ).orElseThrow(() -> new ResourceNotFoundException("Stock transaction not found "));
+            Item item = saleItem.getItem();
 
-                                stockTransactionRepository.delete(stockTransaction);
+            if (!item.getItemType().equals(ItemType.PRODUCT)) continue;
 
-                        });
+            double qtyToRestore = saleItem.getQuantity();
+
+            // 1️⃣ fetch SALE transactions (reverse order)
+            List<StockTransaction> saleTxs =
+                    stockTransactionRepository.findByReferenceOrderByIdDesc(
+                            "SALE-" + sale.getSaleId()
+                    );
+
+            for (StockTransaction tx : saleTxs) {
+
+                if (qtyToRestore <= 0) break;
+
+                // NEGATIVE SALE → just delete
+                if (tx.getRate().compareTo(BigDecimal.ZERO) == 0) {
+                    stockTransactionRepository.delete(tx);
+                    continue;
+                }
+
+
+                double used = Math.min(Math.abs(tx.getQuantity()), qtyToRestore);
+
+
+                // restore FIFO batches (LIFO while restoring)
+                List<PurchaseBatch> batches =
+                        purchaseBatchRepository.findByItemOrderByPurchaseDateDesc(item);
+
+                for (PurchaseBatch batch : batches) {
+                    if (used <= 0) break;
+
+                    double restore = Math.min(
+                            batch.getQtyPurchased() - batch.getQtyRemaining(),
+                            used
+                    );
+
+                    if (restore > 0) {
+                        batch.setQtyRemaining(batch.getQtyRemaining() + restore);
+                        batch.setActive(true);
+                        purchaseBatchRepository.save(batch);
+
+                        used -= restore;
+                    }
+
+                }
+
+                stockTransactionRepository.delete(tx);
+                qtyToRestore -= used;
+            }
+
+            // 2️⃣ snapshot update
+            double availableStock =
+                    stockTransactionRepository.totalStock(item.getItemId());
+
+            double stockValue =
+                    availableStock <= 0 ? 0.0 :
+                            purchaseBatchRepository.sumRemainingValue(item.getItemId());
+
+            item.setAvailableStock(availableStock);
+            item.setStockValue(stockValue);
+            itemRepository.save(item);
+        }
+
+
 
         partyLedgerService.deletePartyLedger(PartyTransactionType.SALE,sale.getSaleId());
         partyActivityService.deletePartyActivity(PartyTransactionType.SALE,sale.getSaleId());
 
         saleRepository.delete(sale);
-
-
-
 
         return  "Sale delete successfully.";
     }
@@ -635,49 +867,6 @@ public class SaleService {
    }
 
 
-    public Item updateStockAfterSale(Item item, SaleItem saleItem) {
-        double qty = saleItem.getQuantity();
-
-        // Use safe defaults
-        double currentQty = item.getTotalStockIn() != null ? item.getAvailableStock() : 0.0;
-        double currentValue = item.getStockValue() != null ? item.getStockValue() : 0.0;
-
-        double costRemoved;
-
-        if (currentQty >= qty) {
-            // Normal case: enough stock
-            double averageCost = (currentQty > 0) ? currentValue / currentQty : 0.0;
-            costRemoved = qty * averageCost;
-
-            double newQty = currentQty - qty;
-            double newValue = currentValue - costRemoved;
-
-            item.setTotalStockIn(newQty);
-            item.setStockValue(newValue);
-        } else {
-            // Oversold case: qty > currentQty
-            // Deduct all remaining value → stock value becomes 0
-            costRemoved = currentValue;  // sell everything that exists
-
-            double oversoldQty = qty - currentQty;
-
-            // Stock quantity goes negative
-            double newQty = currentQty - qty;  // negative value
-
-            // Stock value forced to 0
-            double newValue = 0.0;
-
-            item.setTotalStockIn(newQty);
-            item.setStockValue(newValue);
-
-            // Optional: log or throw warning (but not exception, since you want to allow overselling)
-            // You can add logging here if needed:
-            // log.warn("Oversold item {}: sold {} but only {} available. Stock now negative: {}",
-            //          item.getItemName(), qty, currentQty, newQty);
-        }
-
-        return item;
-    }
 
    private SaleResponse setSaleResponseField(Sale sale,PartyResponseDto partyResponseDto,List<SaleItemResponse> saleItemResponses,LocalDate inovoiceDate,LocalDate dueDate,
                                              List<SalePaymentResponse> salePaymentResponses,double totalTaxRate){
@@ -718,16 +907,7 @@ public class SaleService {
                 .sum();
     }
 
-    private void reverseSaleEffect(Item item, SaleItem saleItem) {
-        double qty = saleItem.getQuantity();
-        double currentQty = item.getTotalStockIn() != null ? item.getAvailableStock() : 0.0;
-        double currentValue = item.getStockValue() != null ? item.getStockValue() : 0.0;
 
-        double averageCost = (currentQty > 0) ? currentValue / currentQty : 0.0;
-        double costToAddBack = qty * averageCost;
 
-        item.setTotalStockIn(currentQty + qty);
-        item.setStockValue(currentValue + costToAddBack);
-    }
 
 }

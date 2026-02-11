@@ -26,6 +26,8 @@ public class PurchaseOrderItemRequest {
 
     private Double totalAmount;
 
+    private String itemDescription;
+
     public String getItemName() {
         return itemName;
     }
@@ -104,5 +106,13 @@ public class PurchaseOrderItemRequest {
 
     public void setItemId(Long itemId) {
         this.itemId = itemId;
+    }
+
+    public String getItemDescription() {
+        return itemDescription;
+    }
+
+    public void setItemDescription(String itemDescription) {
+        this.itemDescription = itemDescription;
     }
 }

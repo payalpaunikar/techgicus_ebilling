@@ -82,6 +82,31 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST,exception.getMessage());
     }
 
+    @ExceptionHandler(InvalidStockOperationException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidStockOperationException(InvalidStockOperationException exception){
+        return buildResponse(HttpStatus.BAD_REQUEST,exception.getMessage());
+    }
+
+    @ExceptionHandler(ItemDeletionNotAllowedException.class)
+    public ResponseEntity<ErrorResponse> handleItemDeletionNotAllowedException(ItemDeletionNotAllowedException exception){
+        return buildResponse(HttpStatus.BAD_REQUEST,exception.getMessage());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException exception){
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR,exception.getMessage());
+    }
+
+    @ExceptionHandler(StockTransactionMissingException.class)
+    public ResponseEntity<ErrorResponse> handleStockTransactionMissingException(StockTransactionMissingException exception){
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR,exception.getMessage());
+    }
+
+    @ExceptionHandler(InvalidStockUpdateException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidStockUpdateException(InvalidStockUpdateException exception){
+        return buildResponse(HttpStatus.BAD_REQUEST,exception.getMessage());
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
         Map<String, String> error = new HashMap<>();

@@ -60,7 +60,11 @@ public class SaleReturnItemTransactionProcessor implements TransactionProcessor{
         Optional<SaleReturn> saleReturn = saleReturnRepository.findByReturnNoAndCompany(saleItemRow.getInvoiceNo(),company);
 
         if (saleReturn.isEmpty()){
-            context.addError(row.getRowNum()+1,"Sale Return not found for invoice : "+saleItemRow.getInvoiceNo());
+            if (saleItemRow.getInvoiceNo() == null || saleItemRow.getInvoiceNo().isEmpty()){
+                context.addError(row.getSheet().getSheetName(),row.getRowNum()+1,"Invoice number is missing. Sale items require an existing Purchase Invoice.");
+                return;
+            }
+            context.addError(row.getSheet().getSheetName(),row.getRowNum()+1,"Sale Return not found for invoice : "+saleItemRow.getInvoiceNo());
             return;
         }
 

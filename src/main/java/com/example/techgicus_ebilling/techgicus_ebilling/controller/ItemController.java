@@ -73,45 +73,45 @@ public class ItemController {
 
 
 
-    @Operation(
-            summary = "Update stock for an item",
-            description = """
-                    This API allows adding or reducing stock for a specific item.
-                    
-                    **ADD STOCK**
-                    - Increases item quantity
-                    - Updates stock value
-                   
-                    
-                    **REDUCE STOCK**
-                    - Decreases item quantity
-                    - Prevents stock from going negative
-                    
-                    The StockTransactionType must be either **ADD_STOCK** or **REDUCE_STOCK**.
-                    """
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Stock updated successfully",
-                    content = @Content(schema = @Schema(implementation = String.class))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid input or insufficient stock",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Item not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
-            )
-    })
-    @PostMapping("/item/{itemId}/stock/update")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<String> updateStock(@RequestBody StockUpdateRequest request,@PathVariable Long itemId){
-        return ResponseEntity.ok(itemService.updateStock(request,itemId));
-    }
+//    @Operation(
+//            summary = "Update stock for an item",
+//            description = """
+//                    This API allows adding or reducing stock for a specific item.
+//
+//                    **ADD STOCK**
+//                    - Increases item quantity
+//                    - Updates stock value
+//
+//
+//                    **REDUCE STOCK**
+//                    - Decreases item quantity
+//                    - Prevents stock from going negative
+//
+//                    The StockTransactionType must be either **ADD_STOCK** or **REDUCE_STOCK**.
+//                    """
+//    )
+//    @ApiResponses(value = {
+//            @ApiResponse(
+//                    responseCode = "200",
+//                    description = "Stock updated successfully",
+//                    content = @Content(schema = @Schema(implementation = String.class))
+//            ),
+//            @ApiResponse(
+//                    responseCode = "400",
+//                    description = "Invalid input or insufficient stock",
+//                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+//            ),
+//            @ApiResponse(
+//                    responseCode = "404",
+//                    description = "Item not found",
+//                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+//            )
+//    })
+//    @PostMapping("/item/{itemId}/stock/update")
+//    @PreAuthorize("hasAuthority('ADMIN')")
+//    public ResponseEntity<String> updateStock(@RequestBody StockUpdateRequest request,@PathVariable Long itemId){
+//        return ResponseEntity.ok(itemService.updateStock(request,itemId));
+//    }
 
 
     @GetMapping("/item/{itemId}/stock-transaction")
@@ -119,6 +119,8 @@ public class ItemController {
     public List<StockTransactionDto> getItemStockTransactionList(@PathVariable Long itemId){
       return itemService.getStockTrasactioList(itemId);
     }
+
+
 
 
 }

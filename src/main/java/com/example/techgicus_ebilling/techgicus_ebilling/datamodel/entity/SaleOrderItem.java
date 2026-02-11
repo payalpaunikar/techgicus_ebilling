@@ -40,6 +40,8 @@ public class SaleOrderItem {
     @JoinColumn(name = "item_id")
     private Item item;
 
+    private String itemDescription;
+
     public Item getItem() {
         return item;
     }
@@ -134,5 +136,13 @@ public class SaleOrderItem {
 
     public void setSaleOrder(SaleOrder saleOrder) {
         this.saleOrder = saleOrder;
+    }
+
+    public String getItemDescription() {
+        return itemDescription;
+    }
+
+    public void setItemDescription(String itemDescription) {
+        this.itemDescription = itemDescription;
     }
 }

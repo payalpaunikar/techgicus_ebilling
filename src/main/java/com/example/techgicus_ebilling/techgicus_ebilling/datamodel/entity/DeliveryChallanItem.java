@@ -39,6 +39,8 @@ public class DeliveryChallanItem {
 
     private Double totalAmount;
 
+    private String itemDescription;
+
     @ManyToOne
     @JoinColumn(name = "delivery_challan_id")
     private DeliveryChallan deliveryChallan;
@@ -137,5 +139,13 @@ public class DeliveryChallanItem {
 
     public void setItem(Item item) {
         this.item = item;
+    }
+
+    public String getItemDescription() {
+        return itemDescription;
+    }
+
+    public void setItemDescription(String itemDescription) {
+        this.itemDescription = itemDescription;
     }
 }

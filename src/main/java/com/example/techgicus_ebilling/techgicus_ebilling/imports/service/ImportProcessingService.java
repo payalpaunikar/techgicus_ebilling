@@ -2,6 +2,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.imports.service;
 
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.Company;
+import com.example.techgicus_ebilling.techgicus_ebilling.imports.dto.ImportSummaryResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.handler.PurchaseReportImportHandler;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.handler.SaleReportImportHandler;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.validator.ItemExcelValidator;
@@ -99,7 +100,7 @@ public class ImportProcessingService {
 
 
     @Transactional
-    public String importSingleExcel(MultipartFile file, Long companyId, String reportType) throws Exception {
+    public ImportSummaryResponse importSingleExcel(MultipartFile file, Long companyId, String reportType) throws Exception {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new IllegalArgumentException("Company not found"));
 

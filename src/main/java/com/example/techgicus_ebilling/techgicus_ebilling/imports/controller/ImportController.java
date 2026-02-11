@@ -1,6 +1,7 @@
 package com.example.techgicus_ebilling.techgicus_ebilling.imports.controller;
 
 
+import com.example.techgicus_ebilling.techgicus_ebilling.imports.dto.ImportSummaryResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.service.ImportProcessingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -49,9 +50,9 @@ public class ImportController {
       // report type be :- ITEM (for import item), SALE, PURCHASE, PARTY
       @PostMapping("/company/{companyId}/upload/excel")
       @PreAuthorize("hasAuthority('ADMIN')")
-     public ResponseEntity<String> uploadExcelSheet(@PathVariable Long companyId,
-                                                    @RequestParam("file") MultipartFile file,
-                                                    @RequestParam("reportType")String reportType) throws Exception {
+     public ResponseEntity<ImportSummaryResponse> uploadExcelSheet(@PathVariable Long companyId,
+                                                                   @RequestParam("file") MultipartFile file,
+                                                                   @RequestParam("reportType")String reportType) throws Exception {
         return ResponseEntity.ok(importService.importSingleExcel(file,companyId,reportType));
      }
 

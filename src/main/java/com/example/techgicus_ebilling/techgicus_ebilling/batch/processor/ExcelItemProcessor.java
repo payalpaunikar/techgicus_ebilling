@@ -10,7 +10,6 @@ import com.example.techgicus_ebilling.techgicus_ebilling.repository.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.PartyRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.service.PartyActivityService;
 import com.example.techgicus_ebilling.techgicus_ebilling.service.PartyLedgerService;
-import com.example.techgicus_ebilling.techgicus_ebilling.service.StockTransactionService;
 import jakarta.annotation.PostConstruct;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -57,8 +56,6 @@ public class ExcelItemProcessor implements ItemProcessor<ExcelRowData, Object> {
     @Autowired
     private PartyActivityService partyActivityService;
 
-    @Autowired
-    private StockTransactionService stockTransactionService;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -211,20 +208,31 @@ public class ExcelItemProcessor implements ItemProcessor<ExcelRowData, Object> {
                 itemRepository.save(item);
             }
 
-            // Add stock transaction
-            StockTransaction stockTransaction = stockTransactionService.addStockTransaction(
-                    item,
-                    StockTransactionType.SALE,
-                    saleItem.getTotalAmount(),
-                    sale.getInvoceDate(),
-                    sale.getInvoiceNumber()
-            );
+            Double saleQty = saleItem.getQuantity();
 
+// FIFO cost calculation
+            Double fifoCost = 0.0;
             if (item.getItemType().equals(ItemType.PRODUCT)) {
-                stockTransaction.setQuantity(saleItem.getQuantity());
-            }
+                //  fifoCost = fifoService.calculateFifoCost(item, saleQty);
 
-            stockTransactionRepository.save(stockTransaction);
+
+//                StockTransaction stockTransaction = stockTransactionService.addStockTransaction(
+//                        item,
+//                        StockTransactionType.SALE,
+//                        saleItem.getTotalAmount(),      // sale amount
+//                        sale.getInvoceDate(),
+//                        sale.getInvoiceNumber(),
+//                        saleQty,
+//                        saleItem.getPricePerUnit()
+//                );
+
+
+//            if (item.getItemType().equals(ItemType.PRODUCT)) {
+//                stockTransaction.setQuantity(saleItem.getQuantity());
+//            }
+
+              //  stockTransactionRepository.save(stockTransaction);
+            }
 
             saleItemRepository.save(saleItem);
 
@@ -361,7 +369,7 @@ public class ExcelItemProcessor implements ItemProcessor<ExcelRowData, Object> {
             newItem.setTaxRate(TaxRate.GST18);  // or detect from Excel if possible
             newItem.setBaseUnit(Unit.NUMBERS);     // common default
             newItem.setAvailableStock(0.0);
-            newItem.setTotalStockIn(0.0);
+           // newItem.setTotalStockIn(0.0);
             newItem.setStockValue(0.0);
 
             // Handle Category
@@ -400,17 +408,17 @@ public class ExcelItemProcessor implements ItemProcessor<ExcelRowData, Object> {
 //        if (item.getCurrentStock() == null) {
 //            item.setCurrentStock(0.0);
 //        }
+//
+//        if (item.getTotalStockIn() == null) {
+//            item.setTotalStockIn(0.0);
+//        }
 
-        if (item.getTotalStockIn() == null) {
-            item.setTotalStockIn(0.0);
-        }
-
-        // Subtract the sold quantity from stock
-        double newStock = item.getTotalStockIn() - saleItem.getQuantity();
-
-       // item.setCurrentStock(newStock);
-
-        item.setTotalStockIn(newStock);
+//        // Subtract the sold quantity from stock
+//        double newStock = item.getTotalStockIn() - saleItem.getQuantity();
+//
+//       // item.setCurrentStock(newStock);
+//
+//        item.setTotalStockIn(newStock);
 
 
         // Optional: set low stock flag or other logic if you have it

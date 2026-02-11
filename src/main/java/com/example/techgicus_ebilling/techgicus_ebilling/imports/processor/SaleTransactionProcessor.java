@@ -64,6 +64,11 @@ public class SaleTransactionProcessor implements TransactionProcessor {
                 company
         );
 
+        if (rowData.getInvoiceNo() == null || rowData.getInvoiceNo().isEmpty()){
+            context.addError(row.getSheet().getSheetName(),row.getRowNum()+1,"Invoice number is missing. Sale require an existing Purchase Invoice.");
+            return;
+        }
+
         Optional<Sale> existingSaleOpt = saleRepository.findByInvoiceNumberAndCompany(
                 rowData.getInvoiceNo(),
                 company

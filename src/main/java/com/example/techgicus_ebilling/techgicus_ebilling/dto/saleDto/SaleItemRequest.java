@@ -9,7 +9,7 @@ public class SaleItemRequest {
 //    private String itemName;
 //    private String itemHsnCode;
     private String itemDescription;
-    private Integer quantity;
+    private Double quantity;
   //  private Unit unit;
     private Double pricePerUnit;
     private TaxType pricePerUnitTaxType;
@@ -32,11 +32,11 @@ public class SaleItemRequest {
         this.itemDescription = itemDescription;
     }
 
-    public Integer getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
     }
 

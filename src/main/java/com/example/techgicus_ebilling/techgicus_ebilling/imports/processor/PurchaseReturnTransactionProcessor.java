@@ -54,6 +54,12 @@ public class PurchaseReturnTransactionProcessor implements TransactionProcessor{
                 company
         );
 
+        if (rowData.getBillNo() == null || rowData.getBillNo().isEmpty()){
+            context.addError(row.getSheet().getSheetName(),row.getRowNum()+1,"Invoice number is missing. Purchase require an existing Purchase Invoice.");
+            return;
+        }
+
+
         Optional<PurchaseReturn> existingPurchaseReturnOpt = purchaseReturnRepository.findByReturnNoAndCompany(rowData.getBillNo(),company);
 
         PurchaseReturn existingPurchaseReturn = existingPurchaseReturnOpt.orElse(null);

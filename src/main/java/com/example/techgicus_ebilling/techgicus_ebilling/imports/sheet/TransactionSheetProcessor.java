@@ -94,16 +94,52 @@ public class TransactionSheetProcessor {
                     count++;
                 } catch (Exception e) {
                     log.error("Error processing row {} in sheet '{}': {}", r, sheetName, e.getMessage(), e);
-                    context.addError(r + 1, "In the "+sheetName+ " sheet :  Error processing row: " + e.getMessage());
+                   // context.addError(r + 1, "In the "+sheetName+ " sheet :  Error processing row: " + e.getMessage());
+                    String userMessage = buildUserFriendlyMessage(e);
+
+                    context.addError(sheetName,
+                            r + 1,
+//                            "Sheet: " + sheetName +
+//                                    " | Row: " + (r + 1) +
+                                    " | Problem: " + userMessage
+                    );
+
                 }
             } else {
                 log.warn("No processor for kind '{}' on row {}", transactionKind, r);
-                context.addError(r + 1, "In the "+sheetName+ " sheet : No processor found for transaction kind: " + transactionKind);
+                context.addError(sheetName,r + 1, " No processor found for transaction kind: " + transactionKind);
             }
         }
 
 
         return count+headerRow+1;
     }
+
+
+    private String buildUserFriendlyMessage(Exception e) {
+
+        String msg = e.getMessage();
+
+        if (msg == null) return "Unexpected system error";
+
+        if (msg.contains("Purchase Return.getPurchaseReturnId")) {
+            return "Purchase Return record could not be created. Please check invoice No.";
+        }
+
+        if (msg.contains("Sale Return.getSaleReturnId")) {
+            return "Sale Return record could not be created. Please check invoice No.";
+        }
+
+        if (msg.contains("not found")) {
+            return msg; // already business-friendly
+        }
+
+        if (msg.contains("Negative stock")) {
+            return "Stock is insufficient for this item.";
+        }
+
+        return msg;
+    }
+
 }
 

@@ -3,6 +3,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.dto.saleReturnDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PaymentType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.State;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.ItemTaxSummaryResponse;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -43,6 +44,8 @@ public class SaleReturnResponse {
     private PartyResponseDto partyResponseDto;
 
     private List<SaleReturnItemResponse> saleReturnItemResponses = new ArrayList<>();
+
+    private List<ItemTaxSummaryResponse> taxSummary;
 
     public Long getSaleReturnId() {
         return saleReturnId;
@@ -178,5 +181,13 @@ public class SaleReturnResponse {
 
     public void setSaleReturnItemResponses(List<SaleReturnItemResponse> saleReturnItemResponses) {
         this.saleReturnItemResponses = saleReturnItemResponses;
+    }
+
+    public List<ItemTaxSummaryResponse> getTaxSummary() {
+        return taxSummary;
+    }
+
+    public void setTaxSummary(List<ItemTaxSummaryResponse> taxSummary) {
+        this.taxSummary = taxSummary;
     }
 }

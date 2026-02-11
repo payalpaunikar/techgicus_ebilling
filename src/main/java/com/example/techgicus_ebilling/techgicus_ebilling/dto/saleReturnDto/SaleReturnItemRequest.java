@@ -26,6 +26,8 @@ public class SaleReturnItemRequest {
 
     private Double totalAmount;
 
+    private String itemDescription;
+
     public String getName() {
         return name;
     }
@@ -104,5 +106,13 @@ public class SaleReturnItemRequest {
 
     public void setItemId(Long itemId) {
         this.itemId = itemId;
+    }
+
+    public String getItemDescription() {
+        return itemDescription;
+    }
+
+    public void setItemDescription(String itemDescription) {
+        this.itemDescription = itemDescription;
     }
 }

@@ -1,15 +1,11 @@
 package com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration;
 
 public enum StockTransactionType {
-    SALE,
-    CREDIT_NOTE,
-    QUOTATION,
-    SALE_ORDER,
-    DELIVERY_CHALLAN,
+    OPENING,
     PURCHASE,
-    DEBIT_NOTE,
-    PURCHASE_ORDER,
-    OPENING_STOCK,
-    ADD_STOCK,
-    REDUCE_STOCK
+    SALE,
+    SALE_RETURN,
+    PURCHASE_RETURN,
+    ADJUSTMENT_IN,
+    ADJUSTMENT_OUT
 }

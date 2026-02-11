@@ -2,7 +2,6 @@ package com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity;
 
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.TaxRate;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.TaxType;
-import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.Unit;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

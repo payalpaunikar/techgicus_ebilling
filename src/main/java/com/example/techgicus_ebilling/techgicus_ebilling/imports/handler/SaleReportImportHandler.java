@@ -3,6 +3,7 @@ package com.example.techgicus_ebilling.techgicus_ebilling.imports.handler;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.entity.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.context.ImportContext;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.context.ImportError;
+import com.example.techgicus_ebilling.techgicus_ebilling.imports.dto.ImportSummaryResponse;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.enumeration.ImportReportType;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.sheet.TransactionSheetProcessor;
 import com.example.techgicus_ebilling.techgicus_ebilling.imports.validator.SaleItemDetailsExcelValidator;
@@ -25,6 +26,7 @@ public class SaleReportImportHandler implements ImportHandler {
     private final SalePaymentRepository salePaymentRepository;
     private final SaleReturnRepository saleReturnRepository;
 
+
     public SaleReportImportHandler(SaleReportExcelValidator saleReportExcelValidator, TransactionSheetProcessor transactionSheetProcessor, SaleItemDetailsExcelValidator saleItemDetailsExcelValidator, SaleRepository saleRepository, SalePaymentRepository salePaymentRepository, SaleReturnRepository saleReturnRepository) {
         this.saleReportExcelValidator = saleReportExcelValidator;
         this.transactionSheetProcessor = transactionSheetProcessor;
@@ -40,7 +42,7 @@ public class SaleReportImportHandler implements ImportHandler {
     }
 
     @Override
-    public String importReport(Workbook workbook, Company company) {
+    public ImportSummaryResponse importReport(Workbook workbook, Company company) {
 
         Sheet saleSheet = workbook.getSheetAt(0);
         Sheet saleItemSheet = workbook.getSheetAt(1);
@@ -71,39 +73,44 @@ public class SaleReportImportHandler implements ImportHandler {
 
         finalizeSales(context);
 
-        return buildImportSummary(saleCount, itemCount, context);
+//        return buildImportSummary(saleCount, itemCount, context);
+
+        return buildImportSummary("SALE",saleCount,itemCount,context);
     }
 
-    private String buildImportSummary(
-            int saleCount,
-            int itemCount,
-            ImportContext context
-    ) {
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("Import completed\n");
-        sb.append("• Sales processed: ").append(saleCount).append("\n");
-        sb.append("• Sale items processed: ").append(itemCount).append("\n");
-
-        if (context.hasErrors()) {
-            sb.append("\n⚠ Errors (")
-                    .append(context.getErrors().size())
-                    .append("):\n");
-
-            for (ImportError error : context.getErrors()) {
-                sb.append("Row ")
-                        .append(error.getRowNumber())
-                        .append(": ")
-                        .append(error.getMessage())
-                        .append("\n");
-            }
-        } else {
-            sb.append("\n✔ No errors found");
-        }
-
-        return sb.toString();
-    }
+//    private String buildImportSummary(
+//            int saleCount,
+//            int itemCount,
+//            ImportContext context
+//    ) {
+//
+//        StringBuilder sb = new StringBuilder();
+//
+//        sb.append("Import completed\n");
+//        sb.append("• Sales processed: ").append(saleCount).append("\n");
+//        sb.append("• Sale items processed: ").append(itemCount).append("\n");
+//
+//        if (context.hasErrors()) {
+//            sb.append("\n⚠ Errors (")
+//                    .append(context.getErrors().size())
+//                    .append("):\n");
+//
+//            for (ImportError error : context.getErrors()) {
+//                sb.append("Sheet Name ")
+//                        .append(error.getSheetName())
+//                        .append(": ")
+//                        .append("Row ")
+//                        .append(error.getRowNumber())
+//                        .append(": ")
+//                        .append(error.getMessage())
+//                        .append("\n");
+//            }
+//        } else {
+//            sb.append("\n✔ No errors found");
+//        }
+//
+//        return sb.toString();
+//    }
 
 
     @Transactional

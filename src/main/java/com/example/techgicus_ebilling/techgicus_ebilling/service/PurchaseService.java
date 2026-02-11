@@ -9,9 +9,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.S
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.purchaseDto.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.ItemTaxSummaryResponse;
-import com.example.techgicus_ebilling.techgicus_ebilling.exception.BadRequestException;
-import com.example.techgicus_ebilling.techgicus_ebilling.exception.InvalidPaymentAmountException;
-import com.example.techgicus_ebilling.techgicus_ebilling.exception.ResourceNotFoundException;
+import com.example.techgicus_ebilling.techgicus_ebilling.exception.*;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.PartyMapper;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.PurchaseItemMapper;
 import com.example.techgicus_ebilling.techgicus_ebilling.mapper.PurchaseMapper;
@@ -20,10 +18,11 @@ import com.example.techgicus_ebilling.techgicus_ebilling.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PurchaseService {
@@ -40,14 +39,14 @@ public class PurchaseService {
         private ItemRepository itemRepository;
         private StockTransactionRepository stockTransactionRepository;
         private PartyLedgerService partyLedgerService;
-        private StockTransactionService stockTransactionService;
         private PartyActivityService partyActivityService;
         private final TaxCalculationService taxCalculationService;
+        private final PurchaseBatchRepository purchaseBatchRepository;
 
-    public PurchaseService(TaxCalculationService taxCalculationService, PartyActivityService partyActivityService, StockTransactionService stockTransactionService, PartyLedgerService partyLedgerService, StockTransactionRepository stockTransactionRepository, ItemRepository itemRepository, PurchasePaymentRepository purchasePaymentRepository, PurchasePaymentMapper purchasePaymentMapper, PartyMapper partyMapper, PurchaseItemMapper purchaseItemMapper, PurchaseMapper purchaseMapper, PurchaseItemRepository purchaseItemRepository, PurchaseRepository purchaseRepository, PartyRepository partyRepository, CompanyRepository companyRepository) {
+    public PurchaseService(TaxCalculationService taxCalculationService, PurchaseBatchRepository purchaseBatchRepository, PartyActivityService partyActivityService,  PartyLedgerService partyLedgerService, StockTransactionRepository stockTransactionRepository, ItemRepository itemRepository, PurchasePaymentRepository purchasePaymentRepository, PurchasePaymentMapper purchasePaymentMapper, PartyMapper partyMapper, PurchaseItemMapper purchaseItemMapper, PurchaseMapper purchaseMapper, PurchaseItemRepository purchaseItemRepository, PurchaseRepository purchaseRepository, PartyRepository partyRepository, CompanyRepository companyRepository) {
         this.taxCalculationService = taxCalculationService;
+        this.purchaseBatchRepository = purchaseBatchRepository;
         this.partyActivityService = partyActivityService;
-        this.stockTransactionService = stockTransactionService;
         this.partyLedgerService = partyLedgerService;
         this.stockTransactionRepository = stockTransactionRepository;
         this.itemRepository = itemRepository;
@@ -117,31 +116,64 @@ public class PurchaseService {
 
             purchaseItems.add(purchaseItem);
 
-            if(item.getItemType().equals(ItemType.PRODUCT)) {
-                // management of item stock after sale happend
-                 item = updateStockAfterPurchase(item,purchaseItem);
-                item.setPurchasePrice(purchaseRequest.getSendAmount());
-
-                itemRepository.save(item);
-
-            }
 
 
-                StockTransaction stockTransaction = new StockTransaction();
-                 stockTransaction = stockTransactionService.addStockTransaction(item,
-                         StockTransactionType.PURCHASE,purchaseItem.getTotalAmount(),purchase.getBillDate(),
-                         purchase.getPurchaseId().toString());
+                if (item.getItemType().equals(ItemType.PRODUCT)) {
+                    // 1️⃣ FIFO BATCH
+                    PurchaseBatch batch = new PurchaseBatch();
+                    batch.setItem(item);
+                    batch.setPurchaseId(purchase.getPurchaseId());
+                    batch.setQtyPurchased(purchaseItem.getQuantity());
+                    batch.setQtyRemaining(purchaseItem.getQuantity());
+                    batch.setPricePerQty(BigDecimal.valueOf(purchaseItem.getPricePerUnit()));
+                    batch.setPurchaseDate(purchase.getBillDate());
+                    batch.setActive(true);
 
-                if(item.getItemType().equals(ItemType.PRODUCT)) {
-                    stockTransaction.setQuantity(purchaseItem.getQuantity());
+                    purchaseBatchRepository.save(batch);
+
+                    // 2️⃣ STOCK TRANSACTION (HISTORY)
+                    StockTransaction tx = new StockTransaction();
+                    tx.setItem(item);
+                    tx.setType(StockTransactionType.PURCHASE);
+                    tx.setQuantity(purchaseItem.getQuantity());
+                    tx.setRate(BigDecimal.valueOf(purchaseItem.getPricePerUnit()));
+                    tx.setAmount(BigDecimal.valueOf(purchaseItem.getQuantity()).multiply(BigDecimal.valueOf(purchaseItem.getPricePerUnit())));
+                    tx.setTransactionDate(purchase.getBillDate());
+                    tx.setReference("PURCHASE-" + purchase.getPurchaseId());
+
+                    stockTransactionRepository.save(tx);
+
                 }
-
-              stockTransactionList.add(stockTransaction);
         }
 
-        stockTransactionRepository.saveAll(stockTransactionList);
-        savedPurchase.setPurchaseItems(purchaseItems);
 
+        // Update snapshot for all items
+        for (PurchaseItem pi : purchaseItems) {
+            Item item = pi.getItem();
+            Double availableStock =
+                    stockTransactionRepository.totalStock(item.getItemId());
+
+//            Double stockValue = availableStock == 0.0 || (availableStock < 0.0) ? 0.0 :
+//                   item.getStockValue() + (pi.getPricePerUnit() * pi.getQuantity());
+
+            Double stockValue =
+                    availableStock == null || availableStock <= 0
+                            ? 0.0
+                            : purchaseBatchRepository.sumRemainingValue(item.getItemId());
+
+            item.setPurchasePrice(pi.getPricePerUnit());
+            item.setAvailableStock(
+                    availableStock != null ? availableStock : 0.0
+            );
+            // stock value must NEVER be negative
+            item.setStockValue(
+                    stockValue != null && availableStock > 0 ? stockValue : 0.0
+            );
+            itemRepository.save(item);
+        }
+
+
+        savedPurchase.setPurchaseItems(purchaseItems);
 
         PurchasePayment purchasePayment = new PurchasePayment();
         String paymentDescription = "Paid During Purchase";
@@ -276,12 +308,6 @@ public class PurchaseService {
             );
         }
 
-//        PurchasePayment firstPayment = purchasePaymentList.get(0);
-//        double previousReceivedAmount = purchase.getSendAmount();
-//
-//        if (previousReceivedAmount>firstPayment.getAmountPaid()){
-//
-//        }
 
         purchaseMapper.updatePurchaseByDto(purchaseRequest,purchase);
         purchase.setParty(party);
@@ -289,52 +315,119 @@ public class PurchaseService {
         purchase.setIsPaid(purchaseRequest.getIsPaid());
         purchase.setOverdue(purchaseRequest.getIsOverdue());
 
+        // ===============================
+        // 4️⃣ MAP OLD ITEMS (FOR DIFF LOGIC)
+        // ===============================
+        Map<Long, PurchaseItem> oldItemMap = purchase.getPurchaseItems()
+                .stream()
+                .collect(Collectors.toMap(
+                        pi -> pi.getItem().getItemId(),
+                        pi -> pi
+                ));
+
+        // 🔴 delete old purchase items
+        purchaseItemRepository
+                .deleteByPurchase(purchase);
+
         purchase.getPurchaseItems().clear();
 
-     //   List<PurchaseItem> purchaseItems = purchaseItemMapper.convertPurchaseItemRequestListIntoPurchaseItemList(purchaseRequest.getPurchaseItemRequests());
 
-//        for (PurchaseItem purchaseItem : purchaseItems){
-//            purchaseItem.setPurchase(purchase);
-//            purchaseItem.setCreatedAt(LocalDateTime.now());
-//            purchaseItem.setUpdateAt(LocalDateTime.now());
-//        }
-
-        List<PurchaseItem> purchaseItems = new ArrayList<>();
-        List<StockTransaction> stockTransactionList = new ArrayList<>();
+        // ===============================
+        // 5️⃣ ADD UPDATED PURCHASE ITEMS
+        // ===============================
+        List<PurchaseItem> newItems = new ArrayList<>();
+        Set<Item> touchedItems = new HashSet<>();
 
         for (PurchaseItemRequest purchaseItemRequest : purchaseRequest.getPurchaseItemRequests()) {
             Item item = itemRepository.findById(purchaseItemRequest.getItemId())
                     .orElseThrow(() -> new ResourceNotFoundException("Item not found with id : " + purchaseItemRequest.getItemId()));
 
+            touchedItems.add(item);
+            PurchaseItem oldItem = oldItemMap.get(item.getItemId());
+
+            double oldQty = oldItem != null ? oldItem.getQuantity() : 0.0;
+            double newQty = purchaseItemRequest.getQuantity();
+
             PurchaseItem purchaseItem = new PurchaseItem();
             purchaseItem = setPurchaseItemFields(purchaseItemRequest, purchase, LocalDateTime.now(),
                     LocalDateTime.now(), item);
 
-            purchaseItems.add(purchaseItem);
+            newItems.add(purchaseItem);
 
-            if (item.getItemType().equals(ItemType.PRODUCT)) {
+            if (!item.getItemType().equals(ItemType.PRODUCT)) continue;
 
-                reversePurchaseEffect(item,purchaseItem);
+            // ===============================
+            // 7️⃣ UPDATE STOCK TRANSACTION
+            // ===============================
+            StockTransaction tx =
+                    stockTransactionRepository.findByItemAndReference(
+                            item,
+                            "PURCHASE-" + purchase.getPurchaseId()
+                    ).orElseThrow(() ->
+                            new StockTransactionMissingException("Purchase stock transaction missing"));
 
-                itemRepository.save(item);
+            tx.setQuantity(newQty);
+            tx.setRate(BigDecimal.valueOf(purchaseItemRequest.getPricePerUnit()));
+            tx.setAmount(
+                    BigDecimal.valueOf(newQty)
+                            .multiply(BigDecimal.valueOf(purchaseItemRequest.getPricePerUnit()))
+            );
+            tx.setTransactionDate(purchase.getBillDate());
+
+            stockTransactionRepository.save(tx);
+
+
+            // ===============================
+            // 8️⃣ UPDATE PURCHASE BATCH (FIFO SAFE)
+            // ===============================
+            PurchaseBatch batch =
+                    purchaseBatchRepository.findByItemAndPurchaseId(
+                            item,
+                            purchase.getPurchaseId()
+                    ).orElseThrow(() ->
+                            new StockTransactionMissingException("Purchase batch missing"));
+
+            double usedQty =
+                    batch.getQtyPurchased() - batch.getQtyRemaining();
+
+            if (newQty < usedQty) {
+                throw new InvalidStockUpdateException(
+                        "Cannot reduce quantity below already sold stock (" + usedQty + ")");
             }
 
-            StockTransaction stockTransaction = new StockTransaction();
-            stockTransaction = stockTransactionService.addStockTransaction(item,
-                    StockTransactionType.PURCHASE, purchaseItem.getTotalAmount(),
-                    purchase.getBillDate(), purchase.getPurchaseId().toString());
+            batch.setQtyPurchased(newQty);
+            batch.setQtyRemaining(newQty - usedQty);
+            batch.setPricePerQty(BigDecimal.valueOf(purchaseItemRequest.getPricePerUnit()));
+            batch.setPurchaseDate(purchase.getBillDate());
+            batch.setActive(batch.getQtyRemaining() > 0);
 
-            if (item.getItemType().equals(ItemType.PRODUCT)) {
-                stockTransaction.setQuantity(purchaseItem.getQuantity());
-            }
+            purchaseBatchRepository.save(batch);
+        }
 
-            stockTransactionList.add(stockTransaction);
+        purchase.getPurchaseItems().addAll(newItems);
 
+        // ===============================
+        // 9️⃣ UPDATE ITEM SNAPSHOT (FINAL TRUTH)
+        // ===============================
+        for (Item item : touchedItems) {
+
+            Double availableStock =
+                    stockTransactionRepository.totalStock(item.getItemId());
+
+            Double stockValue =
+                    availableStock == null || availableStock <= 0
+                            ? 0.0
+                            : purchaseBatchRepository.sumRemainingValue(item.getItemId());
+
+            item.setAvailableStock(availableStock != null ? availableStock : 0.0);
+            item.setStockValue(stockValue != null ? stockValue : 0.0);
+
+            itemRepository.save(item);
         }
 
 
         if (purchasePaymentList.isEmpty()) {
-            throw new RuntimeException("First payment is missing. Sale data is corrupted.");
+            throw new DataIntegrityViolationException("First payment is missing. Sale data is corrupted.");
         }
 
         PurchasePayment firstPayment = purchasePaymentList.get(0);
@@ -343,10 +436,9 @@ public class PurchaseService {
                 purchase.getBillDate(),purchase.getSendAmount(),LocalDateTime.now(),
                 null,null);
 
-        purchase.getPurchaseItems().addAll(purchaseItems);
+       // purchase.getPurchaseItems().addAll(purchaseItems);
         purchase.setPurchasePayments(purchasePaymentList);
 
-        stockTransactionRepository.saveAll(stockTransactionList);
 
 
         // update party ledger entry in the database
@@ -398,22 +490,61 @@ public class PurchaseService {
         Purchase purchase = purchaseRepository.findById(purchaseId)
                 .orElseThrow(()-> new ResourceNotFoundException("Purchase not found with id : "+purchaseId));
 
-        purchase.getPurchaseItems().stream()
-                .forEach(purchaseItem-> {
-                    Item item = purchaseItem.getItem();
 
-                    if(item.getItemType().equals(ItemType.PRODUCT)) {
-                        reversePurchaseEffect(item,purchaseItem);
-                        itemRepository.save(item);
-                    }
+        for (PurchaseItem pi : purchase.getPurchaseItems()) {
 
-                    StockTransaction stockTransaction = stockTransactionRepository.findByReferenceNumberAndItemAndTransactionType(
-                            purchase.getPurchaseId().toString(), item, StockTransactionType.PURCHASE
-                    ).orElseThrow(() -> new ResourceNotFoundException("Stock transaction not found "));
+            Item item = pi.getItem();
+            if (!item.getItemType().equals(ItemType.PRODUCT)) continue;
 
-                    stockTransactionRepository.delete(stockTransaction);
+            PurchaseBatch batch =
+                    purchaseBatchRepository
+                            .findByItemAndPurchaseId(item, purchase.getPurchaseId())
+                            .orElseThrow(() -> new StockTransactionMissingException("Batch not found"));
 
-                });
+            double qtyPurchased = batch.getQtyPurchased();
+            double qtyRemaining = batch.getQtyRemaining();
+            double consumed = qtyPurchased - qtyRemaining;
+
+            // 1️⃣ DELETE PURCHASE BATCH
+            purchaseBatchRepository.delete(batch);
+
+            // 2️⃣ DELETE PURCHASE STOCK TRANSACTIONS
+            stockTransactionRepository
+                    .deleteByReference("PURCHASE-" + purchase.getPurchaseId());
+
+
+            // 3️⃣ IF CONSUMED → CREATE NEGATIVE STOCK
+            if (consumed > 0) {
+
+                StockTransaction negativeTx = new StockTransaction();
+                negativeTx.setItem(item);
+                negativeTx.setType(StockTransactionType.PURCHASE);
+                negativeTx.setQuantity(-consumed);
+                negativeTx.setRate(BigDecimal.ZERO);
+                negativeTx.setAmount(BigDecimal.ZERO);
+                negativeTx.setTransactionDate(LocalDate.now());
+                negativeTx.setReference("PURCHASE-DELETE-" + purchase.getPurchaseId());
+
+                stockTransactionRepository.save(negativeTx);
+            }
+
+            // 4️⃣ UPDATE ITEM SNAPSHOT
+            double availableStock =
+                    stockTransactionRepository.totalStock(item.getItemId());
+
+            double stockValue =
+                    availableStock <= 0
+                            ? 0.0
+                            : purchaseBatchRepository.sumRemainingValue(item.getItemId());
+
+            item.setAvailableStock(availableStock);
+            item.setStockValue(stockValue);
+            itemRepository.save(item);
+        }
+
+
+//        // 🔁 Recalculate everything
+//        recalculateStock();
 
         partyLedgerService.deletePartyLedger(PartyTransactionType.PURCHASE,purchase.getPurchaseId());
         partyActivityService.deletePartyActivity(PartyTransactionType.PURCHASE,purchase.getPurchaseId());
@@ -541,31 +672,7 @@ public class PurchaseService {
     }
 
 
-    public Item updateStockAfterPurchase(Item item, PurchaseItem purchaseItem) {
-        double qty = purchaseItem.getQuantity();                    // quantity purchased
-        double cost = purchaseItem.getTotalAmount() - purchaseItem.getTotalTaxAmount();
 
-        // Current state
-        double currentQty = item.getTotalStockIn() != null ? item.getAvailableStock() : 0.0;
-        double currentValue = item.getStockValue() != null ? item.getStockValue() : 0.0;
-
-        // New totals
-        double newQty = currentQty + qty;
-        double newValue = currentValue + cost;
-
-        // Update average cost (for information / reporting)
-        double newAverage = (newQty > 0) ? newValue / newQty : 0.0;
-
-        // Update item
-        item.setTotalStockIn(newQty);
-        item.setStockValue(newValue);
-       // item.setTotalStockIn((item.getTotalStockIn() != null ? item.getTotalStockIn() : 0.0) + qty);
-
-        // Optional: you can store the new average if you want
-        // item.setAverageCost(newAverage);  // add field if needed
-
-        return item;
-    }
 
     private PurchasePayment setPurchasePaymentFields(String paymentDescription, PaymentType paymentType, LocalDate paymentDate,
                                              Purchase purchase, Double amountPaid, LocalDateTime creationDateAndTime, LocalDateTime updationDateAndTime,
@@ -628,17 +735,6 @@ public class PurchaseService {
                 }).toList();
 
         return purchaseItemResponses;
-    }
-
-    private void reversePurchaseEffect(Item item, PurchaseItem purchaseItem) {
-        double qty = purchaseItem.getQuantity();
-        double costToRemove = purchaseItem.getTotalAmount();
-
-        double currentQty = item.getTotalStockIn() != null ? item.getAvailableStock() : 0.0;
-        double currentValue = item.getStockValue() != null ? item.getStockValue() : 0.0;
-
-        item.setTotalStockIn(currentQty - qty);
-        item.setStockValue(currentValue - costToRemove);
     }
 
 }

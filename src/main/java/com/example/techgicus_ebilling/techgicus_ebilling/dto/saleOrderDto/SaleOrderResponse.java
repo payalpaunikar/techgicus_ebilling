@@ -4,6 +4,7 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.O
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.PaymentType;
 import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.State;
 import com.example.techgicus_ebilling.techgicus_ebilling.dto.partyDto.PartyResponseDto;
+import com.example.techgicus_ebilling.techgicus_ebilling.dto.taxDto.ItemTaxSummaryResponse;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -44,6 +45,9 @@ public class SaleOrderResponse {
     private OrderType orderType;
 
     private List<SaleOrderItemResponse> saleOrderItemResponses = new ArrayList<>();
+
+    private List<ItemTaxSummaryResponse> taxSummary;
+
 
     public String getOrderNo() {
         return orderNo;
@@ -179,5 +183,13 @@ public class SaleOrderResponse {
 
     public void setSaleOrderId(Long saleOrderId) {
         this.saleOrderId = saleOrderId;
+    }
+
+    public List<ItemTaxSummaryResponse> getTaxSummary() {
+        return taxSummary;
+    }
+
+    public void setTaxSummary(List<ItemTaxSummaryResponse> taxSummary) {
+        this.taxSummary = taxSummary;
     }
 }

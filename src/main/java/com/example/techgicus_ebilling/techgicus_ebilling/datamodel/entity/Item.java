@@ -78,8 +78,8 @@ public class Item {
      private String openingStockLocation;
 
 
-    private Double totalStockIn = 0.0;
-    private Double reservedStock =0.0;  // items allocated but not yet sold (like pending orders)
+  //  private Double totalStockIn = 0.0;
+  //  private Double reservedStock =0.0;  // items allocated but not yet sold (like pending orders)
     private Double availableStock = 0.0;
     private Double stockValue = 0.0;
 
@@ -100,39 +100,6 @@ public class Item {
     private LocalDateTime updatedAt;
 
     public Item() {
-    }
-
-    public Item(Long itemId, String itemName, String itemHsn, String itemCode, String description, ItemType itemType, Unit baseUnit, Unit secondaryUnit, Double baseUnitToSecondaryUnit, Double salePrice, Double saleDiscountPrice, DiscountType saleDiscountType, TaxType saleTaxType, Double purchasePrice, TaxType purchaseTaxType, TaxRate taxRate, Company company, Double stockOpeningQty, Double stockPricePerQty, LocalDate stockOpeningDate, Double minimumStockToMaintain, String openingStockLocation, Double totalStockIn, Double reservedStock, Double availableStock, Double stockValue, Set<Category> categories, List<StockTransaction> stockTransactions, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.itemId = itemId;
-        this.itemName = itemName;
-        this.itemHsn = itemHsn;
-        this.itemCode = itemCode;
-        this.description = description;
-        this.itemType = itemType;
-        this.baseUnit = baseUnit;
-        this.secondaryUnit = secondaryUnit;
-        this.baseUnitToSecondaryUnit = baseUnitToSecondaryUnit;
-        this.salePrice = salePrice;
-        this.saleDiscountPrice = saleDiscountPrice;
-        this.saleDiscountType = saleDiscountType;
-        this.saleTaxType = saleTaxType;
-        this.purchasePrice = purchasePrice;
-        this.purchaseTaxType = purchaseTaxType;
-        this.taxRate = taxRate;
-        this.company = company;
-        this.stockOpeningQty = stockOpeningQty;
-        this.stockPricePerQty = stockPricePerQty;
-        this.stockOpeningDate = stockOpeningDate;
-        this.minimumStockToMaintain = minimumStockToMaintain;
-        this.openingStockLocation = openingStockLocation;
-        this.totalStockIn = totalStockIn;
-        this.reservedStock = reservedStock;
-        this.availableStock = availableStock;
-        this.stockValue = stockValue;
-        this.categories = categories;
-        this.stockTransactions = stockTransactions;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public Long getItemId() {
@@ -335,21 +302,21 @@ public class Item {
         this.categories = categories;
     }
 
-    public Double getTotalStockIn() {
-        return totalStockIn;
-    }
-
-    public void setTotalStockIn(Double totalStockIn) {
-        this.totalStockIn = totalStockIn;
-    }
-
-    public Double getReservedStock() {
-        return reservedStock;
-    }
-
-    public void setReservedStock(Double reservedStock) {
-        this.reservedStock = reservedStock;
-    }
+//    public Double getTotalStockIn() {
+//        return totalStockIn;
+//    }
+//
+//    public void setTotalStockIn(Double totalStockIn) {
+//        this.totalStockIn = totalStockIn;
+//    }
+//
+//    public Double getReservedStock() {
+//        return reservedStock;
+//    }
+//
+//    public void setReservedStock(Double reservedStock) {
+//        this.reservedStock = reservedStock;
+//    }
 
     public Double getAvailableStock() {
         return availableStock;
