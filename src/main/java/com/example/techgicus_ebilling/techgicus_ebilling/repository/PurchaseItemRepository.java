@@ -24,7 +24,8 @@ public interface PurchaseItemRepository extends JpaRepository<PurchaseItem,Long>
     WHERE pi.purchase.purchaseId = :purchaseId
     GROUP BY pi.item.itemId
 """)
-    Map<Long, Double> sumQuantityGroupByItem(@Param("purchaseId") Long purchaseId);
+    List<Object[]> sumQuantityGroupByItem(@Param("purchaseId") Long purchaseId);
+
 
 
 }

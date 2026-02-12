@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PurchaseItemTransactionProcessor implements TransactionProcessor{
@@ -83,9 +84,14 @@ public class PurchaseItemTransactionProcessor implements TransactionProcessor{
             /*
              * 1️⃣ Capture OLD Quantities (CRITICAL)
              */
-            Map<Long, Double> oldQtyMap =
-                    purchaseItemRepository.sumQuantityGroupByItem(
-                            purchase.get().getPurchaseId());
+            Map<Long, Double> oldQtyMap = purchaseItemRepository
+                    .sumQuantityGroupByItem(purchase.get().getPurchaseId())
+                    .stream()
+                    .collect(Collectors.toMap(
+                            r -> (Long) r[0],
+                            r -> (Double) r[1]
+                    ));
+
 
             context.storePurchaseOldQty(purchase.get().getPurchaseId(), oldQtyMap);
 
