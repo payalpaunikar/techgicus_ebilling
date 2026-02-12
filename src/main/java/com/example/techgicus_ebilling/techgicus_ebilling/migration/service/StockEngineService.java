@@ -7,6 +7,8 @@ import com.example.techgicus_ebilling.techgicus_ebilling.datamodel.enumeration.S
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.ItemRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.PurchaseBatchRepository;
 import com.example.techgicus_ebilling.techgicus_ebilling.repository.StockTransactionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,8 @@ public class StockEngineService {
         this.stockTransactionRepository = stockTransactionRepository;
         this.itemRepository = itemRepository;
     }
+
+    private final static Logger log = LoggerFactory.getLogger(StockMigrationService.class);
 
     /*
      * ============================================================
@@ -146,9 +150,21 @@ public class StockEngineService {
         }
 
         if (remaining > 0) {
-            throw new RuntimeException("Stock not available for item "
-                    + item.getItemName());
+
+            log.warn("⚠ Negative stock → {}", item.getItemName());
+
+            StockTransaction negativeTx = new StockTransaction();
+            negativeTx.setItem(item);
+            negativeTx.setType(StockTransactionType.SALE);
+            negativeTx.setQuantity(-remaining);
+            negativeTx.setRate(BigDecimal.ZERO);
+            negativeTx.setAmount(BigDecimal.ZERO);
+            negativeTx.setTransactionDate(date);
+            negativeTx.setReference("SALE-" + saleId + "-NEGATIVE");
+
+            stockTransactionRepository.save(negativeTx);
         }
+
 
         StockTransaction tx = new StockTransaction();
         tx.setItem(item);
