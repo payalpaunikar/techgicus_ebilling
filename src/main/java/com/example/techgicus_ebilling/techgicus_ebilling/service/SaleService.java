@@ -26,10 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -375,8 +372,10 @@ public class SaleService {
             Item item = tx.getItem();
             double qtyToRestore = -tx.getQuantity();
 
+            BigDecimal rate = Optional.ofNullable(tx.getRate()).orElse(BigDecimal.ZERO);
+
             // ❌ negative stock tx → no batch restore
-            if (tx.getRate().compareTo(BigDecimal.ZERO) == 0) {
+            if (rate.compareTo(BigDecimal.ZERO) == 0) {
                 continue;
             }
 
@@ -607,7 +606,7 @@ public class SaleService {
                 if (qtyToRestore <= 0) break;
 
                 // NEGATIVE SALE → just delete
-                if (tx.getRate().compareTo(BigDecimal.ZERO) == 0) {
+                if (tx.getRate() !=null && tx.getRate().compareTo(BigDecimal.ZERO) == 0) {
                     stockTransactionRepository.delete(tx);
                     continue;
                 }
